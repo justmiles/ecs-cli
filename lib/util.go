@@ -71,7 +71,7 @@ func buildPortMapping(publish []string) (k []*ecs.PortMapping) {
 // Log types
 func logCloudWatchEvent(log *cloudwatchlogs.OutputLogEvent) {
 	yellow := color.New(color.FgYellow).SprintFunc()
-	fmt.Printf("[%v]\t%v\n", yellow(time.Unix(*log.Timestamp/1000, 0)), *log.Message)
+	fmt.Printf("%v\t%v\n", yellow(time.Unix(*log.Timestamp/1000, 0)), *log.Message)
 }
 
 func logInfo(s string) {

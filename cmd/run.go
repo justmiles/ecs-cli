@@ -31,6 +31,7 @@ func init() {
 	runCmd.PersistentFlags().StringArrayVarP(&task.Volumes, "volume", "v", nil, "[TODO] Map volume to ECS Container Instance")
 	runCmd.PersistentFlags().BoolVar(&task.Public, "public", false, "[TODO] Assign public IP")
 	runCmd.PersistentFlags().BoolVar(&task.Fargate, "fargate", false, "[TODO] Launch in Fargate")
+	runCmd.Flags().SetInterspersed(false)
 }
 
 // process the list command
