@@ -27,7 +27,7 @@ func init() {
 	runCmd.PersistentFlags().StringArrayVarP(&task.Publish, "publish", "p", nil, "Publish a container's port(s) to the host")
 	runCmd.PersistentFlags().StringArrayVar(&task.SecurityGroups, "security-groups", nil, "[TODO] Attach security groups to task")
 	runCmd.PersistentFlags().StringArrayVar(&task.Subnets, "subnet", nil, "[TODO] Subnet(s) where task should run")
-	// mark subnets required if using fargate
+	// TODO mark required flags if using fargate (subnets)
 	runCmd.PersistentFlags().StringArrayVarP(&task.Volumes, "volume", "v", nil, "[TODO] Map volume to ECS Container Instance")
 	runCmd.PersistentFlags().BoolVar(&task.Public, "public", false, "[TODO] Assign public IP")
 	runCmd.PersistentFlags().BoolVar(&task.Fargate, "fargate", false, "[TODO] Launch in Fargate")
