@@ -8,35 +8,25 @@ import (
 )
 
 var (
-	name              string
-	detach            bool
-	public            bool
-	fargate           bool
-	count             int64
-	memory            int64
-	memoryReservation int64
-	publish           []string
-	environment       []string
-	securityGroups    []string
-	subnets           []string
-	volume            []string
+	task ecs.Task
 )
 
 func init() {
 	rootCmd.AddCommand(runCmd)
-	runCmd.PersistentFlags().StringVarP(&name, "name", "n", "ecs-cli-app", "Assign a name to the task")
-	runCmd.PersistentFlags().BoolVarP(&detach, "detach", "d", false, "[TODO] Run the task in the background")
-	runCmd.PersistentFlags().Int64VarP(&count, "count", "c", 1, "Spawn n tasks")
-	runCmd.PersistentFlags().Int64VarP(&memory, "memory", "m", 0, "Memory limit")
-	runCmd.PersistentFlags().Int64Var(&memoryReservation, "memory-reservation", 1024, "Memory reservation")
-	runCmd.PersistentFlags().StringArrayVarP(&environment, "environment", "e", nil, "Set environment variables")
-	runCmd.PersistentFlags().StringArrayVarP(&publish, "publish", "p", nil, "Publish a container's port(s) to the host")
-	runCmd.PersistentFlags().StringArrayVar(&securityGroups, "security-groups", nil, "[TODO] Attach security groups to task")
-	runCmd.PersistentFlags().StringArrayVar(&subnets, "subnets", nil, "[TODO] Subnet(s) where task should run")
+	runCmd.PersistentFlags().StringVarP(&task.Cluster, "cluster", "", "", "ECS cluster")
+	runCmd.PersistentFlags().StringVarP(&task.Name, "name", "n", "ecs-cli-app", "Assign a name to the task")
+	runCmd.PersistentFlags().BoolVarP(&task.Detach, "detach", "d", false, "[TODO] Run the task in the background")
+	runCmd.PersistentFlags().Int64VarP(&task.Count, "count", "c", 1, "Spawn n tasks")
+	runCmd.PersistentFlags().Int64VarP(&task.Memory, "memory", "m", 0, "Memory limit")
+	runCmd.PersistentFlags().Int64Var(&task.MemoryReservation, "memory-reservation", 1024, "Memory reservation")
+	runCmd.PersistentFlags().StringArrayVarP(&task.Environment, "env", "e", nil, "Set environment variables")
+	runCmd.PersistentFlags().StringArrayVarP(&task.Publish, "publish", "p", nil, "Publish a container's port(s) to the host")
+	runCmd.PersistentFlags().StringArrayVar(&task.SecurityGroups, "security-groups", nil, "[TODO] Attach security groups to task")
+	runCmd.PersistentFlags().StringArrayVar(&task.Subnets, "subnet", nil, "[TODO] Subnet(s) where task should run")
 	// mark subnets required if using fargate
-	runCmd.PersistentFlags().StringArrayVarP(&volume, "volume", "v", nil, "[TODO] Map volume to ECS Container Instance")
-	runCmd.PersistentFlags().BoolVar(&public, "public", false, "[TODO] Assign public IP")
-	runCmd.PersistentFlags().BoolVar(&fargate, "fargate", false, "[TODO] Launch in Fargate")
+	runCmd.PersistentFlags().StringArrayVarP(&task.Volumes, "volume", "v", nil, "[TODO] Map volume to ECS Container Instance")
+	runCmd.PersistentFlags().BoolVar(&task.Public, "public", false, "[TODO] Assign public IP")
+	runCmd.PersistentFlags().BoolVar(&task.Fargate, "fargate", false, "[TODO] Launch in Fargate")
 }
 
 // process the list command
@@ -48,11 +38,14 @@ var runCmd = &cobra.Command{
 			fmt.Println("Please pass an image to run")
 			return
 		}
-		var command []string
+
+		task.Image = args[0]
+
 		if len(args) > 1 {
-			command = args[1:len(args)]
+			task.Command = args[1:len(args)]
 		}
-		err := ecs.Run(cluster, name, args[0], detach, public, fargate, count, memory, memoryReservation, publish, environment, securityGroups, subnets, volume, command)
+		// Run the task
+		err := task.Run()
 		if err != nil {
 			fmt.Println(err.Error())
 		}

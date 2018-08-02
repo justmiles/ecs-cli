@@ -14,8 +14,8 @@ var (
 	}))
 )
 
-// Run a container
-func Run(cluster, name, image string, detach, public, fargate bool, count, memory, memoryReservation int64, publish, environment, securityGroups, subnets, volume, command []string) error {
+// Run a task
+func (t *Task) Run() error {
 	var launchType string
 	var publicIP string
 	var svc = ecs.New(sess)
@@ -23,30 +23,30 @@ func Run(cluster, name, image string, detach, public, fargate bool, count, memor
 	taskDefInput := ecs.RegisterTaskDefinitionInput{
 		ContainerDefinitions: []*ecs.ContainerDefinition{
 			&ecs.ContainerDefinition{
-				Name:    aws.String(name),
-				Image:   aws.String(image),
-				Command: aws.StringSlice(command),
+				Name:    aws.String(t.Name),
+				Image:   aws.String(t.Image),
+				Command: aws.StringSlice(t.Command),
 				LogConfiguration: &ecs.LogConfiguration{
 					LogDriver: aws.String("awslogs"),
 					Options: aws.StringMap(map[string]string{
-						"awslogs-group":         "/" + cluster + "/ecs/epemeral-task-from-ecs-cli",
+						"awslogs-group":         "/" + t.Cluster + "/ecs/epemeral-task-from-ecs-cli",
 						"awslogs-region":        "us-east-1",
-						"awslogs-stream-prefix": name,
+						"awslogs-stream-prefix": t.Name,
 					}),
 				},
-				Environment:  buildEnvironmentKeyValuePair(environment),
-				PortMappings: buildPortMapping(publish),
+				Environment:  buildEnvironmentKeyValuePair(t.Environment),
+				PortMappings: buildPortMapping(t.Publish),
 			},
 		},
 		Family: aws.String("epemeral-task-from-ecs-cli"),
 	}
 
-	if memory > 0 {
-		taskDefInput.ContainerDefinitions[0].Memory = aws.Int64(memory)
+	if t.Memory > 0 {
+		taskDefInput.ContainerDefinitions[0].Memory = aws.Int64(t.Memory)
 	}
 
-	if memoryReservation > 0 {
-		taskDefInput.ContainerDefinitions[0].MemoryReservation = aws.Int64(memoryReservation)
+	if t.MemoryReservation > 0 {
+		taskDefInput.ContainerDefinitions[0].MemoryReservation = aws.Int64(t.MemoryReservation)
 	}
 
 	// Register a new task definition
@@ -56,20 +56,20 @@ func Run(cluster, name, image string, detach, public, fargate bool, count, memor
 		return err
 	}
 
-	fmt.Println(taskDef)
+	fmt.Println(taskDef) //debug
 
 	// Build the task parametes
 	runTaskInput := &ecs.RunTaskInput{
-		Cluster:        aws.String(cluster),
-		Count:          aws.Int64(count),
+		Cluster:        aws.String(t.Cluster),
+		Count:          aws.Int64(t.Count),
 		StartedBy:      aws.String("ecs cli"),
 		TaskDefinition: taskDef.TaskDefinition.Family,
 	}
 
 	// Configure for Fargate
-	if fargate {
+	if t.Fargate {
 
-		if public {
+		if t.Public {
 			publicIP = "ENABLED"
 		} else {
 			publicIP = "DISABLED"
@@ -78,8 +78,8 @@ func Run(cluster, name, image string, detach, public, fargate bool, count, memor
 		runTaskInput.NetworkConfiguration = &ecs.NetworkConfiguration{
 			AwsvpcConfiguration: &ecs.AwsVpcConfiguration{
 				AssignPublicIp: aws.String(publicIP),
-				SecurityGroups: aws.StringSlice(securityGroups),
-				Subnets:        aws.StringSlice(subnets),
+				SecurityGroups: aws.StringSlice(t.SecurityGroups),
+				Subnets:        aws.StringSlice(t.Subnets),
 			},
 		}
 
@@ -90,6 +90,7 @@ func Run(cluster, name, image string, detach, public, fargate bool, count, memor
 
 	runTaskInput.LaunchType = aws.String(launchType)
 
+	fmt.Println(runTaskInput)
 	// Run the task
 	runTaskResponse, err := svc.RunTask(runTaskInput)
 	if err != nil {

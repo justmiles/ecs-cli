@@ -32,7 +32,6 @@ func Execute() {
 
 // Init the root command
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&cluster, "cluster", "", "", "ECS cluster")
 }
 
 // Log errors if exist and exit
