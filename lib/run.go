@@ -20,27 +20,37 @@ func Run(cluster, name, image string, detach, public, fargate bool, count, memor
 	var publicIP string
 	var svc = ecs.New(sess)
 
-	// Register a new task definition
-	taskDef, err := svc.RegisterTaskDefinition(&ecs.RegisterTaskDefinitionInput{
+	taskDefInput := ecs.RegisterTaskDefinitionInput{
 		ContainerDefinitions: []*ecs.ContainerDefinition{
 			&ecs.ContainerDefinition{
-				Name:              aws.String(name),
-				Image:             aws.String("hello-world"),
-				Command:           aws.StringSlice(command),
-				Memory:            aws.Int64(memory),
-				MemoryReservation: aws.Int64(memoryReservation),
+				Name:    aws.String(name),
+				Image:   aws.String(image),
+				Command: aws.StringSlice(command),
 				LogConfiguration: &ecs.LogConfiguration{
 					LogDriver: aws.String("awslogs"),
 					Options: aws.StringMap(map[string]string{
-						"awslogs-group":         "/ecs/" + cluster + "/epemeral-task-from-ecs-cli",
+						"awslogs-group":         "/" + cluster + "/ecs/epemeral-task-from-ecs-cli",
 						"awslogs-region":        "us-east-1",
 						"awslogs-stream-prefix": name,
 					}),
 				},
+				Environment:  buildEnvironmentKeyValuePair(environment),
+				PortMappings: buildPortMapping(publish),
 			},
 		},
 		Family: aws.String("epemeral-task-from-ecs-cli"),
-	})
+	}
+
+	if memory > 0 {
+		taskDefInput.ContainerDefinitions[0].Memory = aws.Int64(memory)
+	}
+
+	if memoryReservation > 0 {
+		taskDefInput.ContainerDefinitions[0].MemoryReservation = aws.Int64(memoryReservation)
+	}
+
+	// Register a new task definition
+	taskDef, err := svc.RegisterTaskDefinition(&taskDefInput)
 
 	if err != nil {
 		return err
