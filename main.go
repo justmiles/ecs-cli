@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/justmiles/ecs-task-runner/cmd"
+	"gitlab.com/justmiles/ecs-cli/cmd"
 )
 
 func main() {
