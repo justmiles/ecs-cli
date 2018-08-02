@@ -4,9 +4,11 @@ import "github.com/aws/aws-sdk-go/service/ecs"
 import "github.com/aws/aws-sdk-go/aws"
 import "fmt"
 import "os"
-import "log"
 import "strings"
 import "strconv"
+import "time"
+import "github.com/fatih/color"
+import "github.com/aws/aws-sdk-go/service/cloudwatchlogs"
 
 func buildEnvironmentKeyValuePair(environment []string) (k []*ecs.KeyValuePair) {
 
@@ -59,7 +61,6 @@ func buildPortMapping(publish []string) (k []*ecs.PortMapping) {
 			portMap.Protocol = aws.String(envArr[3])
 		}
 
-		fmt.Println(portMap)
 		// Append to the slice
 		k = append(k, &portMap)
 	}
@@ -67,8 +68,34 @@ func buildPortMapping(publish []string) (k []*ecs.PortMapping) {
 	return
 }
 
-func check(e error) {
+// Log types
+func logCloudWatchEvent(log *cloudwatchlogs.OutputLogEvent) {
+	yellow := color.New(color.FgYellow).SprintFunc()
+	fmt.Printf("[%v]\t%v\n", yellow(time.Unix(*log.Timestamp/1000, 0)), *log.Message)
+}
+
+func logInfo(s string) {
+	color.Green(s)
+}
+
+func logFatal(s string) {
+	color.Red(s)
+	os.Exit(1)
+}
+
+func logFatalError(e error) {
 	if e != nil {
-		log.Fatal(e)
+		color.Red(e.Error())
+		os.Exit(1)
 	}
+}
+
+func logError(e error) {
+	if e != nil {
+		color.Red(e.Error())
+	}
+}
+
+func logWarning(s string) {
+	color.Yellow(s)
 }

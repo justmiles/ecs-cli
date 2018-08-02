@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"sync"
 
 	"github.com/spf13/cobra"
 	"gitlab.com/justmiles/ecs-cli/lib"
@@ -9,6 +12,7 @@ import (
 
 var (
 	task ecs.Task
+	wg   sync.WaitGroup
 )
 
 func init() {
@@ -46,8 +50,26 @@ var runCmd = &cobra.Command{
 		}
 		// Run the task
 		err := task.Run()
+		defer task.Stop()
+		check(err)
+
+		wg.Add(2)
+		go task.Stream()
+		go task.Check()
+
 		if err != nil {
 			fmt.Println(err.Error())
 		}
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt)
+		go func() {
+			for sig := range c {
+				fmt.Printf("I got a %T\n", sig)
+				task.Stop()
+				os.Exit(0)
+			}
+		}()
+
+		wg.Wait()
 	},
 }

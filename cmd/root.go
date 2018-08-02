@@ -30,10 +30,6 @@ func Execute() {
 	}
 }
 
-// Init the root command
-func init() {
-}
-
 // Log errors if exist and exit
 func check(err error) {
 	if err != nil {

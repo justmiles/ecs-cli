@@ -18,6 +18,11 @@ func TestRun(t *testing.T) {
 		"y=thisisthevalueforY",
 		"SOMEENVVAR",
 	}
+
+	// task := Task{
+	// 	Name: "test",
+	// }
+	// task.Stream()
 	buildEnvironmentKeyValuePair(x)
 	return
 }

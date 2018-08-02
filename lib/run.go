@@ -1,8 +1,6 @@
 package ecs
 
 import (
-	"fmt"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecs"
@@ -19,6 +17,8 @@ func (t *Task) Run() error {
 	var launchType string
 	var publicIP string
 	var svc = ecs.New(sess)
+
+	logInfo("Creating task definition")
 
 	taskDefInput := ecs.RegisterTaskDefinitionInput{
 		ContainerDefinitions: []*ecs.ContainerDefinition{
@@ -51,13 +51,14 @@ func (t *Task) Run() error {
 
 	// Register a new task definition
 	taskDef, err := svc.RegisterTaskDefinition(&taskDefInput)
+	t.TaskDefinition = *taskDef.TaskDefinition
 
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(taskDef) //debug
-
+	// fmt.Println(taskDef) //debug
+	logInfo("Running task definition: " + *t.TaskDefinition.TaskDefinitionArn)
 	// Build the task parametes
 	runTaskInput := &ecs.RunTaskInput{
 		Cluster:        aws.String(t.Cluster),
@@ -90,14 +91,12 @@ func (t *Task) Run() error {
 
 	runTaskInput.LaunchType = aws.String(launchType)
 
-	fmt.Println(runTaskInput)
 	// Run the task
 	runTaskResponse, err := svc.RunTask(runTaskInput)
 	if err != nil {
 		return err
 	}
-	fmt.Println(runTaskResponse)
-
+	t.Tasks = runTaskResponse.Tasks
 	return nil
 }
 

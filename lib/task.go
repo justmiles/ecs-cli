@@ -1,5 +1,7 @@
 package ecs
 
+import "github.com/aws/aws-sdk-go/service/ecs"
+
 // Task represents a single, runnable task
 type Task struct {
 	Cluster           string
@@ -17,4 +19,6 @@ type Task struct {
 	Subnets           []string
 	Volumes           []string
 	Command           []string
+	TaskDefinition    ecs.TaskDefinition
+	Tasks             []*ecs.Task
 }
