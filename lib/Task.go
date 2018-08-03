@@ -54,7 +54,7 @@ func (t *Task) Stop() {
 		if err != nil {
 			logError(err)
 		} else {
-			logWarning("Successfully stopped " + *task.TaskArn)
+			logInfo("Successfully stopped " + *task.TaskArn)
 		}
 	}
 }
@@ -67,7 +67,7 @@ func (t *Task) Run() error {
 	var svc = ecs.New(sess)
 
 	logInfo("Creating task definition")
-
+	v, m := buildMountPoint(t.Volumes)
 	taskDefInput := ecs.RegisterTaskDefinitionInput{
 		ContainerDefinitions: []*ecs.ContainerDefinition{
 			&ecs.ContainerDefinition{
@@ -84,9 +84,11 @@ func (t *Task) Run() error {
 				},
 				Environment:  buildEnvironmentKeyValuePair(t.Environment),
 				PortMappings: buildPortMapping(t.Publish),
+				MountPoints:  m,
 			},
 		},
-		Family: aws.String("epemeral-task-from-ecs-cli"),
+		Volumes: v,
+		Family:  aws.String("epemeral-task-from-ecs-cli"),
 	}
 
 	if t.Memory > 0 {
@@ -99,11 +101,10 @@ func (t *Task) Run() error {
 
 	// Register a new task definition
 	taskDef, err := svc.RegisterTaskDefinition(&taskDefInput)
-	t.TaskDefinition = *taskDef.TaskDefinition
-
 	if err != nil {
 		return err
 	}
+	t.TaskDefinition = *taskDef.TaskDefinition
 
 	// fmt.Println(taskDef) //debug
 	logInfo("Running task definition: " + *t.TaskDefinition.TaskDefinitionArn)
@@ -223,7 +224,7 @@ func (t *Task) Check() {
 				logError(err)
 				// getEc2Ip
 				ip = getEc2InstanceIp(*res.ContainerInstances[0].Ec2InstanceId)
-				logInfo(fmt.Sprintf("Container is starting on EC2 instance %v (%v)", *res.ContainerInstances[0].Ec2InstanceId, *ip))
+				logInfo(fmt.Sprintf("Container is starting on EC2 instance %v (%v).", *res.ContainerInstances[0].Ec2InstanceId, *ip))
 			}
 
 			if !reportedPorts {

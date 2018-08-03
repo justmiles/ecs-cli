@@ -69,6 +69,42 @@ func buildPortMapping(publish []string) (k []*ecs.PortMapping) {
 	return
 }
 
+func buildMountPoint(volumes []string) (v []*ecs.Volume, k []*ecs.MountPoint) {
+
+	for i, volume := range volumes {
+		av := strings.Split(volume, ":")
+
+		// If only one port is provided, map it to both container and host
+		// default to TCP map
+		sourcePath := av[0]
+		volumeName := "volume" + strconv.Itoa(i)
+
+		mountPoint := ecs.MountPoint{
+			ContainerPath: &sourcePath,
+			SourceVolume:  aws.String(volumeName),
+			ReadOnly:      aws.Bool(false),
+		}
+
+		volume := ecs.Volume{
+			Name: aws.String(volumeName),
+			Host: &ecs.HostVolumeProperties{
+				SourcePath: aws.String(sourcePath),
+			},
+		}
+
+		// Map container port, if defined
+		if len(av) > 1 {
+			containerPath := av[1]
+			mountPoint.ContainerPath = &containerPath
+		}
+
+		// Append to the slice
+		k = append(k, &mountPoint)
+		v = append(v, &volume)
+	}
+	return
+}
+
 // Log types
 func logCloudWatchEvent(log *cloudwatchlogs.OutputLogEvent) {
 	yellow := color.New(color.FgYellow).SprintFunc()
