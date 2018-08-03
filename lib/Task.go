@@ -198,6 +198,8 @@ func (t *Task) Check() {
 	var cluster *string
 	var stoppedCount int
 	var exitCode int64 = 1
+	var reportedPorts = false
+	var ip *string
 
 	for _, task := range t.Tasks {
 		tasks = append(tasks, *task.TaskArn)
@@ -212,11 +214,37 @@ func (t *Task) Check() {
 
 		for _, ecsTask := range res.Tasks {
 			// fmt.Println(*ecsTask) // debug
+
+			if ip == nil {
+				res, err := svc.DescribeContainerInstances(&ecs.DescribeContainerInstancesInput{
+					Cluster:            &t.Cluster,
+					ContainerInstances: aws.StringSlice([]string{*ecsTask.ContainerInstanceArn}),
+				})
+				logError(err)
+				// getEc2Ip
+				ip = getEc2InstanceIp(*res.ContainerInstances[0].Ec2InstanceId)
+				logInfo(fmt.Sprintf("Container is starting on EC2 instance %v (%v)", *res.ContainerInstances[0].Ec2InstanceId, *ip))
+			}
+
+			if !reportedPorts {
+				for _, container := range ecsTask.Containers {
+
+					if container.NetworkBindings != nil {
+						for _, networkBind := range container.NetworkBindings {
+							//  get container instance ip from container.ContainerInstanceArn
+							logInfo(fmt.Sprintf("Container is available here\n\thttp://%v:%v\n\tTCP %v %v", *ip, *networkBind.HostPort, *ip, *networkBind.HostPort))
+							reportedPorts = true
+						}
+					}
+				}
+			}
+
 			if *ecsTask.LastStatus == "STOPPED" {
 				for _, container := range ecsTask.Containers {
 					if container.ExitCode != nil {
 						exitCode = *container.ExitCode
 					}
+
 					logInfo(fmt.Sprintf("Task %v has stopped (exit code %v):\n\t%v", *ecsTask.TaskArn, exitCode, *ecsTask.StoppedReason))
 					if container.Reason != nil {
 						logInfo(fmt.Sprintf("\t%v", *container.Reason))

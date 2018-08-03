@@ -1,5 +1,6 @@
 package ecs
 
+import "github.com/aws/aws-sdk-go/service/ec2"
 import "github.com/aws/aws-sdk-go/service/ecs"
 import "github.com/aws/aws-sdk-go/aws"
 import "fmt"
@@ -98,4 +99,16 @@ func logError(e error) {
 
 func logWarning(s string) {
 	color.Yellow(s)
+}
+
+func getEc2InstanceIp(instanceId string) *string {
+	var svc = ec2.New(sess)
+	res, err := svc.DescribeInstances(&ec2.DescribeInstancesInput{
+		InstanceIds: aws.StringSlice([]string{instanceId}),
+	})
+	logError(err)
+	if res.Reservations[0].Instances[0].PublicIpAddress != nil {
+		return res.Reservations[0].Instances[0].PublicIpAddress
+	}
+	return res.Reservations[0].Instances[0].PrivateIpAddress
 }

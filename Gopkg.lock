@@ -26,6 +26,7 @@
     "internal/sdkuri",
     "internal/shareddefaults",
     "private/protocol",
+    "private/protocol/ec2query",
     "private/protocol/json/jsonutil",
     "private/protocol/jsonrpc",
     "private/protocol/query",
@@ -33,6 +34,7 @@
     "private/protocol/rest",
     "private/protocol/xml/xmlutil",
     "service/cloudwatchlogs",
+    "service/ec2",
     "service/ecs",
     "service/ecs/ecsiface",
     "service/sts"
@@ -96,6 +98,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "057fef864c61c4c9697113e9f01d49dfd2f79cd0bd3799af34d0728a8d5d5a7a"
+  inputs-digest = "1f62c1c8ce14b4e4fffd7b897b4bfefc6cb2b340e3a3b1d7cfe70d13385833dd"
   solver-name = "gps-cdcl"
   solver-version = 1
