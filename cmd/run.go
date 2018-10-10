@@ -19,18 +19,19 @@ func init() {
 	rootCmd.AddCommand(runCmd)
 	runCmd.PersistentFlags().StringVarP(&task.Cluster, "cluster", "", "", "ECS cluster")
 	runCmd.PersistentFlags().StringVarP(&task.Name, "name", "n", "ecs-cli-app", "Assign a name to the task")
+	runCmd.PersistentFlags().StringVar(&task.ExecutionRoleArn, "execution-role", "", "Execution role ARN (required for Fargate)")
 	runCmd.PersistentFlags().BoolVarP(&task.Detach, "detach", "d", false, "[TODO] Run the task in the background")
 	runCmd.PersistentFlags().Int64VarP(&task.Count, "count", "c", 1, "Spawn n tasks")
 	runCmd.PersistentFlags().Int64VarP(&task.Memory, "memory", "m", 0, "Memory limit")
-	runCmd.PersistentFlags().Int64Var(&task.MemoryReservation, "memory-reservation", 1024, "Memory reservation")
+	runCmd.PersistentFlags().Int64Var(&task.CPUReservation, "cpu-reservation", 1024, "CPU reservation")
+	runCmd.PersistentFlags().Int64Var(&task.MemoryReservation, "memory-reservation", 2048, "Memory reservation")
 	runCmd.PersistentFlags().StringArrayVarP(&task.Environment, "env", "e", nil, "Set environment variables")
 	runCmd.PersistentFlags().StringArrayVarP(&task.Publish, "publish", "p", nil, "Publish a container's port(s) to the host")
 	runCmd.PersistentFlags().StringArrayVar(&task.SecurityGroups, "security-groups", nil, "[TODO] Attach security groups to task")
-	runCmd.PersistentFlags().StringArrayVar(&task.Subnets, "subnet", nil, "[TODO] Subnet(s) where task should run")
-	// TODO mark required flags if using fargate (subnets)
+	runCmd.PersistentFlags().StringArrayVar(&task.Subnets, "subnet", nil, "Subnet(s) where task should run")
 	runCmd.PersistentFlags().StringArrayVarP(&task.Volumes, "volume", "v", nil, "Map volume to ECS Container Instance")
 	runCmd.PersistentFlags().BoolVar(&task.Public, "public", false, "[TODO] Assign public IP")
-	runCmd.PersistentFlags().BoolVar(&task.Fargate, "fargate", false, "[TODO] Launch in Fargate")
+	runCmd.PersistentFlags().BoolVar(&task.Fargate, "fargate", false, "Launch in Fargate")
 	runCmd.Flags().SetInterspersed(false)
 }
 
@@ -48,6 +49,18 @@ var runCmd = &cobra.Command{
 
 		if len(args) > 1 {
 			task.Command = args[1:len(args)]
+		}
+
+		// fargate validation
+		if task.Fargate {
+			if len(task.Subnets) == 0 {
+				fmt.Println("Fargate requires at least one subnet (--subnet)")
+				os.Exit(1)
+			}
+			if task.ExecutionRoleArn == "" {
+				fmt.Println("Fargate requires an executino role (--execution-role)")
+				os.Exit(1)
+			}
 		}
 		// Run the task
 		err := task.Run()

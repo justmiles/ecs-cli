@@ -18,12 +18,14 @@ type Task struct {
 	Cluster           string
 	Name              string
 	Image             string
+	ExecutionRoleArn  string
 	Detach            bool
 	Public            bool
 	Fargate           bool
 	Count             int64
 	Memory            int64
 	MemoryReservation int64
+	CPUReservation    int64
 	Publish           []string
 	Environment       []string
 	SecurityGroups    []string
@@ -97,6 +99,14 @@ func (t *Task) Run() error {
 
 	if t.MemoryReservation > 0 {
 		taskDefInput.ContainerDefinitions[0].MemoryReservation = aws.Int64(t.MemoryReservation)
+	}
+
+	if t.Fargate {
+		taskDefInput.RequiresCompatibilities = aws.StringSlice([]string{"FARGATE"})
+		taskDefInput.NetworkMode = aws.String("awsvpc")
+		taskDefInput.ExecutionRoleArn = aws.String(t.ExecutionRoleArn)
+		taskDefInput.Cpu = aws.String(fmt.Sprintf("%d", t.CPUReservation))
+		taskDefInput.Memory = aws.String(fmt.Sprintf("%d", t.MemoryReservation))
 	}
 
 	// Register a new task definition
@@ -214,9 +224,8 @@ func (t *Task) Check() {
 		logError(err)
 
 		for _, ecsTask := range res.Tasks {
-			// fmt.Println(*ecsTask) // debug
 
-			if ip == nil {
+			if ip == nil && ecsTask.ContainerInstanceArn != nil {
 				res, err := svc.DescribeContainerInstances(&ecs.DescribeContainerInstancesInput{
 					Cluster:            &t.Cluster,
 					ContainerInstances: aws.StringSlice([]string{*ecsTask.ContainerInstanceArn}),
