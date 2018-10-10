@@ -20,7 +20,7 @@ func init() {
 	runCmd.PersistentFlags().StringVarP(&task.Cluster, "cluster", "", "", "ECS cluster")
 	runCmd.PersistentFlags().StringVarP(&task.Name, "name", "n", "ecs-cli-app", "Assign a name to the task")
 	runCmd.PersistentFlags().StringVar(&task.ExecutionRoleArn, "execution-role", "", "Execution role ARN (required for Fargate)")
-	runCmd.PersistentFlags().BoolVarP(&task.Detach, "detach", "d", false, "[TODO] Run the task in the background")
+	runCmd.PersistentFlags().BoolVarP(&task.Detach, "detach", "d", false, "Run the task in the background")
 	runCmd.PersistentFlags().Int64VarP(&task.Count, "count", "c", 1, "Spawn n tasks")
 	runCmd.PersistentFlags().Int64VarP(&task.Memory, "memory", "m", 0, "Memory limit")
 	runCmd.PersistentFlags().Int64Var(&task.CPUReservation, "cpu-reservation", 1024, "CPU reservation")
@@ -64,26 +64,31 @@ var runCmd = &cobra.Command{
 		}
 		// Run the task
 		err := task.Run()
-		defer task.Stop()
 		check(err)
 
-		wg.Add(2)
-		go task.Stream()
-		go task.Check()
+		if task.Detach {
+			task.Check()
+		} else {
+			defer task.Stop()
+			wg.Add(2)
+			go task.Stream()
+			go task.Check()
 
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt)
-		go func() {
-			for sig := range c {
-				fmt.Printf("I got a %T\n", sig)
-				task.Stop()
-				os.Exit(0)
+			if err != nil {
+				fmt.Println(err.Error())
 			}
-		}()
+			c := make(chan os.Signal, 1)
+			signal.Notify(c, os.Interrupt)
+			go func() {
+				for sig := range c {
+					fmt.Printf("I got a %T\n", sig)
+					task.Stop()
+					os.Exit(0)
+				}
+			}()
 
-		wg.Wait()
+			wg.Wait()
+		}
+
 	},
 }
