@@ -62,12 +62,11 @@ func (t *Task) Stop() {
 }
 
 // Run a task
-// TODO: create log group 	/ecs/qa/ephemeral-task-from-ecs-cli
 func (t *Task) Run() error {
 	var launchType string
 	var publicIP string
 	var svc = ecs.New(sess)
-
+	t.createLogGroup()
 	logInfo("Creating task definition")
 	v, m := buildMountPoint(t.Volumes)
 	taskDefInput := ecs.RegisterTaskDefinitionInput{
@@ -216,6 +215,7 @@ func (t *Task) Check() {
 		tasks = append(tasks, *task.TaskArn)
 		cluster = task.ClusterArn
 	}
+
 	for {
 		res, err := svc.DescribeTasks(&ecs.DescribeTasksInput{
 			Cluster: cluster,
@@ -268,9 +268,30 @@ func (t *Task) Check() {
 			time.Sleep(time.Second * 5) // give the logs another chance to come in
 			os.Exit(int(exitCode))
 		}
-
+		if t.Detach {
+			return
+		}
 		time.Sleep(time.Second * 5)
 
 	}
 
+}
+
+func (t *Task) createLogGroup() {
+	var svc = cloudwatchlogs.New(sess)
+	var logGroupName = aws.String("/" + t.Cluster + "/ecs/ephemeral-task-from-ecs-cli")
+
+	output, err := svc.DescribeLogGroups(&cloudwatchlogs.DescribeLogGroupsInput{
+		LogGroupNamePrefix: logGroupName,
+	})
+	if err != nil {
+		logError(err)
+		return
+	}
+	if len(output.LogGroups) == 0 {
+		logInfo(fmt.Sprintf("Creating Log Group %s\n", *logGroupName))
+		svc.CreateLogGroup(&cloudwatchlogs.CreateLogGroupInput{
+			LogGroupName: logGroupName,
+		})
+	}
 }
