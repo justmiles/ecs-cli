@@ -62,7 +62,7 @@ func (t *Task) Stop() {
 }
 
 // Run a task
-// TODO: create log group 	/ecs/qa/epemeral-task-from-ecs-cli
+// TODO: create log group 	/ecs/qa/ephemeral-task-from-ecs-cli
 func (t *Task) Run() error {
 	var launchType string
 	var publicIP string
@@ -79,7 +79,7 @@ func (t *Task) Run() error {
 				LogConfiguration: &ecs.LogConfiguration{
 					LogDriver: aws.String("awslogs"),
 					Options: aws.StringMap(map[string]string{
-						"awslogs-group":         "/" + t.Cluster + "/ecs/epemeral-task-from-ecs-cli",
+						"awslogs-group":         "/" + t.Cluster + "/ecs/ephemeral-task-from-ecs-cli",
 						"awslogs-region":        "us-east-1",
 						"awslogs-stream-prefix": t.Name,
 					}),
@@ -90,7 +90,7 @@ func (t *Task) Run() error {
 			},
 		},
 		Volumes: v,
-		Family:  aws.String("epemeral-task-from-ecs-cli"),
+		Family:  aws.String("ephemeral-task-from-ecs-cli"),
 	}
 
 	if t.Memory > 0 {

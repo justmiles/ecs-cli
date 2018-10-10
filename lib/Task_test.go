@@ -50,7 +50,7 @@ func (m mockedReceiveMsgs) ReceiveMessage(in *ecs.RunTaskInput) (*ecs.RunTaskOut
         Cpu: "0",
         CreatedAt: 2018-08-02 14:39:10 +0000 UTC,
         DesiredStatus: "RUNNING",
-        Group: "family:epemeral-task-from-ecs-cli",
+        Group: "family:ephemeral-task-from-ecs-cli",
         LastStatus: "PENDING",
         LaunchType: "EC2",
         Memory: "100",
@@ -61,7 +61,7 @@ func (m mockedReceiveMsgs) ReceiveMessage(in *ecs.RunTaskInput) (*ecs.RunTaskOut
         },
         StartedBy: "ecs cli",
         TaskArn: "arn:aws:ecs:us-east-1:965579072529:task/8ce3fc54-1630-4703-9bfd-3b4d55dc6219",
-        TaskDefinitionArn: "arn:aws:ecs:us-east-1:965579072529:task-definition/epemeral-task-from-ecs-cli:22",
+        TaskDefinitionArn: "arn:aws:ecs:us-east-1:965579072529:task-definition/ephemeral-task-from-ecs-cli:22",
         Version: 1
       }]
   }`
