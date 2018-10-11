@@ -214,6 +214,7 @@ func (t *Task) Check() {
 	for _, task := range t.Tasks {
 		tasks = append(tasks, *task.TaskArn)
 		cluster = task.ClusterArn
+		logInfo(fmt.Sprintf("https://console.aws.amazon.com/ecs/home?#/clusters/%s/tasks/%s/details", t.Cluster, strings.Split(*task.TaskArn, "/")[1]))
 	}
 
 	for {
@@ -224,7 +225,6 @@ func (t *Task) Check() {
 		logError(err)
 
 		for _, ecsTask := range res.Tasks {
-			logInfo(fmt.Sprintf("https://console.aws.amazon.com/ecs/home?#/clusters/%s/tasks/%s/details", t.Cluster, strings.Split(*ecsTask.TaskArn, "/")[1]))
 
 			if ip == nil && ecsTask.ContainerInstanceArn != nil {
 				res, err := svc.DescribeContainerInstances(&ecs.DescribeContainerInstancesInput{
