@@ -192,7 +192,7 @@ func (t *Task) Stream() {
 				logCloudWatchEvent(log)
 			}
 
-			if *logEvents.NextForwardToken != "" {
+			if logEvents.NextForwardToken != nil {
 				nextToken = *logEvents.NextForwardToken
 			}
 
@@ -224,6 +224,7 @@ func (t *Task) Check() {
 		logError(err)
 
 		for _, ecsTask := range res.Tasks {
+			logInfo(fmt.Sprintf("https://console.aws.amazon.com/ecs/home?#/clusters/%s/tasks/%s/details", t.Cluster, strings.Split(*ecsTask.TaskArn, "/")[1]))
 
 			if ip == nil && ecsTask.ContainerInstanceArn != nil {
 				res, err := svc.DescribeContainerInstances(&ecs.DescribeContainerInstancesInput{
@@ -234,7 +235,6 @@ func (t *Task) Check() {
 				// getEc2Ip
 				ip = getEc2InstanceIp(*res.ContainerInstances[0].Ec2InstanceId)
 				logInfo(fmt.Sprintf("Container is starting on EC2 instance %v (%v).", *res.ContainerInstances[0].Ec2InstanceId, *ip))
-				logInfo(fmt.Sprintf("https://console.aws.amazon.com/ecs/home?#/clusters/%s/tasks/%s/details", t.Cluster, strings.Split(*ecsTask.TaskArn, "/")[1]))
 			}
 
 			if !reportedPorts {
