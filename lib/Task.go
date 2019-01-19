@@ -168,7 +168,7 @@ func (t *Task) Stream() {
 			logEventsInput := cloudwatchlogs.GetLogEventsInput{
 				StartFromHead: aws.Bool(true),
 				LogGroupName:  aws.String(*t.TaskDefinition.ContainerDefinitions[0].LogConfiguration.Options["awslogs-group"]),
-				LogStreamName: aws.String(t.Name + "/" + t.Name + "/" + strings.Split(*task.TaskArn, "/")[1]),
+				LogStreamName: aws.String(t.Name + "/" + t.Name + "/" + strings.Split(*task.TaskArn, "/")[2]),
 			}
 
 			if nextToken != "" {
@@ -180,7 +180,7 @@ func (t *Task) Stream() {
 				if awsErr, ok := err.(awserr.Error); ok {
 					// Get error details
 					if awsErr.Code() == "ResourceNotFoundException" {
-						time.Sleep(time.Second / 5)
+						time.Sleep(time.Second * 5)
 						continue
 					}
 				} else {
@@ -196,7 +196,7 @@ func (t *Task) Stream() {
 				nextToken = *logEvents.NextForwardToken
 			}
 
-			time.Sleep(time.Second / 5)
+			time.Sleep(time.Second * 5)
 		}
 	}
 }
@@ -214,7 +214,7 @@ func (t *Task) Check() {
 	for _, task := range t.Tasks {
 		tasks = append(tasks, *task.TaskArn)
 		cluster = task.ClusterArn
-		logInfo(fmt.Sprintf("https://console.aws.amazon.com/ecs/home?#/clusters/%s/tasks/%s/details", t.Cluster, strings.Split(*task.TaskArn, "/")[1]))
+		logInfo(fmt.Sprintf("https://console.aws.amazon.com/ecs/home?#/clusters/%s/tasks/%s/details", t.Cluster, strings.Split(*task.TaskArn, "/")[2]))
 	}
 
 	for {
