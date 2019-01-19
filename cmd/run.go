@@ -1,13 +1,13 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"sync"
 
+	"github.com/justmiles/ecs-cli/lib"
 	"github.com/spf13/cobra"
-	"gitlab.com/justmiles/ecs-cli/lib"
 )
 
 var (
@@ -16,6 +16,8 @@ var (
 )
 
 func init() {
+	log.SetFlags(0)
+
 	rootCmd.AddCommand(runCmd)
 	runCmd.PersistentFlags().StringVarP(&task.Cluster, "cluster", "", "", "ECS cluster")
 	runCmd.PersistentFlags().StringVarP(&task.Name, "name", "n", "ecs-cli-app", "Assign a name to the task")
@@ -43,8 +45,7 @@ var runCmd = &cobra.Command{
 	Short: "Run a command in a new task",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
-			fmt.Println("Please pass an image to run")
-			return
+			log.Fatal("Please pass an image to run")
 		}
 
 		task.Image = args[0]
@@ -56,12 +57,10 @@ var runCmd = &cobra.Command{
 		// fargate validation
 		if task.Fargate {
 			if len(task.Subnets) == 0 {
-				fmt.Println("Fargate requires at least one subnet (--subnet)")
-				os.Exit(1)
+				log.Fatal("Fargate requires at least one subnet (--subnet)")
 			}
 			if task.ExecutionRoleArn == "" {
-				fmt.Println("Fargate requires an executino role (--execution-role)")
-				os.Exit(1)
+				log.Fatal("Fargate requires an execution role (--execution-role)")
 			}
 		}
 		// Run the task
@@ -77,13 +76,13 @@ var runCmd = &cobra.Command{
 			go task.Check()
 
 			if err != nil {
-				fmt.Println(err.Error())
+				log.Fatal(err.Error())
 			}
 			c := make(chan os.Signal, 1)
 			signal.Notify(c, os.Interrupt)
 			go func() {
 				for sig := range c {
-					fmt.Printf("I got a %T\n", sig)
+					log.Printf("I got a %T\n", sig)
 					task.Stop()
 					os.Exit(0)
 				}

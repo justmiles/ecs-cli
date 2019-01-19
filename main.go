@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gitlab.com/justmiles/ecs-cli/cmd"
+	"github.com/justmiles/ecs-cli/cmd"
 )
 
 func main() {

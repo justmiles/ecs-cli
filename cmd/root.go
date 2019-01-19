@@ -1,8 +1,7 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
+	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -25,15 +24,13 @@ var rootCmd = &cobra.Command{
 // Execute validates input the Cobra CLI
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
 
 // Log errors if exist and exit
 func check(err error) {
 	if err != nil {
-		fmt.Printf("ERROR\t%s", err.Error())
-		os.Exit(1)
+		log.Fatalf("ERROR\t%s", err.Error())
 	}
 }
