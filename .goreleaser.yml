@@ -33,4 +33,4 @@ changelog:
     - '^test:'
 
 release:
-  disable: true
+  disable: false
