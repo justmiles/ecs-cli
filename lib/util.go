@@ -12,7 +12,9 @@ import "github.com/fatih/color"
 import "github.com/aws/aws-sdk-go/service/cloudwatchlogs"
 
 func buildEnvironmentKeyValuePair(environment []string) (k []*ecs.KeyValuePair) {
-
+	if len(environment) < 1 {
+		return []*ecs.KeyValuePair{}
+	}
 	for _, env := range environment {
 		envArr := strings.Split(env, "=")
 
@@ -38,7 +40,9 @@ func buildEnvironmentKeyValuePair(environment []string) (k []*ecs.KeyValuePair) 
 }
 
 func buildPortMapping(publish []string) (k []*ecs.PortMapping) {
-
+	if len(publish) < 1 {
+		return []*ecs.PortMapping{}
+	}
 	for _, env := range publish {
 		envArr := strings.Split(env, ":")
 
@@ -66,10 +70,13 @@ func buildPortMapping(publish []string) (k []*ecs.PortMapping) {
 		k = append(k, &portMap)
 	}
 
-	return
+	return k
 }
 
 func buildMountPoint(volumes []string) (v []*ecs.Volume, k []*ecs.MountPoint) {
+	if len(volumes) < 1 {
+		return []*ecs.Volume{}, []*ecs.MountPoint{}
+	}
 
 	for i, volume := range volumes {
 		av := strings.Split(volume, ":")
