@@ -1,6 +1,7 @@
 package ecs
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -19,6 +20,8 @@ type Task struct {
 	Name              string
 	Image             string
 	ExecutionRoleArn  string
+	Family            string
+	LogGroupName      string
 	Detach            bool
 	Public            bool
 	Fargate           bool
@@ -67,29 +70,36 @@ func (t *Task) Run() error {
 	var publicIP string
 	var svc = ecs.New(sess)
 	t.createLogGroup()
-	logInfo("Creating task definition")
 	v, m := buildMountPoint(t.Volumes)
+
+	if t.Family == "" {
+		t.Family = t.Name
+	}
+
 	taskDefInput := ecs.RegisterTaskDefinitionInput{
 		ContainerDefinitions: []*ecs.ContainerDefinition{
 			&ecs.ContainerDefinition{
-				Name:    aws.String(t.Name),
+				Name:    aws.String(t.Family),
 				Image:   aws.String(t.Image),
 				Command: aws.StringSlice(t.Command),
+				Cpu:     aws.Int64(t.CPUReservation),
 				LogConfiguration: &ecs.LogConfiguration{
 					LogDriver: aws.String("awslogs"),
 					Options: aws.StringMap(map[string]string{
-						"awslogs-group":         "/" + t.Cluster + "/ecs/ephemeral-task-from-ecs-cli",
-						"awslogs-region":        "us-east-1",
+						"awslogs-group":         t.LogGroupName,
+						"awslogs-region":        *sess.Config.Region,
 						"awslogs-stream-prefix": t.Name,
 					}),
 				},
+				Essential:    aws.Bool(true),
 				Environment:  buildEnvironmentKeyValuePair(t.Environment),
 				PortMappings: buildPortMapping(t.Publish),
 				MountPoints:  m,
+				VolumesFrom:  []*ecs.VolumeFrom{},
 			},
 		},
 		Volumes: v,
-		Family:  aws.String("ephemeral-task-from-ecs-cli"),
+		Family:  aws.String(t.Name),
 	}
 
 	if t.Memory > 0 {
@@ -109,20 +119,16 @@ func (t *Task) Run() error {
 	}
 
 	// Register a new task definition
-	taskDef, err := svc.RegisterTaskDefinition(&taskDefInput)
-	if err != nil {
-		return err
-	}
-	t.TaskDefinition = *taskDef.TaskDefinition
+	arn, _ := t.upsertTaskDefinition(svc, &taskDefInput)
 
-	// fmt.Println(taskDef) //debug
 	logInfo("Running task definition: " + *t.TaskDefinition.TaskDefinitionArn)
+
 	// Build the task parametes
 	runTaskInput := &ecs.RunTaskInput{
 		Cluster:        aws.String(t.Cluster),
 		Count:          aws.Int64(t.Count),
 		StartedBy:      aws.String("ecs cli"),
-		TaskDefinition: taskDef.TaskDefinition.Family,
+		TaskDefinition: arn,
 	}
 
 	// Configure for Fargate
@@ -279,8 +285,10 @@ func (t *Task) Check() {
 }
 
 func (t *Task) createLogGroup() {
+	t.LogGroupName = "/" + t.Cluster + "/ecs/" + t.Name
+
 	var svc = cloudwatchlogs.New(sess)
-	var logGroupName = aws.String("/" + t.Cluster + "/ecs/ephemeral-task-from-ecs-cli")
+	var logGroupName = aws.String(t.LogGroupName)
 
 	output, err := svc.DescribeLogGroups(&cloudwatchlogs.DescribeLogGroupsInput{
 		LogGroupNamePrefix: logGroupName,
@@ -295,4 +303,52 @@ func (t *Task) createLogGroup() {
 			LogGroupName: logGroupName,
 		})
 	}
+}
+
+func (t *Task) upsertTaskDefinition(svc *ecs.ECS, taskDefInput *ecs.RegisterTaskDefinitionInput) (*string, error) {
+	var td ecs.TaskDefinition
+	td.ContainerDefinitions = taskDefInput.ContainerDefinitions
+	definitions, err := svc.ListTaskDefinitions(&ecs.ListTaskDefinitionsInput{
+		FamilyPrefix: aws.String(t.Family),
+		Sort:         aws.String("DESC"),
+		MaxResults:   aws.Int64(10),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Loop through previous task definitions to prevent duplicates
+	for _, definition := range definitions.TaskDefinitionArns {
+		d, err2 := svc.DescribeTaskDefinition(&ecs.DescribeTaskDefinitionInput{
+			TaskDefinition: definition,
+		})
+		if err2 != nil {
+			return nil, err2
+		}
+		old, err2 := json.Marshal(d.TaskDefinition.ContainerDefinitions[0])
+		if err2 != nil {
+			return nil, err2
+		}
+		new, err2 := json.Marshal(td.ContainerDefinitions[0])
+		if err2 != nil {
+			return nil, err2
+		}
+
+		if string(old) == string(new) {
+			logInfo("Using previous task definition")
+			t.TaskDefinition = *d.TaskDefinition
+			return d.TaskDefinition.TaskDefinitionArn, nil
+		}
+	}
+
+	// unable to find an old task definition, register a new one
+	logInfo("Creating task definition")
+	taskDef, err := svc.RegisterTaskDefinition(taskDefInput)
+	if err != nil {
+		return nil, err
+	}
+
+	t.TaskDefinition = *taskDef.TaskDefinition
+	return taskDef.TaskDefinition.TaskDefinitionArn, nil
+
 }
