@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strings"
+	"regexp"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -171,13 +171,14 @@ func (t *Task) Run() error {
 func (t *Task) Stream() {
 	logInfo("Streaming from Cloudwatch Logs")
 	var svc = cloudwatchlogs.New(sess)
+	var re = regexp.MustCompile("[^/]*$")
 	nextToken := ""
 	for _, task := range t.Tasks {
 		for {
 			logEventsInput := cloudwatchlogs.GetLogEventsInput{
 				StartFromHead: aws.Bool(true),
 				LogGroupName:  aws.String(*t.TaskDefinition.ContainerDefinitions[0].LogConfiguration.Options["awslogs-group"]),
-				LogStreamName: aws.String(t.Name + "/" + t.Name + "/" + strings.Split(*task.TaskArn, "/")[2]),
+				LogStreamName: aws.String(t.Name + "/" + t.Name + "/" + re.FindString(*task.TaskArn)),
 			}
 
 			if nextToken != "" {
@@ -219,11 +220,11 @@ func (t *Task) Check() {
 	var exitCode int64 = 1
 	var reportedPorts = false
 	var ip *string
-
+	var re = regexp.MustCompile("[^/]*$")
 	for _, task := range t.Tasks {
 		tasks = append(tasks, *task.TaskArn)
 		cluster = task.ClusterArn
-		logInfo(fmt.Sprintf("https://console.aws.amazon.com/ecs/home?#/clusters/%s/tasks/%s/details", t.Cluster, strings.Split(*task.TaskArn, "/")[2]))
+		logInfo(fmt.Sprintf("https://console.aws.amazon.com/ecs/home?#/clusters/%s/tasks/%s/details", t.Cluster, re.FindString(*task.TaskArn)))
 	}
 
 	for {
