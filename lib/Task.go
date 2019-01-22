@@ -20,11 +20,13 @@ type Task struct {
 	Name              string
 	Image             string
 	ExecutionRoleArn  string
+	RoleArn           string
 	Family            string
 	LogGroupName      string
 	Detach            bool
 	Public            bool
 	Fargate           bool
+	Deregister        bool
 	Count             int64
 	Memory            int64
 	MemoryReservation int64
@@ -98,8 +100,9 @@ func (t *Task) Run() error {
 				VolumesFrom:  []*ecs.VolumeFrom{},
 			},
 		},
-		Volumes: v,
-		Family:  aws.String(t.Name),
+		Volumes:     v,
+		Family:      aws.String(t.Name),
+		TaskRoleArn: aws.String(t.RoleArn),
 	}
 
 	if t.Memory > 0 {
@@ -272,6 +275,9 @@ func (t *Task) Check() {
 		}
 		if stoppedCount == len(res.Tasks) {
 			logInfo("All containers have exited")
+			if t.Deregister {
+				t.deregister(svc)
+			}
 			time.Sleep(time.Second * 5) // give the logs another chance to come in
 			os.Exit(int(exitCode))
 		}
@@ -305,6 +311,16 @@ func (t *Task) createLogGroup() {
 	}
 }
 
+func (t *Task) deregister(svc *ecs.ECS) {
+	_, err := svc.DeregisterTaskDefinition(&ecs.DeregisterTaskDefinitionInput{
+		TaskDefinition: t.TaskDefinition.TaskDefinitionArn,
+	})
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
 func (t *Task) upsertTaskDefinition(svc *ecs.ECS, taskDefInput *ecs.RegisterTaskDefinitionInput) (*string, error) {
 	var td ecs.TaskDefinition
 	td.ContainerDefinitions = taskDefInput.ContainerDefinitions
@@ -325,11 +341,11 @@ func (t *Task) upsertTaskDefinition(svc *ecs.ECS, taskDefInput *ecs.RegisterTask
 		if err2 != nil {
 			return nil, err2
 		}
-		old, err2 := json.Marshal(d.TaskDefinition.ContainerDefinitions[0])
+		old, err2 := json.Marshal(d.TaskDefinition.ContainerDefinitions)
 		if err2 != nil {
 			return nil, err2
 		}
-		new, err2 := json.Marshal(td.ContainerDefinitions[0])
+		new, err2 := json.Marshal(td.ContainerDefinitions)
 		if err2 != nil {
 			return nil, err2
 		}

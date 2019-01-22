@@ -23,6 +23,7 @@ func init() {
 	runCmd.PersistentFlags().StringVarP(&task.Name, "name", "n", "ephemeral-task-from-ecs-cli", "Assign a name to the task")
 	runCmd.PersistentFlags().StringVar(&task.Family, "family", "", "Family for ECS task")
 	runCmd.PersistentFlags().StringVar(&task.ExecutionRoleArn, "execution-role", "", "Execution role ARN (required for Fargate)")
+	runCmd.PersistentFlags().StringVar(&task.RoleArn, "role", "", "Task role ARN")
 	runCmd.PersistentFlags().BoolVarP(&task.Detach, "detach", "d", false, "Run the task in the background")
 	runCmd.PersistentFlags().Int64VarP(&task.Count, "count", "c", 1, "Spawn n tasks")
 	runCmd.PersistentFlags().Int64VarP(&task.Memory, "memory", "m", 0, "Memory limit")
@@ -37,6 +38,7 @@ func init() {
 	// TODO: support assigning public ip address
 	runCmd.PersistentFlags().BoolVar(&task.Public, "public", false, "assign public ip")
 	runCmd.PersistentFlags().BoolVar(&task.Fargate, "fargate", false, "Launch in Fargate")
+	runCmd.PersistentFlags().BoolVar(&task.Deregister, "no-dergister", false, "do not deregister the task definition")
 	runCmd.Flags().SetInterspersed(false)
 }
 
