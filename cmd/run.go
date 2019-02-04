@@ -38,7 +38,7 @@ func init() {
 	// TODO: support assigning public ip address
 	runCmd.PersistentFlags().BoolVar(&task.Public, "public", false, "assign public ip")
 	runCmd.PersistentFlags().BoolVar(&task.Fargate, "fargate", false, "Launch in Fargate")
-	runCmd.PersistentFlags().BoolVar(&task.Deregister, "no-dergister", false, "do not deregister the task definition")
+	runCmd.PersistentFlags().BoolVar(&task.Deregister, "no-deregister", false, "do not deregister the task definition")
 	runCmd.Flags().SetInterspersed(false)
 }
 
