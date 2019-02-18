@@ -122,9 +122,13 @@ func (t *Task) Run() error {
 	}
 
 	// Register a new task definition
-	arn, _ := t.upsertTaskDefinition(svc, &taskDefInput)
+	arn, err := t.upsertTaskDefinition(svc, &taskDefInput)
+	if err != nil {
+		fmt.Printf("Error creating task definition: %s", err.Error())
+		os.Exit(1)
+	}
 
-	logInfo("Running task definition: " + *t.TaskDefinition.TaskDefinitionArn)
+	logInfo("Running task definition: " + *arn)
 
 	// Build the task parametes
 	runTaskInput := &ecs.RunTaskInput{
