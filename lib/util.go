@@ -16,7 +16,7 @@ func buildEnvironmentKeyValuePair(environment []string) (k []*ecs.KeyValuePair) 
 		return []*ecs.KeyValuePair{}
 	}
 	for _, env := range environment {
-		envArr := strings.Split(env, "=")
+		envArr := strings.SplitN(env, "=", 2)
 
 		// Recieved a --env MYVAR=test
 		if len(envArr) > 1 {
