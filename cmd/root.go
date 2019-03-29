@@ -15,7 +15,7 @@ var rootCmd = &cobra.Command{
 	Use:     "ecs",
 	Short:   "Manage ECS",
 	Long:    `A lightweight tool for working with ECS`,
-	Version: "0.0.13",
+	Version: "0.0.14",
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},

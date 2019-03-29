@@ -278,7 +278,7 @@ func (t *Task) Check() {
 				}
 			}
 		}
-		if stoppedCount == len(res.Tasks) {
+		if stoppedCount == len(res.Tasks) && len(res.Tasks) != 0 {
 			logInfo("All containers have exited")
 			if !t.Deregister {
 				t.deregister(svc)
