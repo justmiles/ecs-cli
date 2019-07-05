@@ -2,6 +2,7 @@ package ecs
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -167,6 +168,15 @@ func (t *Task) Run() error {
 	if err != nil {
 		return err
 	}
+
+	for _, failure := range runTaskResponse.Failures {
+		fmt.Printf("Unable to schedule task on: %s\n\t%s\n", *failure.Arn, *failure.Reason)
+	}
+
+	if len(runTaskResponse.Failures) > 0 && len(runTaskResponse.Tasks) == 0 {
+		return errors.New("Unable to schedule task")
+	}
+
 	t.Tasks = runTaskResponse.Tasks
 	return nil
 }
@@ -218,7 +228,6 @@ func (t *Task) Stream() {
 // Check the container is still running
 func (t *Task) Check() {
 	var svc = ecs.New(sess)
-	var tasks []string
 	var cluster *string
 	var stoppedCount int
 	var exitCode int64 = 1
@@ -226,16 +235,23 @@ func (t *Task) Check() {
 	var ip *string
 	var re = regexp.MustCompile("[^/]*$")
 	for _, task := range t.Tasks {
-		tasks = append(tasks, *task.TaskArn)
 		cluster = task.ClusterArn
 		logInfo(fmt.Sprintf("https://console.aws.amazon.com/ecs/home?#/clusters/%s/tasks/%s/details", t.Cluster, re.FindString(*task.TaskArn)))
 	}
 
 	for {
-		res, err := svc.DescribeTasks(&ecs.DescribeTasksInput{
+		describeTasksInput := ecs.DescribeTasksInput{
 			Cluster: cluster,
-			Tasks:   aws.StringSlice(tasks),
-		})
+			Tasks:   t.taskIds(),
+		}
+
+		if len(describeTasksInput.Tasks) == 0 {
+			fmt.Println("Task not yet registered")
+			time.Sleep(time.Second * 5)
+			continue
+		}
+
+		res, err := svc.DescribeTasks(&describeTasksInput)
 		logError(err)
 
 		for _, ecsTask := range res.Tasks {
@@ -372,4 +388,11 @@ func (t *Task) upsertTaskDefinition(svc *ecs.ECS, taskDefInput *ecs.RegisterTask
 	t.TaskDefinition = *taskDef.TaskDefinition
 	return taskDef.TaskDefinition.TaskDefinitionArn, nil
 
+}
+
+func (t *Task) taskIds() (tasks []*string) {
+	for _, task := range t.Tasks {
+		tasks = append(tasks, task.TaskArn)
+	}
+	return tasks
 }
