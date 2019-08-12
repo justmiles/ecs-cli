@@ -5,7 +5,7 @@ go 1.12
 require (
 	github.com/aws/aws-sdk-go v1.15.3
 	github.com/cenkalti/backoff v2.2.1+incompatible
-	github.com/dustin/go-humanize v1.0.0 // indirect
+	github.com/dustin/go-humanize v1.0.0
 	github.com/fatih/color v1.7.0
 	github.com/go-ini/ini v1.38.1 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
