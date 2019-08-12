@@ -13,6 +13,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go/service/ecs"
+	"github.com/cenkalti/backoff"
+	humanize "github.com/dustin/go-humanize"
 )
 
 // Task represents a single, runnable task
@@ -379,8 +381,28 @@ func (t *Task) upsertTaskDefinition(svc *ecs.ECS, taskDefInput *ecs.RegisterTask
 	}
 
 	// unable to find an old task definition, register a new one
-	logInfo("Creating task definition")
-	taskDef, err := svc.RegisterTaskDefinition(taskDefInput)
+	req, taskDef := svc.RegisterTaskDefinitionRequest(taskDefInput)
+
+	// An operation that may fail.
+	var retryCount int
+	const maxRetries = 50
+	backoffWithRetries := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), maxRetries)
+	cfg := req.Config.WithLogLevel(aws.LogDebugWithRequestRetries)
+	operation := func() error {
+		logInfo("Creating task definition")
+		req.Retryable = aws.Bool(true)
+		req.Config = *cfg
+		err = req.Send()
+		if err != nil {
+			t := time.Now()
+			t = t.Add(backoffWithRetries.NextBackOff())
+			logInfo(fmt.Sprintf("error creating task definition (attempt %d of %d). Will retry %s: %s\n", retryCount, maxRetries, humanize.Time(t), err))
+		}
+		retryCount++
+		return err
+	}
+
+	err = backoff.Retry(operation, backoffWithRetries)
 	if err != nil {
 		return nil, err
 	}
