@@ -1,15 +1,18 @@
 package ecs
 
-import "github.com/aws/aws-sdk-go/service/ec2"
-import "github.com/aws/aws-sdk-go/service/ecs"
-import "github.com/aws/aws-sdk-go/aws"
-import "fmt"
-import "os"
-import "strings"
-import "strconv"
-import "time"
-import "github.com/fatih/color"
-import "github.com/aws/aws-sdk-go/service/cloudwatchlogs"
+import (
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
+	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go/service/ecs"
+	"github.com/fatih/color"
+)
 
 func buildEnvironmentKeyValuePair(environment []string) (k []*ecs.KeyValuePair) {
 	if len(environment) < 1 {
@@ -73,11 +76,12 @@ func buildPortMapping(publish []string) (k []*ecs.PortMapping) {
 	return k
 }
 
-func buildMountPoint(volumes []string) (v []*ecs.Volume, k []*ecs.MountPoint) {
-	if len(volumes) < 1 {
+func buildMountPoint(volumes []string, efsVolumes []string) (v []*ecs.Volume, k []*ecs.MountPoint) {
+	if len(volumes) < 1 && len(efsVolumes) < 1 {
 		return []*ecs.Volume{}, []*ecs.MountPoint{}
 	}
 
+	// Add Bind Mounts
 	for i, volume := range volumes {
 		av := strings.Split(volume, ":")
 
@@ -103,6 +107,35 @@ func buildMountPoint(volumes []string) (v []*ecs.Volume, k []*ecs.MountPoint) {
 		if len(av) > 1 {
 			containerPath := av[1]
 			mountPoint.ContainerPath = &containerPath
+		}
+
+		// Append to the slice
+		k = append(k, &mountPoint)
+		v = append(v, &volume)
+	}
+
+	// Add EFS Mounts
+	for i, volume := range efsVolumes {
+		av := strings.Split(volume, ":")
+		efsFileSystemId := av[0]
+		efsDirectory := av[1]
+		containerDirectory := av[2]
+		volumeName := "volume-efs" + strconv.Itoa(i)
+
+		mountPoint := ecs.MountPoint{
+			ContainerPath: &containerDirectory,
+			SourceVolume:  aws.String(volumeName),
+			ReadOnly:      aws.Bool(false),
+		}
+
+		volume := ecs.Volume{
+			Name: aws.String(volumeName),
+			EfsVolumeConfiguration: &ecs.EFSVolumeConfiguration{
+				// TODO parameterize this
+				FileSystemId: &efsFileSystemId,
+				// TODO pass in root efs mount path explicitly instead of using sourcePath
+				RootDirectory: &efsDirectory,
+			},
 		}
 
 		// Append to the slice

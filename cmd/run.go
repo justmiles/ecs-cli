@@ -4,9 +4,10 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 
-	"github.com/justmiles/ecs-cli/lib"
+	ecs "github.com/justmiles/ecs-cli/lib"
 	"github.com/spf13/cobra"
 )
 
@@ -35,6 +36,7 @@ func init() {
 	runCmd.PersistentFlags().StringArrayVar(&task.SecurityGroups, "security-groups", nil, "[TODO] Attach security groups to task")
 	runCmd.PersistentFlags().StringArrayVar(&task.Subnets, "subnet", nil, "Subnet(s) where task should run")
 	runCmd.PersistentFlags().StringArrayVarP(&task.Volumes, "volume", "v", nil, "Map volume to ECS Container Instance")
+	runCmd.PersistentFlags().StringArrayVarP(&task.EfsVolumes, "efs-volume", "", nil, "Map EFS volume to ECS Container Instance (ex. fs-23kj2f:/efs/dir:/container/mnt/dir)")
 	// TODO: support assigning public ip address
 	runCmd.PersistentFlags().BoolVar(&task.Public, "public", false, "assign public ip")
 	runCmd.PersistentFlags().BoolVar(&task.Fargate, "fargate", false, "Launch in Fargate")
@@ -66,6 +68,15 @@ var runCmd = &cobra.Command{
 				log.Fatal("Fargate requires an execution role (--execution-role)")
 			}
 		}
+
+		// efs-volume validation
+		for _, volume := range task.EfsVolumes {
+			av := strings.Split(volume, ":")
+			if len(av) != 3 {
+				log.Fatal("Incorrect usage (--efs-volume)")
+			}
+		}
+
 		// Run the task
 		err := task.Run()
 		check(err)
