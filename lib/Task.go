@@ -1,7 +1,6 @@
 package ecs
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -39,6 +38,7 @@ type Task struct {
 	SecurityGroups    []string
 	Subnets           []string
 	Volumes           []string
+	EfsVolumes        []string
 	Command           []string
 	TaskDefinition    ecs.TaskDefinition
 	Tasks             []*ecs.Task
@@ -75,7 +75,12 @@ func (t *Task) Run() error {
 	var publicIP string
 	var svc = ecs.New(sess)
 	t.createLogGroup()
-	v, m := buildMountPoint(t.Volumes)
+
+	// If fargate, ignore bind mounts
+	if t.Fargate {
+		t.Volumes = []string{}
+	}
+	v, m := buildMountPoint(t.Volumes, t.EfsVolumes)
 
 	if t.Family == "" {
 		t.Family = t.Name
@@ -347,38 +352,6 @@ func (t *Task) deregister(svc *ecs.ECS) {
 func (t *Task) upsertTaskDefinition(svc *ecs.ECS, taskDefInput *ecs.RegisterTaskDefinitionInput) (*string, error) {
 	var td ecs.TaskDefinition
 	td.ContainerDefinitions = taskDefInput.ContainerDefinitions
-	definitions, err := svc.ListTaskDefinitions(&ecs.ListTaskDefinitionsInput{
-		FamilyPrefix: aws.String(t.Family),
-		Sort:         aws.String("DESC"),
-		MaxResults:   aws.Int64(10),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	// Loop through previous task definitions to prevent duplicates
-	for _, definition := range definitions.TaskDefinitionArns {
-		d, err2 := svc.DescribeTaskDefinition(&ecs.DescribeTaskDefinitionInput{
-			TaskDefinition: definition,
-		})
-		if err2 != nil {
-			return nil, err2
-		}
-		old, err2 := json.Marshal(d.TaskDefinition.ContainerDefinitions)
-		if err2 != nil {
-			return nil, err2
-		}
-		new, err2 := json.Marshal(td.ContainerDefinitions)
-		if err2 != nil {
-			return nil, err2
-		}
-
-		if string(old) == string(new) {
-			logInfo("Using previous task definition")
-			t.TaskDefinition = *d.TaskDefinition
-			return d.TaskDefinition.TaskDefinitionArn, nil
-		}
-	}
 
 	// unable to find an old task definition, register a new one
 	req, taskDef := svc.RegisterTaskDefinitionRequest(taskDefInput)
@@ -392,7 +365,7 @@ func (t *Task) upsertTaskDefinition(svc *ecs.ECS, taskDefInput *ecs.RegisterTask
 		logInfo("Creating task definition")
 		req.Retryable = aws.Bool(true)
 		req.Config = *cfg
-		err = req.Send()
+		err := req.Send()
 		if err != nil {
 			t := time.Now()
 			t = t.Add(backoffWithRetries.NextBackOff())
@@ -402,7 +375,7 @@ func (t *Task) upsertTaskDefinition(svc *ecs.ECS, taskDefInput *ecs.RegisterTask
 		return err
 	}
 
-	err = backoff.Retry(operation, backoffWithRetries)
+	err := backoff.Retry(operation, backoffWithRetries)
 	if err != nil {
 		return nil, err
 	}

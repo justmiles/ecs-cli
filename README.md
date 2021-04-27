@@ -13,6 +13,8 @@ This CLI is designed to closely resemble the `docker run` command for ECS. This 
 * [x] the exit code from the container is mirrored by the CLI
 * [x] capture a SIGKILL event (Ctrl+c) and stop the remote container
 * [ ] replicate `docker exec` arguments using SSM agent
+* [ ] Only create new task definition if it differs from the last active task defition
+* [ ] Specify (or maybe create?) cluster capacity provider for fargate spot support
 
 ## Installation
 [Download the latest](https://github.com/justmiles/ecs-cli/releases) release for your OS and extract to your PATH.
@@ -43,21 +45,27 @@ All containers have exited
 ## Usage
 
     Usage:
-      ecs run [flags]
+    ecs run [flags]
 
     Flags:
-          --cluster string           ECS cluster
-      -c, --count int                Spawn n tasks (default 1)
-          --cpu-reservation int      CPU reservation (default 1024)
-      -d, --detach                   Run the task in the background
-      -e, --env stringArray          Set environment variables
-          --execution-role string    Execution role ARN (required for Fargate)
-          --fargate                  Launch in Fargate
-      -h, --help                     help for run
-      -m, --memory int               Memory limit
-          --memory-reservation int   Memory reservation (default 2048)
-      -n, --name string              Assign a name to the task (default "ecs-cli-app")
-      -p, --publish stringArray      Publish a container's port(s) to the host
-          --subnet stringArray       Subnet(s) where task should run
-      -v, --volume stringArray       Map volume to ECS Container Instance
+        --cluster string                ECS cluster
+    -c, --count int                     Spawn n tasks (default 1)
+        --cpu-reservation int           CPU reservation
+    -d, --detach                        Run the task in the background
+        --efs-volume stringArray        Map EFS volume to ECS Container Instance (ex. fs-23kj2f:/efs/dir:/container/mnt/dir)
+    -e, --env stringArray               Set environment variables
+        --execution-role string         Execution role ARN (required for Fargate)
+        --family string                 Family for ECS task
+        --fargate                       Launch in Fargate
+    -h, --help                          help for run
+    -m, --memory int                    Memory limit
+        --memory-reservation int        Memory reservation (default 2048)
+    -n, --name string                   Assign a name to the task (default "ephemeral-task-from-ecs-cli")
+        --no-deregister                 do not deregister the task definition
+        --public                        assign public ip
+    -p, --publish stringArray           Publish a container's port(s) to the host
+        --role string                   Task role ARN
+        --security-groups stringArray   [TODO] Attach security groups to task
+        --subnet stringArray            Subnet(s) where task should run
+    -v, --volume stringArray            Map volume to ECS Container Instance
 
