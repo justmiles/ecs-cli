@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -28,7 +29,7 @@ func init() {
 	runCmd.PersistentFlags().BoolVarP(&task.Detach, "detach", "d", false, "Run the task in the background")
 	runCmd.PersistentFlags().Int64VarP(&task.Count, "count", "c", 1, "Spawn n tasks")
 	runCmd.PersistentFlags().Int64VarP(&task.Memory, "memory", "m", 0, "Memory limit")
-	runCmd.PersistentFlags().Int64Var(&task.CPUReservation, "cpu-reservation", 0, "CPU reservation")
+	runCmd.PersistentFlags().Int64Var(&task.CPUReservation, "cpu-reservation", 256, "CPU reservation")
 	runCmd.PersistentFlags().Int64Var(&task.MemoryReservation, "memory-reservation", 2048, "Memory reservation")
 	runCmd.PersistentFlags().StringArrayVarP(&task.Environment, "env", "e", nil, "Set environment variables")
 	runCmd.PersistentFlags().StringArrayVarP(&task.Publish, "publish", "p", nil, "Publish a container's port(s) to the host")
@@ -67,6 +68,7 @@ var runCmd = &cobra.Command{
 			if task.ExecutionRoleArn == "" {
 				log.Fatal("Fargate requires an execution role (--execution-role)")
 			}
+			validate(int(task.CPUReservation), int(task.MemoryReservation))
 		}
 
 		// efs-volume validation
@@ -106,4 +108,32 @@ var runCmd = &cobra.Command{
 		}
 
 	},
+}
+
+var m map[int][]int
+
+func init() {
+	m = make(map[int][]int)
+	m[256] = []int{512, 1024, 2048}
+	m[512] = []int{1024, 2048, 3072, 4096}
+	m[1024] = []int{2048, 3072, 4096, 5120, 6144, 7168, 8192}
+	m[2048] = []int{4096, 5120, 6144, 7168, 8192, 9216, 10240, 11264, 12288, 13312, 14336, 15360, 16384}
+	m[4096] = []int{8192, 9216, 10240, 11264, 12288, 13312, 14336, 15360, 16384, 17408, 18432, 19456, 20480, 21504, 22528, 23552, 24575, 25600, 26624, 27648, 28678, 29696, 30720}
+}
+
+func validate(cpu, memory int) {
+	fmt.Printf("--> CPU: %d, Memory: %d \n--> %s\n", cpu, memory, isValid(cpu, memory))
+	if isValid(cpu, memory) == "cpu/memory mismatch!\n--> see fargate cpu/memory pairs here:\n  https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html" {
+		os.Exit(1)
+	}
+}
+
+func isValid(cpu, memory int) string {
+	for _, allowedCpuValue := range m[cpu] {
+		if allowedCpuValue == memory {
+			return "cpu/memory match, continuing"
+		}
+	}
+
+	return "cpu/memory mismatch!\n--> see fargate cpu/memory pairs here:\n  https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html"
 }
