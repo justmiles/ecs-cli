@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go/service/ecs"
+	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/cenkalti/backoff"
 	humanize "github.com/dustin/go-humanize"
 )
@@ -48,6 +49,8 @@ var (
 	sess = session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
+	ecsClient = ecs.New(sess)
+	ssmClient = ssm.New(sess)
 )
 
 // Stop a task
