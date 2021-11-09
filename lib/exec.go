@@ -1,6 +1,7 @@
 package ecs
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -47,7 +48,9 @@ func GetServices(cluster string) ([]string, error) {
 		func(page *ecs.ListServicesOutput, lastPage bool) bool {
 			pageNum++
 			for _, arn := range page.ServiceArns {
-				results = append(results, parseServiceName(*arn))
+				if s, err := parseServiceName(*arn); err == nil {
+					results = append(results, s)
+				}
 			}
 			return pageNum <= 10
 		})
@@ -150,9 +153,13 @@ func parseClusterName(arn string) string {
 	return re.FindStringSubmatch(arn)[1]
 }
 
-func parseServiceName(arn string) string {
+func parseServiceName(arn string) (string, error) {
 	re := regexp.MustCompile("service/.*/(.*?)$")
-	return re.FindStringSubmatch(arn)[1]
+	if res := re.FindStringSubmatch(arn); len(res) > 0 {
+		return res[1], nil
+	} else {
+		return "", fmt.Errorf("Unable to parse service name.")
+	}
 }
 
 func parseTaskId(arn string) string {
