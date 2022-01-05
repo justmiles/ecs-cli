@@ -143,10 +143,11 @@ func (t *Task) Run() error {
 
 	// Build the task parametes
 	runTaskInput := &ecs.RunTaskInput{
-		Cluster:        aws.String(t.Cluster),
-		Count:          aws.Int64(t.Count),
-		StartedBy:      aws.String("ecs cli"),
-		TaskDefinition: arn,
+		Cluster:              aws.String(t.Cluster),
+		Count:                aws.Int64(t.Count),
+		StartedBy:            aws.String("ecs cli"),
+		TaskDefinition:       arn,
+		EnableExecuteCommand: aws.Bool(true),
 	}
 
 	// Configure for Fargate
