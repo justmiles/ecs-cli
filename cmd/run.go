@@ -34,8 +34,8 @@ func init() {
 	runCmd.PersistentFlags().StringArrayVarP(&task.Environment, "env", "e", nil, "Set environment variables")
 	runCmd.PersistentFlags().StringArrayVarP(&task.Publish, "publish", "p", nil, "Publish a container's port(s) to the host")
 	// TODO: attach a specific security group
-	runCmd.PersistentFlags().StringArrayVar(&task.SecurityGroups, "security-groups", nil, "[TODO] Attach security groups to task")
-	runCmd.PersistentFlags().StringArrayVar(&task.Subnets, "subnet", nil, "Subnet(s) where task should run")
+	runCmd.PersistentFlags().StringArrayVar(&task.SecurityGroups, "security-groups", nil, "attach security groups to task")
+	runCmd.PersistentFlags().StringArrayVar(&task.SubnetFilters, "subnet-filter", nil, "'Key=Value' filters for your subnet, eg tag:Name=private")
 	runCmd.PersistentFlags().StringArrayVarP(&task.Volumes, "volume", "v", nil, "Map volume to ECS Container Instance")
 	runCmd.PersistentFlags().StringArrayVarP(&task.EfsVolumes, "efs-volume", "", nil, "Map EFS volume to ECS Container Instance (ex. fs-23kj2f:/efs/dir:/container/mnt/dir)")
 	// TODO: support assigning public ip address
@@ -70,11 +70,8 @@ var runCmd = &cobra.Command{
 
 		// fargate validation
 		if task.Fargate {
-			if len(task.Subnets) == 0 {
-				log.Fatal("Fargate requires at least one subnet (--subnet)")
-			}
-			if task.ExecutionRoleArn == "" {
-				log.Fatal("Fargate requires an execution role (--execution-role)")
+			if len(task.SubnetFilters) == 0 {
+				log.Fatal("Fargate requires at least one subnet")
 			}
 			if !isValidMemCPU(int(task.CPUReservation), int(task.MemoryReservation)) {
 				log.Fatal("CPU/Memory unsupported. See supported values here: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html")

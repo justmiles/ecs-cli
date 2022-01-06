@@ -188,3 +188,60 @@ func getEc2InstanceIp(instanceId string) *string {
 	}
 	return res.Reservations[0].Instances[0].PrivateIpAddress
 }
+
+func getSecurityGroupByName(groupName string) (*string, error) {
+	var svc = ec2.New(sess)
+	res, err := svc.DescribeSecurityGroups(&ec2.DescribeSecurityGroupsInput{
+		Filters: []*ec2.Filter{
+			&ec2.Filter{
+				Name:   aws.String("group-name"),
+				Values: []*string{aws.String(groupName)},
+			},
+		},
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("error calling DescribeSecurityGroups %v", err)
+	}
+
+	for _, g := range res.SecurityGroups {
+		return g.GroupId, nil
+	}
+	return nil, fmt.Errorf("unable to find security group with name %s", groupName)
+}
+
+func getSubnetsByFilter(subnetFilters []string) (subnets []*string, err error) {
+	var svc = ec2.New(sess)
+
+	var filters []*ec2.Filter
+
+	// if filters are set, find and return subnet by filters
+	for _, filter := range subnetFilters {
+		s := strings.SplitN(filter, "=", 2)
+		if len(s) != 2 {
+			return nil, fmt.Errorf("unable to derive filter from: %s", filter)
+		}
+		filters = append(filters, &ec2.Filter{
+			Name:   aws.String(s[0]),
+			Values: aws.StringSlice(strings.Split(s[1], ",")),
+		})
+	}
+
+	result, err := svc.DescribeSubnets(&ec2.DescribeSubnetsInput{
+		Filters: filters,
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("Unable to find subnet: %s", err)
+	}
+
+	if len(result.Subnets) == 0 {
+		return nil, fmt.Errorf("No subnets matching current filters")
+	}
+
+	for _, subnet := range result.Subnets {
+		subnets = append(subnets, subnet.SubnetId)
+	}
+
+	return subnets, nil
+}
