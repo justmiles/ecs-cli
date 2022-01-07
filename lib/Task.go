@@ -37,7 +37,7 @@ type Task struct {
 	Publish           []string
 	Environment       []string
 	SecurityGroups    []string
-	Subnets           []string
+	SubnetFilters     []string
 	Volumes           []string
 	EfsVolumes        []string
 	Command           []string
@@ -130,6 +130,16 @@ func (t *Task) Run() error {
 		taskDefInput.ExecutionRoleArn = aws.String(t.ExecutionRoleArn)
 		taskDefInput.Cpu = aws.String(fmt.Sprintf("%d", t.CPUReservation))
 		taskDefInput.Memory = aws.String(fmt.Sprintf("%d", t.MemoryReservation))
+
+		// use the execution role if the standard role isn't specified
+		if t.RoleArn == "" && t.ExecutionRoleArn != "" {
+			taskDefInput.TaskRoleArn = aws.String(t.ExecutionRoleArn)
+		}
+
+		// use the standard role if the execution role isn't specified
+		if t.ExecutionRoleArn == "" && t.RoleArn != "" {
+			taskDefInput.ExecutionRoleArn = aws.String(t.RoleArn)
+		}
 	}
 
 	// Register a new task definition
@@ -162,9 +172,22 @@ func (t *Task) Run() error {
 		runTaskInput.NetworkConfiguration = &ecs.NetworkConfiguration{
 			AwsvpcConfiguration: &ecs.AwsVpcConfiguration{
 				AssignPublicIp: aws.String(publicIP),
-				SecurityGroups: aws.StringSlice(t.SecurityGroups),
-				Subnets:        aws.StringSlice(t.Subnets),
 			},
+		}
+
+		subnets, err := getSubnetsByFilter(t.SubnetFilters)
+		if err != nil {
+			return err
+		}
+
+		runTaskInput.NetworkConfiguration.AwsvpcConfiguration.Subnets = subnets
+
+		for _, groupName := range t.SecurityGroups {
+			id, err := getSecurityGroupByName(groupName)
+			if err != nil {
+				return err
+			}
+			runTaskInput.NetworkConfiguration.AwsvpcConfiguration.SecurityGroups = append(runTaskInput.NetworkConfiguration.AwsvpcConfiguration.SecurityGroups, id)
 		}
 
 		// Default to EC2 launch tye
