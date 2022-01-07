@@ -37,3 +37,15 @@ changelog:
 
 release:
   disable: false
+
+brews:
+  -
+    tap:
+      owner: chrispruitt
+      name: homebrew-tap
+    folder: Formula
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@carlosbecker.com
+    homepage: "https://github.com/justmiles/ecs-cli"
+    license: "Mozilla Public License Version 2.0"

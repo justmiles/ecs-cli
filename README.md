@@ -19,6 +19,11 @@ This CLI is designed to closely resemble the `docker run` command for ECS. This 
 ## Installation
 [Download the latest](https://github.com/justmiles/ecs-cli/releases) release for your OS and extract to your PATH.
 
+**Homebrew**
+```bash
+brew install chrispruitt/tap/esc
+```
+
 ## Example
 
 ```
