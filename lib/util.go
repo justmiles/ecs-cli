@@ -193,7 +193,7 @@ func getSecurityGroupByName(groupName string) (*string, error) {
 	var svc = ec2.New(sess)
 	res, err := svc.DescribeSecurityGroups(&ec2.DescribeSecurityGroupsInput{
 		Filters: []*ec2.Filter{
-			&ec2.Filter{
+			{
 				Name:   aws.String("group-name"),
 				Values: []*string{aws.String(groupName)},
 			},
