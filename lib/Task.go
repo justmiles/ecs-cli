@@ -1,10 +1,12 @@
 package ecs
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -19,30 +21,33 @@ import (
 
 // Task represents a single, runnable task
 type Task struct {
-	Cluster           string
-	Name              string
-	Image             string
-	ExecutionRoleArn  string
-	RoleArn           string
-	Family            string
-	LogGroupName      string
-	Detach            bool
-	Public            bool
-	Fargate           bool
-	Deregister        bool
-	Count             int64
-	Memory            int64
-	MemoryReservation int64
-	CPUReservation    int64
-	Publish           []string
-	Environment       []string
-	SecurityGroups    []string
-	SubnetFilters     []string
-	Volumes           []string
-	EfsVolumes        []string
-	Command           []string
-	TaskDefinition    ecs.TaskDefinition
-	Tasks             []*ecs.Task
+	Cluster            string
+	TaskDefinitionName string
+	Name               string
+	Image              string
+	ImageVersion       string
+	ExecutionRoleArn   string
+	RoleArn            string
+	Family             string
+	LogGroupName       string
+	Detach             bool
+	Public             bool
+	Fargate            bool
+	Deregister         bool
+	Wait               bool
+	Count              int64
+	Memory             int64
+	MemoryReservation  int64
+	CPUReservation     int64
+	Publish            []string
+	Environment        []string
+	SecurityGroups     []string
+	SubnetFilters      []string
+	Volumes            []string
+	EfsVolumes         []string
+	Command            []string
+	TaskDefinition     ecs.TaskDefinition
+	Tasks              []*ecs.Task
 }
 
 var (
@@ -215,18 +220,126 @@ func (t *Task) Run() error {
 	return nil
 }
 
+func (t *Task) RunTaskDef() error {
+	var launchType string
+	var publicIP string
+	var arn *string
+	var err error
+	var svc = ecs.New(sess)
+
+	describeTaskDefinitionOuput, err := svc.DescribeTaskDefinition(&ecs.DescribeTaskDefinitionInput{
+		Include:        aws.StringSlice([]string{"TAGS"}),
+		TaskDefinition: &t.Family,
+	})
+	if err != nil {
+		return fmt.Errorf("Error describing task def: %s", err)
+	}
+
+	var taskDefinitionInput ecs.RegisterTaskDefinitionInput
+	arn = describeTaskDefinitionOuput.TaskDefinition.TaskDefinitionArn
+
+	tmpVar, _ := json.Marshal(describeTaskDefinitionOuput.TaskDefinition)
+	err = json.Unmarshal(tmpVar, &taskDefinitionInput)
+	if err != nil {
+		return fmt.Errorf("Error Unmarshalling TaskDefOutput: %s", err)
+	}
+
+	// Update image version if provided
+	if len(t.ImageVersion) > 0 {
+		// Parse image
+		image := strings.Split(*taskDefinitionInput.ContainerDefinitions[0].Image, ":")
+		image[1] = t.ImageVersion
+		taskDefinitionInput.ContainerDefinitions[0].Image = aws.String(strings.Join(image, ":"))
+
+		logInfo(fmt.Sprintf("Updating image version: %s", image))
+
+		// Register a new task definition
+		arn, err = t.upsertTaskDefinition(svc, &taskDefinitionInput)
+		if err != nil {
+			fmt.Printf("Error creating task definition: %s", err.Error())
+			os.Exit(1)
+		}
+	}
+
+	logInfo("Running task definition: " + *arn)
+
+	// Build the task parametes
+	runTaskInput := &ecs.RunTaskInput{
+		Cluster:              aws.String(t.Cluster),
+		Count:                aws.Int64(t.Count),
+		StartedBy:            aws.String("ecs cli"),
+		TaskDefinition:       arn,
+		EnableExecuteCommand: aws.Bool(true),
+	}
+
+	// Configure for Fargate
+	if t.Fargate {
+
+		if t.Public {
+			publicIP = "ENABLED"
+		} else {
+			publicIP = "DISABLED"
+		}
+		launchType = "FARGATE"
+		runTaskInput.NetworkConfiguration = &ecs.NetworkConfiguration{
+			AwsvpcConfiguration: &ecs.AwsVpcConfiguration{
+				AssignPublicIp: aws.String(publicIP),
+			},
+		}
+
+		subnets, err := getSubnetsByFilter(t.SubnetFilters)
+		if err != nil {
+			return err
+		}
+
+		runTaskInput.NetworkConfiguration.AwsvpcConfiguration.Subnets = subnets
+
+		for _, groupName := range t.SecurityGroups {
+			id, err := getSecurityGroupByName(groupName)
+			if err != nil {
+				return err
+			}
+			runTaskInput.NetworkConfiguration.AwsvpcConfiguration.SecurityGroups = append(runTaskInput.NetworkConfiguration.AwsvpcConfiguration.SecurityGroups, id)
+		}
+	} else {
+		launchType = "EC2"
+	}
+
+	runTaskInput.LaunchType = aws.String(launchType)
+
+	fmt.Println(runTaskInput)
+
+	// Run the task
+	runTaskResponse, err := svc.RunTask(runTaskInput)
+	if err != nil {
+		return err
+	}
+
+	for _, failure := range runTaskResponse.Failures {
+		fmt.Printf("Unable to schedule task on: %s\n\t%s\n", *failure.Arn, *failure.Reason)
+	}
+
+	if len(runTaskResponse.Failures) > 0 && len(runTaskResponse.Tasks) == 0 {
+		return errors.New("Unable to schedule task")
+	}
+
+	t.Tasks = runTaskResponse.Tasks
+	return nil
+}
+
 // Stream logs to stdout
 func (t *Task) Stream() {
 	logInfo("Streaming from Cloudwatch Logs")
 	var svc = cloudwatchlogs.New(sess)
 	var re = regexp.MustCompile("[^/]*$")
 	nextToken := ""
+
 	for _, task := range t.Tasks {
 		for {
 			logEventsInput := cloudwatchlogs.GetLogEventsInput{
 				StartFromHead: aws.Bool(true),
 				LogGroupName:  aws.String(*t.TaskDefinition.ContainerDefinitions[0].LogConfiguration.Options["awslogs-group"]),
-				LogStreamName: aws.String(t.Name + "/" + t.Name + "/" + re.FindString(*task.TaskArn)),
+				LogStreamName: aws.String(*t.TaskDefinition.ContainerDefinitions[0].LogConfiguration.Options["awslogs-stream-prefix"] + "/" + *t.TaskDefinition.ContainerDefinitions[0].Name + "/" + re.FindString(*task.TaskArn)),
 			}
 
 			if nextToken != "" {
