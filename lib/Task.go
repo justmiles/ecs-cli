@@ -353,6 +353,8 @@ func (t *Task) Stream() {
 					if awsErr.Code() == "ResourceNotFoundException" {
 						time.Sleep(time.Second * 5)
 						continue
+					} else {
+						fmt.Println(err)
 					}
 				} else {
 					logFatalError(err)
