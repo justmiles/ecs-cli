@@ -12,9 +12,10 @@ import (
 )
 
 var (
-	task        ecs.Task
-	wg          sync.WaitGroup
-	validMemCPU map[int][]int
+	task         ecs.Task
+	wg           sync.WaitGroup
+	validMemCPU  map[int][]int
+	noDeregister bool
 )
 
 func init() {
@@ -41,7 +42,7 @@ func init() {
 	// TODO: support assigning public ip address
 	runCmd.PersistentFlags().BoolVar(&task.Public, "public", false, "assign public ip")
 	runCmd.PersistentFlags().BoolVar(&task.Fargate, "fargate", false, "Launch in Fargate")
-	runCmd.PersistentFlags().BoolVar(&task.Deregister, "no-deregister", false, "do not deregister the task definition")
+	runCmd.PersistentFlags().BoolVar(&noDeregister, "no-deregister", false, "do not deregister the task definition")
 	runCmd.Flags().SetInterspersed(false)
 
 	// Init CPU/Memory configs
@@ -58,6 +59,8 @@ var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run a command in a new task",
 	Run: func(cmd *cobra.Command, args []string) {
+
+		task.Deregister = !noDeregister
 		if len(args) < 1 {
 			log.Fatal("Please pass an image to run")
 		}

@@ -28,6 +28,7 @@ func init() {
 	runTaskDefCmd.PersistentFlags().BoolVar(&task.Public, "public", false, "assign public ip")
 	runTaskDefCmd.PersistentFlags().BoolVar(&task.Wait, "wait", false, "wait for container to finish")
 	runTaskDefCmd.PersistentFlags().BoolVarP(&task.Detach, "detach", "d", false, "Run the task in the background")
+	runTaskDefCmd.PersistentFlags().BoolVar(&task.Deregister, "deregister", false, "deregister the task definition after completion")
 
 	runTaskDefCmd.PersistentFlags().Int64VarP(&task.Count, "count", "c", 1, "Spawn n tasks")
 	runTaskDefCmd.Flags().SetInterspersed(false)
