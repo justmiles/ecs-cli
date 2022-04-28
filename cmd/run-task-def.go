@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -39,9 +38,6 @@ var runTaskDefCmd = &cobra.Command{
 	Use:   "run-task-def",
 	Short: "Run a task from an existing task definition",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Hello world")
-		fmt.Println(task)
-
 		task.Fargate = true
 
 		if len(task.SubnetFilters) == 0 {
