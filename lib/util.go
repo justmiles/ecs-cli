@@ -8,11 +8,41 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/fatih/color"
 )
+
+var (
+	sess = session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+	ecsClient            *ecs.ECS
+	ec2Client            *ec2.EC2
+	cloudwatchlogsClient *cloudwatchlogs.CloudWatchLogs
+)
+
+func init() {
+	initAWSClients("")
+}
+
+func initAWSClients(roleArn string) {
+
+	var creds *credentials.Credentials
+	if roleArn != "" {
+		creds = stscreds.NewCredentials(sess, roleArn, func(arp *stscreds.AssumeRoleProvider) {})
+	}
+
+	awsConfig := &aws.Config{Credentials: creds}
+
+	ecsClient = ecs.New(sess, awsConfig)
+	ec2Client = ec2.New(sess, awsConfig)
+	cloudwatchlogsClient = cloudwatchlogs.New(sess, awsConfig)
+}
 
 func buildEnvironmentKeyValuePair(environment []string) (k []*ecs.KeyValuePair) {
 	if len(environment) < 1 {
@@ -178,8 +208,7 @@ func logWarning(s string) {
 }
 
 func getEc2InstanceIp(instanceId string) *string {
-	var svc = ec2.New(sess)
-	res, err := svc.DescribeInstances(&ec2.DescribeInstancesInput{
+	res, err := ec2Client.DescribeInstances(&ec2.DescribeInstancesInput{
 		InstanceIds: aws.StringSlice([]string{instanceId}),
 	})
 	logError(err)
@@ -190,8 +219,7 @@ func getEc2InstanceIp(instanceId string) *string {
 }
 
 func getSecurityGroupByName(groupName string) (*string, error) {
-	var svc = ec2.New(sess)
-	res, err := svc.DescribeSecurityGroups(&ec2.DescribeSecurityGroupsInput{
+	res, err := ec2Client.DescribeSecurityGroups(&ec2.DescribeSecurityGroupsInput{
 		Filters: []*ec2.Filter{
 			{
 				Name:   aws.String("group-name"),
@@ -211,7 +239,6 @@ func getSecurityGroupByName(groupName string) (*string, error) {
 }
 
 func getSubnetsByFilter(subnetFilters []string) (subnets []*string, err error) {
-	var svc = ec2.New(sess)
 
 	var filters []*ec2.Filter
 
@@ -227,7 +254,7 @@ func getSubnetsByFilter(subnetFilters []string) (subnets []*string, err error) {
 		})
 	}
 
-	result, err := svc.DescribeSubnets(&ec2.DescribeSubnetsInput{
+	result, err := ec2Client.DescribeSubnets(&ec2.DescribeSubnetsInput{
 		Filters: filters,
 	})
 

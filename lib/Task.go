@@ -11,23 +11,24 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go/service/ecs"
-	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/cenkalti/backoff"
 	humanize "github.com/dustin/go-humanize"
 )
 
 // Task represents a single, runnable task
 type Task struct {
+	// Used by CLI to perform aws actions
+	CLIRoleArn string
+
 	Cluster            string
 	TaskDefinitionName string
 	Name               string
 	Image              string
 	ImageVersion       string
 	ExecutionRoleArn   string
-	RoleArn            string
+	TaskRoleArn        string
 	Family             string
 	LogGroupName       string
 	Detach             bool
@@ -50,20 +51,11 @@ type Task struct {
 	Tasks              []*ecs.Task
 }
 
-var (
-	sess = session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-	}))
-	ecsClient = ecs.New(sess)
-	ssmClient = ssm.New(sess)
-)
-
 // Stop a task
 func (t *Task) Stop() {
-	var svc = ecs.New(sess)
 	logInfo("Stopping tasks")
 	for _, task := range t.Tasks {
-		_, err := svc.StopTask(&ecs.StopTaskInput{
+		_, err := ecsClient.StopTask(&ecs.StopTaskInput{
 			Cluster: task.ClusterArn,
 			Reason:  aws.String("recieved a ^C"),
 			Task:    task.TaskArn,
@@ -79,9 +71,13 @@ func (t *Task) Stop() {
 
 // Run a task
 func (t *Task) Run() error {
+	if t.CLIRoleArn != "" {
+		initAWSClients(t.CLIRoleArn)
+	}
+
 	var launchType string
 	var publicIP string
-	var svc = ecs.New(sess)
+	// var svc = ecs.New(sess)
 	t.createLogGroup()
 
 	// If fargate, ignore bind mounts
@@ -118,7 +114,7 @@ func (t *Task) Run() error {
 		},
 		Volumes:     v,
 		Family:      aws.String(t.Name),
-		TaskRoleArn: aws.String(t.RoleArn),
+		TaskRoleArn: aws.String(t.TaskRoleArn),
 	}
 
 	if t.Memory > 0 {
@@ -137,18 +133,18 @@ func (t *Task) Run() error {
 		taskDefInput.Memory = aws.String(fmt.Sprintf("%d", t.MemoryReservation))
 
 		// use the execution role if the standard role isn't specified
-		if t.RoleArn == "" && t.ExecutionRoleArn != "" {
+		if t.TaskRoleArn == "" && t.ExecutionRoleArn != "" {
 			taskDefInput.TaskRoleArn = aws.String(t.ExecutionRoleArn)
 		}
 
 		// use the standard role if the execution role isn't specified
-		if t.ExecutionRoleArn == "" && t.RoleArn != "" {
-			taskDefInput.ExecutionRoleArn = aws.String(t.RoleArn)
+		if t.ExecutionRoleArn == "" && t.TaskRoleArn != "" {
+			taskDefInput.ExecutionRoleArn = aws.String(t.TaskRoleArn)
 		}
 	}
 
 	// Register a new task definition
-	arn, err := t.upsertTaskDefinition(svc, &taskDefInput)
+	arn, err := t.upsertTaskDefinition(ecsClient, &taskDefInput)
 	if err != nil {
 		fmt.Printf("Error creating task definition: %s", err.Error())
 		os.Exit(1)
@@ -203,7 +199,7 @@ func (t *Task) Run() error {
 	runTaskInput.LaunchType = aws.String(launchType)
 
 	// Run the task
-	runTaskResponse, err := svc.RunTask(runTaskInput)
+	runTaskResponse, err := ecsClient.RunTask(runTaskInput)
 	if err != nil {
 		return err
 	}
@@ -221,13 +217,16 @@ func (t *Task) Run() error {
 }
 
 func (t *Task) RunTaskDef() error {
+	if t.CLIRoleArn != "" {
+		initAWSClients(t.CLIRoleArn)
+	}
+
 	var launchType string
 	var publicIP string
 	var arn *string
 	var err error
-	var svc = ecs.New(sess)
 
-	describeTaskDefinitionOuput, err := svc.DescribeTaskDefinition(&ecs.DescribeTaskDefinitionInput{
+	describeTaskDefinitionOuput, err := ecsClient.DescribeTaskDefinition(&ecs.DescribeTaskDefinitionInput{
 		Include:        aws.StringSlice([]string{"TAGS"}),
 		TaskDefinition: &t.Family,
 	})
@@ -254,7 +253,7 @@ func (t *Task) RunTaskDef() error {
 		logInfo(fmt.Sprintf("Updating image version: %s", image))
 
 		// Register a new task definition
-		arn, err = t.upsertTaskDefinition(svc, &taskDefinitionInput)
+		arn, err = t.upsertTaskDefinition(ecsClient, &taskDefinitionInput)
 		if err != nil {
 			fmt.Printf("Error creating task definition: %s", err.Error())
 			os.Exit(1)
@@ -310,7 +309,7 @@ func (t *Task) RunTaskDef() error {
 	fmt.Println(runTaskInput)
 
 	// Run the task
-	runTaskResponse, err := svc.RunTask(runTaskInput)
+	runTaskResponse, err := ecsClient.RunTask(runTaskInput)
 	if err != nil {
 		return err
 	}
@@ -330,7 +329,6 @@ func (t *Task) RunTaskDef() error {
 // Stream logs to stdout
 func (t *Task) Stream() {
 	logInfo("Streaming from Cloudwatch Logs")
-	var svc = cloudwatchlogs.New(sess)
 	var re = regexp.MustCompile("[^/]*$")
 	nextToken := ""
 
@@ -346,7 +344,7 @@ func (t *Task) Stream() {
 				logEventsInput.NextToken = aws.String(nextToken)
 			}
 
-			logEvents, err := svc.GetLogEvents(&logEventsInput)
+			logEvents, err := cloudwatchlogsClient.GetLogEvents(&logEventsInput)
 			if err != nil {
 				if awsErr, ok := err.(awserr.Error); ok {
 					// Get error details
@@ -376,7 +374,6 @@ func (t *Task) Stream() {
 
 // Check the container is still running
 func (t *Task) Check() {
-	var svc = ecs.New(sess)
 	var cluster *string
 	var stoppedCount int
 	var exitCode int64 = 1
@@ -400,13 +397,13 @@ func (t *Task) Check() {
 			continue
 		}
 
-		res, err := svc.DescribeTasks(&describeTasksInput)
+		res, err := ecsClient.DescribeTasks(&describeTasksInput)
 		logError(err)
 
 		for _, ecsTask := range res.Tasks {
 
 			if ip == nil && ecsTask.ContainerInstanceArn != nil {
-				res, err := svc.DescribeContainerInstances(&ecs.DescribeContainerInstancesInput{
+				res, err := ecsClient.DescribeContainerInstances(&ecs.DescribeContainerInstancesInput{
 					Cluster:            &t.Cluster,
 					ContainerInstances: aws.StringSlice([]string{*ecsTask.ContainerInstanceArn}),
 				})
@@ -446,7 +443,7 @@ func (t *Task) Check() {
 		if stoppedCount == len(res.Tasks) && len(res.Tasks) != 0 {
 			logInfo("All containers have exited")
 			if t.Deregister {
-				t.deregister(svc)
+				t.deregister(ecsClient)
 			}
 			time.Sleep(time.Second * 5) // give the logs another chance to come in
 			os.Exit(int(exitCode))
@@ -463,10 +460,10 @@ func (t *Task) Check() {
 func (t *Task) createLogGroup() {
 	t.LogGroupName = "/" + t.Cluster + "/ecs/" + t.Name
 
-	var svc = cloudwatchlogs.New(sess)
+	// var svc = cloudwatchlogs.New(sess)
 	var logGroupName = aws.String(t.LogGroupName)
 
-	output, err := svc.DescribeLogGroups(&cloudwatchlogs.DescribeLogGroupsInput{
+	output, err := cloudwatchlogsClient.DescribeLogGroups(&cloudwatchlogs.DescribeLogGroupsInput{
 		LogGroupNamePrefix: logGroupName,
 	})
 	if err != nil {
@@ -475,7 +472,7 @@ func (t *Task) createLogGroup() {
 	}
 	if len(output.LogGroups) == 0 {
 		logInfo(fmt.Sprintf("Creating Log Group %s\n", *logGroupName))
-		svc.CreateLogGroup(&cloudwatchlogs.CreateLogGroupInput{
+		cloudwatchlogsClient.CreateLogGroup(&cloudwatchlogs.CreateLogGroupInput{
 			LogGroupName: logGroupName,
 		})
 	}
