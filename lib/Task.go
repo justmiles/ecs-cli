@@ -49,6 +49,7 @@ type Task struct {
 	Command            []string
 	TaskDefinition     ecs.TaskDefinition
 	Tasks              []*ecs.Task
+	Debug              bool
 }
 
 // Stop a task
@@ -245,12 +246,14 @@ func (t *Task) RunTaskDef() error {
 
 	// Update image version if provided
 	if len(t.ImageVersion) > 0 {
+		previousImage := *taskDefinitionInput.ContainerDefinitions[0].Image
+
 		// Parse image
-		image := strings.Split(*taskDefinitionInput.ContainerDefinitions[0].Image, ":")
+		image := strings.Split(previousImage, ":")
 		image[1] = t.ImageVersion
 		taskDefinitionInput.ContainerDefinitions[0].Image = aws.String(strings.Join(image, ":"))
 
-		logInfo(fmt.Sprintf("Updating image version: %s", image))
+		logInfo(fmt.Sprintf("Updating image version. %s -> %s", strings.Split(previousImage, "/")[1], strings.Split(*taskDefinitionInput.ContainerDefinitions[0].Image, "/")[1]))
 
 		// Register a new task definition
 		arn, err = t.upsertTaskDefinition(ecsClient, &taskDefinitionInput)
@@ -499,11 +502,13 @@ func (t *Task) upsertTaskDefinition(svc *ecs.ECS, taskDefInput *ecs.RegisterTask
 	var retryCount int
 	const maxRetries = 50
 	backoffWithRetries := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), maxRetries)
-	cfg := req.Config.WithLogLevel(aws.LogDebugWithRequestRetries)
+
+	if t.Debug {
+		req.Config = *req.Config.WithLogLevel(aws.LogDebugWithRequestRetries)
+	}
 	operation := func() error {
 		logInfo("Creating task definition")
 		req.Retryable = aws.Bool(true)
-		req.Config = *cfg
 		err := req.Send()
 		if err != nil {
 			t := time.Now()

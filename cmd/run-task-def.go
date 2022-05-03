@@ -29,6 +29,8 @@ func init() {
 	runTaskDefCmd.PersistentFlags().BoolVarP(&task.Detach, "detach", "d", false, "Run the task in the background")
 	runTaskDefCmd.PersistentFlags().BoolVar(&task.Deregister, "deregister", false, "deregister the task definition after completion")
 
+	runTaskDefCmd.PersistentFlags().BoolVar(&task.Debug, "debug", false, "Verbose logging")
+
 	runTaskDefCmd.PersistentFlags().StringVar(&task.CLIRoleArn, "cli-role", "", "An IAM role ARN to assume before creating/executing a task")
 
 	runTaskDefCmd.PersistentFlags().Int64VarP(&task.Count, "count", "c", 1, "Spawn n tasks")

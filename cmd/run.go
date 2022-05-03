@@ -44,6 +44,7 @@ func init() {
 	runCmd.PersistentFlags().BoolVar(&task.Public, "public", false, "assign public ip")
 	runCmd.PersistentFlags().BoolVar(&task.Fargate, "fargate", false, "Launch in Fargate")
 	runCmd.PersistentFlags().BoolVar(&noDeregister, "no-deregister", false, "do not deregister the task definition")
+	runCmd.PersistentFlags().BoolVar(&task.Debug, "debug", false, "Verbose logging")
 	runCmd.Flags().SetInterspersed(false)
 
 	// Init CPU/Memory configs
