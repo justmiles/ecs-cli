@@ -21,7 +21,7 @@ This CLI is designed to closely resemble the `docker run` command for ECS. This 
 
 **Homebrew**
 ```bash
-brew install chrispruitt/tap/esc
+brew install chrispruitt/tap/ecs
 ```
 
 ## Example
