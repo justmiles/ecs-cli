@@ -12,7 +12,8 @@ This CLI is designed to closely resemble the `docker run` command for ECS. This 
     * [ ] allow custom task-definition name
 * [x] the exit code from the container is mirrored by the CLI
 * [x] capture a SIGKILL event (Ctrl+c) and stop the remote container
-* [ ] replicate `docker exec` arguments using SSM agent
+* [x] replicate `docker exec` arguments using SSM agent
+* [x] support executing an existing task definition with optional image version bump
 * [ ] Only create new task definition if it differs from the last active task defition
 * [ ] Specify (or maybe create?) cluster capacity provider for fargate spot support
 
@@ -74,3 +75,7 @@ All containers have exited
         --subnet stringArray            Subnet(s) where task should run
     -v, --volume stringArray            Map volume to ECS Container Instance
 
+
+## Note
+
+The slim docker image is much smaller, but does not support the exec command.

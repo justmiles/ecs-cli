@@ -9,14 +9,121 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/aws/aws-sdk-go/aws/request"
+	"github.com/aws/aws-sdk-go/private/protocol"
+	"github.com/aws/aws-sdk-go/private/protocol/jsonrpc"
 )
+
+const opCreateCapacityProvider = "CreateCapacityProvider"
+
+// CreateCapacityProviderRequest generates a "aws/request.Request" representing the
+// client's request for the CreateCapacityProvider operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See CreateCapacityProvider for more information on using the CreateCapacityProvider
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the CreateCapacityProviderRequest method.
+//    req, resp := client.CreateCapacityProviderRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/CreateCapacityProvider
+func (c *ECS) CreateCapacityProviderRequest(input *CreateCapacityProviderInput) (req *request.Request, output *CreateCapacityProviderOutput) {
+	op := &request.Operation{
+		Name:       opCreateCapacityProvider,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &CreateCapacityProviderInput{}
+	}
+
+	output = &CreateCapacityProviderOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// CreateCapacityProvider API operation for Amazon EC2 Container Service.
+//
+// Creates a new capacity provider. Capacity providers are associated with an
+// Amazon ECS cluster and are used in capacity provider strategies to facilitate
+// cluster auto scaling.
+//
+// Only capacity providers using an Auto Scaling group can be created. Amazon
+// ECS tasks on Fargate use the FARGATE and FARGATE_SPOT capacity providers
+// which are already created and available to all accounts in Regions supported
+// by Fargate.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation CreateCapacityProvider for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+//   * LimitExceededException
+//   The limit for the resource has been exceeded.
+//
+//   * UpdateInProgressException
+//   There is already a current Amazon ECS container agent update in progress
+//   on the specified container instance. If the container agent becomes disconnected
+//   while it is in a transitional stage, such as PENDING or STAGING, the update
+//   process can get stuck in that state. However, when the agent reconnects,
+//   it resumes where it stopped previously.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/CreateCapacityProvider
+func (c *ECS) CreateCapacityProvider(input *CreateCapacityProviderInput) (*CreateCapacityProviderOutput, error) {
+	req, out := c.CreateCapacityProviderRequest(input)
+	return out, req.Send()
+}
+
+// CreateCapacityProviderWithContext is the same as CreateCapacityProvider with the addition of
+// the ability to pass a context and additional request options.
+//
+// See CreateCapacityProvider for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) CreateCapacityProviderWithContext(ctx aws.Context, input *CreateCapacityProviderInput, opts ...request.Option) (*CreateCapacityProviderOutput, error) {
+	req, out := c.CreateCapacityProviderRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
 
 const opCreateCluster = "CreateCluster"
 
 // CreateClusterRequest generates a "aws/request.Request" representing the
 // client's request for the CreateCluster operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -60,11 +167,11 @@ func (c *ECS) CreateClusterRequest(input *CreateClusterInput) (req *request.Requ
 // your own cluster with a unique name with the CreateCluster action.
 //
 // When you call the CreateCluster API operation, Amazon ECS attempts to create
-// the service-linked role for your account so that required resources in other
-// AWS services can be managed on your behalf. However, if the IAM user that
-// makes the call does not have permissions to create the service-linked role,
-// it is not created. For more information, see Using Service-Linked Roles for
-// Amazon ECS (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/using-service-linked-roles.html)
+// the Amazon ECS service-linked role for your account so that required resources
+// in other Amazon Web Services services can be managed on your behalf. However,
+// if the IAM user that makes the call does not have permissions to create the
+// service-linked role, it is not created. For more information, see Using Service-Linked
+// Roles for Amazon ECS (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using-service-linked-roles.html)
 // in the Amazon Elastic Container Service Developer Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -74,16 +181,16 @@ func (c *ECS) CreateClusterRequest(input *CreateClusterInput) (req *request.Requ
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation CreateCluster for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
@@ -114,7 +221,7 @@ const opCreateService = "CreateService"
 // CreateServiceRequest generates a "aws/request.Request" representing the
 // client's request for the CreateService operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -154,47 +261,88 @@ func (c *ECS) CreateServiceRequest(input *CreateServiceInput) (req *request.Requ
 // CreateService API operation for Amazon EC2 Container Service.
 //
 // Runs and maintains a desired number of tasks from a specified task definition.
-// If the number of tasks running in a service drops below desiredCount, Amazon
-// ECS spawns another copy of the task in the specified cluster. To update an
-// existing service, see UpdateService.
+// If the number of tasks running in a service drops below the desiredCount,
+// Amazon ECS runs another copy of the task in the specified cluster. To update
+// an existing service, see the UpdateService action.
 //
 // In addition to maintaining the desired count of tasks in your service, you
-// can optionally run your service behind a load balancer. The load balancer
-// distributes traffic across the tasks that are associated with the service.
-// For more information, see Service Load Balancing (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-load-balancing.html)
+// can optionally run your service behind one or more load balancers. The load
+// balancers distribute traffic across the tasks that are associated with the
+// service. For more information, see Service Load Balancing (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-load-balancing.html)
 // in the Amazon Elastic Container Service Developer Guide.
 //
-// You can optionally specify a deployment configuration for your service. During
-// a deployment, the service scheduler uses the minimumHealthyPercent and maximumPercent
-// parameters to determine the deployment strategy. The deployment is triggered
-// by changing the task definition or the desired count of a service with an
-// UpdateService operation.
+// Tasks for services that do not use a load balancer are considered healthy
+// if they're in the RUNNING state. Tasks for services that do use a load balancer
+// are considered healthy if they're in the RUNNING state and the container
+// instance that they're hosted on is reported as healthy by the load balancer.
 //
-// The minimumHealthyPercent represents a lower limit on the number of your
-// service's tasks that must remain in the RUNNING state during a deployment,
-// as a percentage of the desiredCount (rounded up to the nearest integer).
-// This parameter enables you to deploy without using additional cluster capacity.
-// For example, if your service has a desiredCount of four tasks and a minimumHealthyPercent
-// of 50%, the scheduler can stop two existing tasks to free up cluster capacity
-// before starting two new tasks. Tasks for services that do not use a load
-// balancer are considered healthy if they are in the RUNNING state. Tasks for
-// services that do use a load balancer are considered healthy if they are in
-// the RUNNING state and the container instance they are hosted on is reported
-// as healthy by the load balancer. The default value for a replica service
-// for minimumHealthyPercent is 50% in the console and 100% for the AWS CLI,
-// the AWS SDKs, and the APIs. The default value for a daemon service for minimumHealthyPercent
-// is 0% for the AWS CLI, the AWS SDKs, and the APIs and 50% for the console.
+// There are two service scheduler strategies available:
 //
-// The maximumPercent parameter represents an upper limit on the number of your
-// service's tasks that are allowed in the RUNNING or PENDING state during a
-// deployment, as a percentage of the desiredCount (rounded down to the nearest
-// integer). This parameter enables you to define the deployment batch size.
-// For example, if your replica service has a desiredCount of four tasks and
-// a maximumPercent value of 200%, the scheduler can start four new tasks before
-// stopping the four older tasks (provided that the cluster resources required
-// to do this are available). The default value for a replica service for maximumPercent
-// is 200%. If you are using a daemon service type, the maximumPercent should
-// remain at 100%, which is the default value.
+//    * REPLICA - The replica scheduling strategy places and maintains the desired
+//    number of tasks across your cluster. By default, the service scheduler
+//    spreads tasks across Availability Zones. You can use task placement strategies
+//    and constraints to customize task placement decisions. For more information,
+//    see Service Scheduler Concepts (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_services.html)
+//    in the Amazon Elastic Container Service Developer Guide.
+//
+//    * DAEMON - The daemon scheduling strategy deploys exactly one task on
+//    each active container instance that meets all of the task placement constraints
+//    that you specify in your cluster. The service scheduler also evaluates
+//    the task placement constraints for running tasks and will stop tasks that
+//    do not meet the placement constraints. When using this strategy, you don't
+//    need to specify a desired number of tasks, a task placement strategy,
+//    or use Service Auto Scaling policies. For more information, see Service
+//    Scheduler Concepts (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_services.html)
+//    in the Amazon Elastic Container Service Developer Guide.
+//
+// You can optionally specify a deployment configuration for your service. The
+// deployment is triggered by changing properties, such as the task definition
+// or the desired count of a service, with an UpdateService operation. The default
+// value for a replica service for minimumHealthyPercent is 100%. The default
+// value for a daemon service for minimumHealthyPercent is 0%.
+//
+// If a service is using the ECS deployment controller, the minimum healthy
+// percent represents a lower limit on the number of tasks in a service that
+// must remain in the RUNNING state during a deployment, as a percentage of
+// the desired number of tasks (rounded up to the nearest integer), and while
+// any container instances are in the DRAINING state if the service contains
+// tasks using the EC2 launch type. This parameter enables you to deploy without
+// using additional cluster capacity. For example, if your service has a desired
+// number of four tasks and a minimum healthy percent of 50%, the scheduler
+// might stop two existing tasks to free up cluster capacity before starting
+// two new tasks. Tasks for services that do not use a load balancer are considered
+// healthy if they're in the RUNNING state. Tasks for services that do use a
+// load balancer are considered healthy if they're in the RUNNING state and
+// they're reported as healthy by the load balancer. The default value for minimum
+// healthy percent is 100%.
+//
+// If a service is using the ECS deployment controller, the maximum percent
+// parameter represents an upper limit on the number of tasks in a service that
+// are allowed in the RUNNING or PENDING state during a deployment, as a percentage
+// of the desired number of tasks (rounded down to the nearest integer), and
+// while any container instances are in the DRAINING state if the service contains
+// tasks using the EC2 launch type. This parameter enables you to define the
+// deployment batch size. For example, if your service has a desired number
+// of four tasks and a maximum percent value of 200%, the scheduler may start
+// four new tasks before stopping the four older tasks (provided that the cluster
+// resources required to do this are available). The default value for maximum
+// percent is 200%.
+//
+// If a service is using either the CODE_DEPLOY or EXTERNAL deployment controller
+// types and tasks that use the EC2 launch type, the minimum healthy percent
+// and maximum percent values are used only to define the lower and upper limit
+// on the number of the tasks in the service that remain in the RUNNING state
+// while the container instances are in the DRAINING state. If the tasks in
+// the service use the Fargate launch type, the minimum healthy percent and
+// maximum percent values aren't used, although they're currently visible when
+// describing your service.
+//
+// When creating a service that uses the EXTERNAL deployment controller, you
+// can specify only parameters that aren't controlled at the task set level.
+// The only required parameter is the service name. You control your services
+// using the CreateTaskSet operation. For more information, see Amazon ECS Deployment
+// Types (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-types.html)
+// in the Amazon Elastic Container Service Developer Guide.
 //
 // When the service scheduler launches new tasks, it determines task placement
 // in your cluster using the following logic:
@@ -205,17 +353,14 @@ func (c *ECS) CreateServiceRequest(input *CreateServiceInput) (req *request.Requ
 //
 //    * By default, the service scheduler attempts to balance tasks across Availability
 //    Zones in this manner (although you can choose a different placement strategy)
-//    with the placementStrategy parameter):
-//
-// Sort the valid container instances, giving priority to instances that have
-//    the fewest number of running tasks for this service in their respective
-//    Availability Zone. For example, if zone A has one running service task
-//    and zones B and C each have zero, valid container instances in either
-//    zone B or C are considered optimal for placement.
-//
-// Place the new service task on a valid container instance in an optimal Availability
-//    Zone (based on the previous steps), favoring container instances with
-//    the fewest number of running tasks for this service.
+//    with the placementStrategy parameter): Sort the valid container instances,
+//    giving priority to instances that have the fewest number of running tasks
+//    for this service in their respective Availability Zone. For example, if
+//    zone A has one running service task and zones B and C each have zero,
+//    valid container instances in either zone B or C are considered optimal
+//    for placement. Place the new service task on a valid container instance
+//    in an optimal Availability Zone (based on the previous steps), favoring
+//    container instances with the fewest number of running tasks for this service.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -224,34 +369,34 @@ func (c *ECS) CreateServiceRequest(input *CreateServiceInput) (req *request.Requ
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation CreateService for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
-//   * ErrCodeUnsupportedFeatureException "UnsupportedFeatureException"
-//   The specified task is not supported in this region.
+//   * UnsupportedFeatureException
+//   The specified task is not supported in this Region.
 //
-//   * ErrCodePlatformUnknownException "PlatformUnknownException"
+//   * PlatformUnknownException
 //   The specified platform version does not exist.
 //
-//   * ErrCodePlatformTaskDefinitionIncompatibilityException "PlatformTaskDefinitionIncompatibilityException"
+//   * PlatformTaskDefinitionIncompatibilityException
 //   The specified platform version does not satisfy the task definition's required
 //   capabilities.
 //
-//   * ErrCodeAccessDeniedException "AccessDeniedException"
+//   * AccessDeniedException
 //   You do not have authorization to perform the requested action.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/CreateService
@@ -276,12 +421,217 @@ func (c *ECS) CreateServiceWithContext(ctx aws.Context, input *CreateServiceInpu
 	return out, req.Send()
 }
 
+const opCreateTaskSet = "CreateTaskSet"
+
+// CreateTaskSetRequest generates a "aws/request.Request" representing the
+// client's request for the CreateTaskSet operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See CreateTaskSet for more information on using the CreateTaskSet
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the CreateTaskSetRequest method.
+//    req, resp := client.CreateTaskSetRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/CreateTaskSet
+func (c *ECS) CreateTaskSetRequest(input *CreateTaskSetInput) (req *request.Request, output *CreateTaskSetOutput) {
+	op := &request.Operation{
+		Name:       opCreateTaskSet,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &CreateTaskSetInput{}
+	}
+
+	output = &CreateTaskSetOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// CreateTaskSet API operation for Amazon EC2 Container Service.
+//
+// Create a task set in the specified cluster and service. This is used when
+// a service uses the EXTERNAL deployment controller type. For more information,
+// see Amazon ECS Deployment Types (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-types.html)
+// in the Amazon Elastic Container Service Developer Guide.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation CreateTaskSet for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+//   * ClusterNotFoundException
+//   The specified cluster could not be found. You can view your available clusters
+//   with ListClusters. Amazon ECS clusters are Region-specific.
+//
+//   * UnsupportedFeatureException
+//   The specified task is not supported in this Region.
+//
+//   * PlatformUnknownException
+//   The specified platform version does not exist.
+//
+//   * PlatformTaskDefinitionIncompatibilityException
+//   The specified platform version does not satisfy the task definition's required
+//   capabilities.
+//
+//   * AccessDeniedException
+//   You do not have authorization to perform the requested action.
+//
+//   * ServiceNotFoundException
+//   The specified service could not be found. You can view your available services
+//   with ListServices. Amazon ECS services are cluster-specific and Region-specific.
+//
+//   * ServiceNotActiveException
+//   The specified service is not active. You can't update a service that is inactive.
+//   If you have previously deleted a service, you can re-create it with CreateService.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/CreateTaskSet
+func (c *ECS) CreateTaskSet(input *CreateTaskSetInput) (*CreateTaskSetOutput, error) {
+	req, out := c.CreateTaskSetRequest(input)
+	return out, req.Send()
+}
+
+// CreateTaskSetWithContext is the same as CreateTaskSet with the addition of
+// the ability to pass a context and additional request options.
+//
+// See CreateTaskSet for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) CreateTaskSetWithContext(ctx aws.Context, input *CreateTaskSetInput, opts ...request.Option) (*CreateTaskSetOutput, error) {
+	req, out := c.CreateTaskSetRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
+const opDeleteAccountSetting = "DeleteAccountSetting"
+
+// DeleteAccountSettingRequest generates a "aws/request.Request" representing the
+// client's request for the DeleteAccountSetting operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See DeleteAccountSetting for more information on using the DeleteAccountSetting
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the DeleteAccountSettingRequest method.
+//    req, resp := client.DeleteAccountSettingRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DeleteAccountSetting
+func (c *ECS) DeleteAccountSettingRequest(input *DeleteAccountSettingInput) (req *request.Request, output *DeleteAccountSettingOutput) {
+	op := &request.Operation{
+		Name:       opDeleteAccountSetting,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &DeleteAccountSettingInput{}
+	}
+
+	output = &DeleteAccountSettingOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// DeleteAccountSetting API operation for Amazon EC2 Container Service.
+//
+// Disables an account setting for a specified IAM user, IAM role, or the root
+// user for an account.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation DeleteAccountSetting for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DeleteAccountSetting
+func (c *ECS) DeleteAccountSetting(input *DeleteAccountSettingInput) (*DeleteAccountSettingOutput, error) {
+	req, out := c.DeleteAccountSettingRequest(input)
+	return out, req.Send()
+}
+
+// DeleteAccountSettingWithContext is the same as DeleteAccountSetting with the addition of
+// the ability to pass a context and additional request options.
+//
+// See DeleteAccountSetting for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) DeleteAccountSettingWithContext(ctx aws.Context, input *DeleteAccountSettingInput, opts ...request.Option) (*DeleteAccountSettingOutput, error) {
+	req, out := c.DeleteAccountSettingRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
 const opDeleteAttributes = "DeleteAttributes"
 
 // DeleteAttributesRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteAttributes operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -329,17 +679,17 @@ func (c *ECS) DeleteAttributesRequest(input *DeleteAttributesInput) (req *reques
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation DeleteAttributes for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+// Returned Error Types:
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
-//   * ErrCodeTargetNotFoundException "TargetNotFoundException"
+//   * TargetNotFoundException
 //   The specified target could not be found. You can view your available container
 //   instances with ListContainerInstances. Amazon ECS container instances are
-//   cluster-specific and region-specific.
+//   cluster-specific and Region-specific.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
@@ -365,12 +715,114 @@ func (c *ECS) DeleteAttributesWithContext(ctx aws.Context, input *DeleteAttribut
 	return out, req.Send()
 }
 
+const opDeleteCapacityProvider = "DeleteCapacityProvider"
+
+// DeleteCapacityProviderRequest generates a "aws/request.Request" representing the
+// client's request for the DeleteCapacityProvider operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See DeleteCapacityProvider for more information on using the DeleteCapacityProvider
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the DeleteCapacityProviderRequest method.
+//    req, resp := client.DeleteCapacityProviderRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DeleteCapacityProvider
+func (c *ECS) DeleteCapacityProviderRequest(input *DeleteCapacityProviderInput) (req *request.Request, output *DeleteCapacityProviderOutput) {
+	op := &request.Operation{
+		Name:       opDeleteCapacityProvider,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &DeleteCapacityProviderInput{}
+	}
+
+	output = &DeleteCapacityProviderOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// DeleteCapacityProvider API operation for Amazon EC2 Container Service.
+//
+// Deletes the specified capacity provider.
+//
+// The FARGATE and FARGATE_SPOT capacity providers are reserved and cannot be
+// deleted. You can disassociate them from a cluster using either the PutClusterCapacityProviders
+// API or by deleting the cluster.
+//
+// Prior to a capacity provider being deleted, the capacity provider must be
+// removed from the capacity provider strategy from all services. The UpdateService
+// API can be used to remove a capacity provider from a service's capacity provider
+// strategy. When updating a service, the forceNewDeployment option can be used
+// to ensure that any tasks using the Amazon EC2 instance capacity provided
+// by the capacity provider are transitioned to use the capacity from the remaining
+// capacity providers. Only capacity providers that are not associated with
+// a cluster can be deleted. To remove a capacity provider from a cluster, you
+// can either use PutClusterCapacityProviders or delete the cluster.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation DeleteCapacityProvider for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DeleteCapacityProvider
+func (c *ECS) DeleteCapacityProvider(input *DeleteCapacityProviderInput) (*DeleteCapacityProviderOutput, error) {
+	req, out := c.DeleteCapacityProviderRequest(input)
+	return out, req.Send()
+}
+
+// DeleteCapacityProviderWithContext is the same as DeleteCapacityProvider with the addition of
+// the ability to pass a context and additional request options.
+//
+// See DeleteCapacityProvider for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) DeleteCapacityProviderWithContext(ctx aws.Context, input *DeleteCapacityProviderInput, opts ...request.Option) (*DeleteCapacityProviderOutput, error) {
+	req, out := c.DeleteCapacityProviderRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
 const opDeleteCluster = "DeleteCluster"
 
 // DeleteClusterRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteCluster operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -409,9 +861,14 @@ func (c *ECS) DeleteClusterRequest(input *DeleteClusterInput) (req *request.Requ
 
 // DeleteCluster API operation for Amazon EC2 Container Service.
 //
-// Deletes the specified cluster. You must deregister all container instances
-// from this cluster before you may delete it. You can list the container instances
-// in a cluster with ListContainerInstances and deregister them with DeregisterContainerInstance.
+// Deletes the specified cluster. The cluster will transition to the INACTIVE
+// state. Clusters with an INACTIVE status may remain discoverable in your account
+// for a period of time. However, this behavior is subject to change in the
+// future, so you should not rely on INACTIVE clusters persisting.
+//
+// You must deregister all container instances from this cluster before you
+// may delete it. You can list the container instances in a cluster with ListContainerInstances
+// and deregister them with DeregisterContainerInstance.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -420,35 +877,42 @@ func (c *ECS) DeleteClusterRequest(input *DeleteClusterInput) (req *request.Requ
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation DeleteCluster for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
-//   * ErrCodeClusterContainsContainerInstancesException "ClusterContainsContainerInstancesException"
-//   You cannot delete a cluster that has registered container instances. You
-//   must first deregister the container instances before you can delete the cluster.
-//   For more information, see DeregisterContainerInstance.
+//   * ClusterContainsContainerInstancesException
+//   You cannot delete a cluster that has registered container instances. First,
+//   deregister the container instances before you can delete the cluster. For
+//   more information, see DeregisterContainerInstance.
 //
-//   * ErrCodeClusterContainsServicesException "ClusterContainsServicesException"
-//   You cannot delete a cluster that contains services. You must first update
-//   the service to reduce its desired task count to 0 and then delete the service.
-//   For more information, see UpdateService and DeleteService.
+//   * ClusterContainsServicesException
+//   You cannot delete a cluster that contains services. First, update the service
+//   to reduce its desired task count to 0 and then delete the service. For more
+//   information, see UpdateService and DeleteService.
 //
-//   * ErrCodeClusterContainsTasksException "ClusterContainsTasksException"
+//   * ClusterContainsTasksException
 //   You cannot delete a cluster that has active tasks.
+//
+//   * UpdateInProgressException
+//   There is already a current Amazon ECS container agent update in progress
+//   on the specified container instance. If the container agent becomes disconnected
+//   while it is in a transitional stage, such as PENDING or STAGING, the update
+//   process can get stuck in that state. However, when the agent reconnects,
+//   it resumes where it stopped previously.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DeleteCluster
 func (c *ECS) DeleteCluster(input *DeleteClusterInput) (*DeleteClusterOutput, error) {
@@ -477,7 +941,7 @@ const opDeleteService = "DeleteService"
 // DeleteServiceRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteService operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -524,12 +988,16 @@ func (c *ECS) DeleteServiceRequest(input *DeleteServiceInput) (req *request.Requ
 //
 // When you delete a service, if there are still running tasks that require
 // cleanup, the service status moves from ACTIVE to DRAINING, and the service
-// is no longer visible in the console or in ListServices API operations. After
-// the tasks have stopped, then the service status moves from DRAINING to INACTIVE.
-// Services in the DRAINING or INACTIVE status can still be viewed with DescribeServices
-// API operations. However, in the future, INACTIVE services may be cleaned
-// up and purged from Amazon ECS record keeping, and DescribeServices API operations
-// on those services return a ServiceNotFoundException error.
+// is no longer visible in the console or in the ListServices API operation.
+// After all tasks have transitioned to either STOPPING or STOPPED status, the
+// service status moves from DRAINING to INACTIVE. Services in the DRAINING
+// or INACTIVE status can still be viewed with the DescribeServices API operation.
+// However, in the future, INACTIVE services may be cleaned up and purged from
+// Amazon ECS record keeping, and DescribeServices calls on those services return
+// a ServiceNotFoundException error.
+//
+// If you attempt to create a new service with the same name as an existing
+// service in either ACTIVE or DRAINING status, you receive an error.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -538,26 +1006,26 @@ func (c *ECS) DeleteServiceRequest(input *DeleteServiceInput) (req *request.Requ
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation DeleteService for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
-//   * ErrCodeServiceNotFoundException "ServiceNotFoundException"
+//   * ServiceNotFoundException
 //   The specified service could not be found. You can view your available services
-//   with ListServices. Amazon ECS services are cluster-specific and region-specific.
+//   with ListServices. Amazon ECS services are cluster-specific and Region-specific.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DeleteService
 func (c *ECS) DeleteService(input *DeleteServiceInput) (*DeleteServiceOutput, error) {
@@ -581,12 +1049,126 @@ func (c *ECS) DeleteServiceWithContext(ctx aws.Context, input *DeleteServiceInpu
 	return out, req.Send()
 }
 
+const opDeleteTaskSet = "DeleteTaskSet"
+
+// DeleteTaskSetRequest generates a "aws/request.Request" representing the
+// client's request for the DeleteTaskSet operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See DeleteTaskSet for more information on using the DeleteTaskSet
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the DeleteTaskSetRequest method.
+//    req, resp := client.DeleteTaskSetRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DeleteTaskSet
+func (c *ECS) DeleteTaskSetRequest(input *DeleteTaskSetInput) (req *request.Request, output *DeleteTaskSetOutput) {
+	op := &request.Operation{
+		Name:       opDeleteTaskSet,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &DeleteTaskSetInput{}
+	}
+
+	output = &DeleteTaskSetOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// DeleteTaskSet API operation for Amazon EC2 Container Service.
+//
+// Deletes a specified task set within a service. This is used when a service
+// uses the EXTERNAL deployment controller type. For more information, see Amazon
+// ECS Deployment Types (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-types.html)
+// in the Amazon Elastic Container Service Developer Guide.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation DeleteTaskSet for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+//   * ClusterNotFoundException
+//   The specified cluster could not be found. You can view your available clusters
+//   with ListClusters. Amazon ECS clusters are Region-specific.
+//
+//   * UnsupportedFeatureException
+//   The specified task is not supported in this Region.
+//
+//   * AccessDeniedException
+//   You do not have authorization to perform the requested action.
+//
+//   * ServiceNotFoundException
+//   The specified service could not be found. You can view your available services
+//   with ListServices. Amazon ECS services are cluster-specific and Region-specific.
+//
+//   * ServiceNotActiveException
+//   The specified service is not active. You can't update a service that is inactive.
+//   If you have previously deleted a service, you can re-create it with CreateService.
+//
+//   * TaskSetNotFoundException
+//   The specified task set could not be found. You can view your available task
+//   sets with DescribeTaskSets. Task sets are specific to each cluster, service
+//   and Region.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DeleteTaskSet
+func (c *ECS) DeleteTaskSet(input *DeleteTaskSetInput) (*DeleteTaskSetOutput, error) {
+	req, out := c.DeleteTaskSetRequest(input)
+	return out, req.Send()
+}
+
+// DeleteTaskSetWithContext is the same as DeleteTaskSet with the addition of
+// the ability to pass a context and additional request options.
+//
+// See DeleteTaskSet for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) DeleteTaskSetWithContext(ctx aws.Context, input *DeleteTaskSetInput, opts ...request.Option) (*DeleteTaskSetOutput, error) {
+	req, out := c.DeleteTaskSetRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
 const opDeregisterContainerInstance = "DeregisterContainerInstance"
 
 // DeregisterContainerInstanceRequest generates a "aws/request.Request" representing the
 // client's request for the DeregisterContainerInstance operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -634,7 +1216,7 @@ func (c *ECS) DeregisterContainerInstanceRequest(input *DeregisterContainerInsta
 // resources.
 //
 // Deregistering a container instance removes the instance from a cluster, but
-// it does not terminate the EC2 instance; if you are finished using the instance,
+// it does not terminate the EC2 instance. If you are finished using the instance,
 // be sure to terminate it in the Amazon EC2 console to stop billing.
 //
 // If you terminate a running container instance, Amazon ECS automatically deregisters
@@ -648,22 +1230,22 @@ func (c *ECS) DeregisterContainerInstanceRequest(input *DeregisterContainerInsta
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation DeregisterContainerInstance for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DeregisterContainerInstance
 func (c *ECS) DeregisterContainerInstance(input *DeregisterContainerInstanceInput) (*DeregisterContainerInstanceOutput, error) {
@@ -692,7 +1274,7 @@ const opDeregisterTaskDefinition = "DeregisterTaskDefinition"
 // DeregisterTaskDefinitionRequest generates a "aws/request.Request" representing the
 // client's request for the DeregisterTaskDefinition operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -739,11 +1321,11 @@ func (c *ECS) DeregisterTaskDefinitionRequest(input *DeregisterTaskDefinitionInp
 //
 // You cannot use an INACTIVE task definition to run new tasks or create new
 // services, and you cannot update an existing service to reference an INACTIVE
-// task definition (although there may be up to a 10-minute window following
-// deregistration where these restrictions have not yet taken effect).
+// task definition. However, there may be up to a 10-minute window following
+// deregistration where these restrictions have not yet taken effect.
 //
 // At this time, INACTIVE task definitions remain discoverable in your account
-// indefinitely; however, this behavior is subject to change in the future,
+// indefinitely. However, this behavior is subject to change in the future,
 // so you should not rely on INACTIVE task definitions persisting beyond the
 // lifecycle of any associated tasks and services.
 //
@@ -754,16 +1336,16 @@ func (c *ECS) DeregisterTaskDefinitionRequest(input *DeregisterTaskDefinitionInp
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation DeregisterTaskDefinition for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
@@ -789,12 +1371,100 @@ func (c *ECS) DeregisterTaskDefinitionWithContext(ctx aws.Context, input *Deregi
 	return out, req.Send()
 }
 
+const opDescribeCapacityProviders = "DescribeCapacityProviders"
+
+// DescribeCapacityProvidersRequest generates a "aws/request.Request" representing the
+// client's request for the DescribeCapacityProviders operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See DescribeCapacityProviders for more information on using the DescribeCapacityProviders
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the DescribeCapacityProvidersRequest method.
+//    req, resp := client.DescribeCapacityProvidersRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DescribeCapacityProviders
+func (c *ECS) DescribeCapacityProvidersRequest(input *DescribeCapacityProvidersInput) (req *request.Request, output *DescribeCapacityProvidersOutput) {
+	op := &request.Operation{
+		Name:       opDescribeCapacityProviders,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &DescribeCapacityProvidersInput{}
+	}
+
+	output = &DescribeCapacityProvidersOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// DescribeCapacityProviders API operation for Amazon EC2 Container Service.
+//
+// Describes one or more of your capacity providers.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation DescribeCapacityProviders for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DescribeCapacityProviders
+func (c *ECS) DescribeCapacityProviders(input *DescribeCapacityProvidersInput) (*DescribeCapacityProvidersOutput, error) {
+	req, out := c.DescribeCapacityProvidersRequest(input)
+	return out, req.Send()
+}
+
+// DescribeCapacityProvidersWithContext is the same as DescribeCapacityProviders with the addition of
+// the ability to pass a context and additional request options.
+//
+// See DescribeCapacityProviders for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) DescribeCapacityProvidersWithContext(ctx aws.Context, input *DescribeCapacityProvidersInput, opts ...request.Option) (*DescribeCapacityProvidersOutput, error) {
+	req, out := c.DescribeCapacityProvidersRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
 const opDescribeClusters = "DescribeClusters"
 
 // DescribeClustersRequest generates a "aws/request.Request" representing the
 // client's request for the DescribeClusters operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -842,16 +1512,16 @@ func (c *ECS) DescribeClustersRequest(input *DescribeClustersInput) (req *reques
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation DescribeClusters for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
@@ -882,7 +1552,7 @@ const opDescribeContainerInstances = "DescribeContainerInstances"
 // DescribeContainerInstancesRequest generates a "aws/request.Request" representing the
 // client's request for the DescribeContainerInstances operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -921,8 +1591,8 @@ func (c *ECS) DescribeContainerInstancesRequest(input *DescribeContainerInstance
 
 // DescribeContainerInstances API operation for Amazon EC2 Container Service.
 //
-// Describes Amazon Elastic Container Service container instances. Returns metadata
-// about registered and remaining resources on each container instance requested.
+// Describes one or more container instances. Returns metadata about each container
+// instance requested.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -931,22 +1601,22 @@ func (c *ECS) DescribeContainerInstancesRequest(input *DescribeContainerInstance
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation DescribeContainerInstances for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DescribeContainerInstances
 func (c *ECS) DescribeContainerInstances(input *DescribeContainerInstancesInput) (*DescribeContainerInstancesOutput, error) {
@@ -975,7 +1645,7 @@ const opDescribeServices = "DescribeServices"
 // DescribeServicesRequest generates a "aws/request.Request" representing the
 // client's request for the DescribeServices operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -1023,22 +1693,22 @@ func (c *ECS) DescribeServicesRequest(input *DescribeServicesInput) (req *reques
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation DescribeServices for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DescribeServices
 func (c *ECS) DescribeServices(input *DescribeServicesInput) (*DescribeServicesOutput, error) {
@@ -1067,7 +1737,7 @@ const opDescribeTaskDefinition = "DescribeTaskDefinition"
 // DescribeTaskDefinitionRequest generates a "aws/request.Request" representing the
 // client's request for the DescribeTaskDefinition operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -1120,16 +1790,16 @@ func (c *ECS) DescribeTaskDefinitionRequest(input *DescribeTaskDefinitionInput) 
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation DescribeTaskDefinition for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
@@ -1155,12 +1825,121 @@ func (c *ECS) DescribeTaskDefinitionWithContext(ctx aws.Context, input *Describe
 	return out, req.Send()
 }
 
+const opDescribeTaskSets = "DescribeTaskSets"
+
+// DescribeTaskSetsRequest generates a "aws/request.Request" representing the
+// client's request for the DescribeTaskSets operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See DescribeTaskSets for more information on using the DescribeTaskSets
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the DescribeTaskSetsRequest method.
+//    req, resp := client.DescribeTaskSetsRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DescribeTaskSets
+func (c *ECS) DescribeTaskSetsRequest(input *DescribeTaskSetsInput) (req *request.Request, output *DescribeTaskSetsOutput) {
+	op := &request.Operation{
+		Name:       opDescribeTaskSets,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &DescribeTaskSetsInput{}
+	}
+
+	output = &DescribeTaskSetsOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// DescribeTaskSets API operation for Amazon EC2 Container Service.
+//
+// Describes the task sets in the specified cluster and service. This is used
+// when a service uses the EXTERNAL deployment controller type. For more information,
+// see Amazon ECS Deployment Types (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-types.html)
+// in the Amazon Elastic Container Service Developer Guide.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation DescribeTaskSets for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+//   * ClusterNotFoundException
+//   The specified cluster could not be found. You can view your available clusters
+//   with ListClusters. Amazon ECS clusters are Region-specific.
+//
+//   * UnsupportedFeatureException
+//   The specified task is not supported in this Region.
+//
+//   * AccessDeniedException
+//   You do not have authorization to perform the requested action.
+//
+//   * ServiceNotFoundException
+//   The specified service could not be found. You can view your available services
+//   with ListServices. Amazon ECS services are cluster-specific and Region-specific.
+//
+//   * ServiceNotActiveException
+//   The specified service is not active. You can't update a service that is inactive.
+//   If you have previously deleted a service, you can re-create it with CreateService.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DescribeTaskSets
+func (c *ECS) DescribeTaskSets(input *DescribeTaskSetsInput) (*DescribeTaskSetsOutput, error) {
+	req, out := c.DescribeTaskSetsRequest(input)
+	return out, req.Send()
+}
+
+// DescribeTaskSetsWithContext is the same as DescribeTaskSets with the addition of
+// the ability to pass a context and additional request options.
+//
+// See DescribeTaskSets for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) DescribeTaskSetsWithContext(ctx aws.Context, input *DescribeTaskSetsInput, opts ...request.Option) (*DescribeTaskSetsOutput, error) {
+	req, out := c.DescribeTaskSetsRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
 const opDescribeTasks = "DescribeTasks"
 
 // DescribeTasksRequest generates a "aws/request.Request" representing the
 // client's request for the DescribeTasks operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -1208,22 +1987,22 @@ func (c *ECS) DescribeTasksRequest(input *DescribeTasksInput) (req *request.Requ
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation DescribeTasks for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/DescribeTasks
 func (c *ECS) DescribeTasks(input *DescribeTasksInput) (*DescribeTasksOutput, error) {
@@ -1252,7 +2031,7 @@ const opDiscoverPollEndpoint = "DiscoverPollEndpoint"
 // DiscoverPollEndpointRequest generates a "aws/request.Request" representing the
 // client's request for the DiscoverPollEndpoint operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -1291,6 +2070,7 @@ func (c *ECS) DiscoverPollEndpointRequest(input *DiscoverPollEndpointInput) (req
 
 // DiscoverPollEndpoint API operation for Amazon EC2 Container Service.
 //
+//
 // This action is only used by the Amazon ECS agent, and it is not intended
 // for use outside of the agent.
 //
@@ -1303,11 +2083,11 @@ func (c *ECS) DiscoverPollEndpointRequest(input *DiscoverPollEndpointInput) (req
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation DiscoverPollEndpoint for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
@@ -1334,12 +2114,257 @@ func (c *ECS) DiscoverPollEndpointWithContext(ctx aws.Context, input *DiscoverPo
 	return out, req.Send()
 }
 
+const opExecuteCommand = "ExecuteCommand"
+
+// ExecuteCommandRequest generates a "aws/request.Request" representing the
+// client's request for the ExecuteCommand operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See ExecuteCommand for more information on using the ExecuteCommand
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the ExecuteCommandRequest method.
+//    req, resp := client.ExecuteCommandRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/ExecuteCommand
+func (c *ECS) ExecuteCommandRequest(input *ExecuteCommandInput) (req *request.Request, output *ExecuteCommandOutput) {
+	op := &request.Operation{
+		Name:       opExecuteCommand,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &ExecuteCommandInput{}
+	}
+
+	output = &ExecuteCommandOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// ExecuteCommand API operation for Amazon EC2 Container Service.
+//
+// Runs a command remotely on a container within a task.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation ExecuteCommand for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+//   * AccessDeniedException
+//   You do not have authorization to perform the requested action.
+//
+//   * ClusterNotFoundException
+//   The specified cluster could not be found. You can view your available clusters
+//   with ListClusters. Amazon ECS clusters are Region-specific.
+//
+//   * TargetNotConnectedException
+//   The target container is not properly configured with the execute command
+//   agent or the container is no longer active or running.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/ExecuteCommand
+func (c *ECS) ExecuteCommand(input *ExecuteCommandInput) (*ExecuteCommandOutput, error) {
+	req, out := c.ExecuteCommandRequest(input)
+	return out, req.Send()
+}
+
+// ExecuteCommandWithContext is the same as ExecuteCommand with the addition of
+// the ability to pass a context and additional request options.
+//
+// See ExecuteCommand for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) ExecuteCommandWithContext(ctx aws.Context, input *ExecuteCommandInput, opts ...request.Option) (*ExecuteCommandOutput, error) {
+	req, out := c.ExecuteCommandRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
+const opListAccountSettings = "ListAccountSettings"
+
+// ListAccountSettingsRequest generates a "aws/request.Request" representing the
+// client's request for the ListAccountSettings operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See ListAccountSettings for more information on using the ListAccountSettings
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the ListAccountSettingsRequest method.
+//    req, resp := client.ListAccountSettingsRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/ListAccountSettings
+func (c *ECS) ListAccountSettingsRequest(input *ListAccountSettingsInput) (req *request.Request, output *ListAccountSettingsOutput) {
+	op := &request.Operation{
+		Name:       opListAccountSettings,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+		Paginator: &request.Paginator{
+			InputTokens:     []string{"nextToken"},
+			OutputTokens:    []string{"nextToken"},
+			LimitToken:      "maxResults",
+			TruncationToken: "",
+		},
+	}
+
+	if input == nil {
+		input = &ListAccountSettingsInput{}
+	}
+
+	output = &ListAccountSettingsOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// ListAccountSettings API operation for Amazon EC2 Container Service.
+//
+// Lists the account settings for a specified principal.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation ListAccountSettings for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/ListAccountSettings
+func (c *ECS) ListAccountSettings(input *ListAccountSettingsInput) (*ListAccountSettingsOutput, error) {
+	req, out := c.ListAccountSettingsRequest(input)
+	return out, req.Send()
+}
+
+// ListAccountSettingsWithContext is the same as ListAccountSettings with the addition of
+// the ability to pass a context and additional request options.
+//
+// See ListAccountSettings for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) ListAccountSettingsWithContext(ctx aws.Context, input *ListAccountSettingsInput, opts ...request.Option) (*ListAccountSettingsOutput, error) {
+	req, out := c.ListAccountSettingsRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
+// ListAccountSettingsPages iterates over the pages of a ListAccountSettings operation,
+// calling the "fn" function with the response data for each page. To stop
+// iterating, return false from the fn function.
+//
+// See ListAccountSettings method for more information on how to use this operation.
+//
+// Note: This operation can generate multiple requests to a service.
+//
+//    // Example iterating over at most 3 pages of a ListAccountSettings operation.
+//    pageNum := 0
+//    err := client.ListAccountSettingsPages(params,
+//        func(page *ecs.ListAccountSettingsOutput, lastPage bool) bool {
+//            pageNum++
+//            fmt.Println(page)
+//            return pageNum <= 3
+//        })
+//
+func (c *ECS) ListAccountSettingsPages(input *ListAccountSettingsInput, fn func(*ListAccountSettingsOutput, bool) bool) error {
+	return c.ListAccountSettingsPagesWithContext(aws.BackgroundContext(), input, fn)
+}
+
+// ListAccountSettingsPagesWithContext same as ListAccountSettingsPages except
+// it takes a Context and allows setting request options on the pages.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) ListAccountSettingsPagesWithContext(ctx aws.Context, input *ListAccountSettingsInput, fn func(*ListAccountSettingsOutput, bool) bool, opts ...request.Option) error {
+	p := request.Pagination{
+		NewRequest: func() (*request.Request, error) {
+			var inCpy *ListAccountSettingsInput
+			if input != nil {
+				tmp := *input
+				inCpy = &tmp
+			}
+			req, _ := c.ListAccountSettingsRequest(inCpy)
+			req.SetContext(ctx)
+			req.ApplyOptions(opts...)
+			return req, nil
+		},
+	}
+
+	for p.Next() {
+		if !fn(p.Page().(*ListAccountSettingsOutput), !p.HasNextPage()) {
+			break
+		}
+	}
+
+	return p.Err()
+}
+
 const opListAttributes = "ListAttributes"
 
 // ListAttributesRequest generates a "aws/request.Request" representing the
 // client's request for the ListAttributes operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -1365,6 +2390,12 @@ func (c *ECS) ListAttributesRequest(input *ListAttributesInput) (req *request.Re
 		Name:       opListAttributes,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
+		Paginator: &request.Paginator{
+			InputTokens:     []string{"nextToken"},
+			OutputTokens:    []string{"nextToken"},
+			LimitToken:      "maxResults",
+			TruncationToken: "",
+		},
 	}
 
 	if input == nil {
@@ -1393,12 +2424,12 @@ func (c *ECS) ListAttributesRequest(input *ListAttributesInput) (req *request.Re
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation ListAttributes for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+// Returned Error Types:
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
@@ -1424,12 +2455,64 @@ func (c *ECS) ListAttributesWithContext(ctx aws.Context, input *ListAttributesIn
 	return out, req.Send()
 }
 
+// ListAttributesPages iterates over the pages of a ListAttributes operation,
+// calling the "fn" function with the response data for each page. To stop
+// iterating, return false from the fn function.
+//
+// See ListAttributes method for more information on how to use this operation.
+//
+// Note: This operation can generate multiple requests to a service.
+//
+//    // Example iterating over at most 3 pages of a ListAttributes operation.
+//    pageNum := 0
+//    err := client.ListAttributesPages(params,
+//        func(page *ecs.ListAttributesOutput, lastPage bool) bool {
+//            pageNum++
+//            fmt.Println(page)
+//            return pageNum <= 3
+//        })
+//
+func (c *ECS) ListAttributesPages(input *ListAttributesInput, fn func(*ListAttributesOutput, bool) bool) error {
+	return c.ListAttributesPagesWithContext(aws.BackgroundContext(), input, fn)
+}
+
+// ListAttributesPagesWithContext same as ListAttributesPages except
+// it takes a Context and allows setting request options on the pages.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) ListAttributesPagesWithContext(ctx aws.Context, input *ListAttributesInput, fn func(*ListAttributesOutput, bool) bool, opts ...request.Option) error {
+	p := request.Pagination{
+		NewRequest: func() (*request.Request, error) {
+			var inCpy *ListAttributesInput
+			if input != nil {
+				tmp := *input
+				inCpy = &tmp
+			}
+			req, _ := c.ListAttributesRequest(inCpy)
+			req.SetContext(ctx)
+			req.ApplyOptions(opts...)
+			return req, nil
+		},
+	}
+
+	for p.Next() {
+		if !fn(p.Page().(*ListAttributesOutput), !p.HasNextPage()) {
+			break
+		}
+	}
+
+	return p.Err()
+}
+
 const opListClusters = "ListClusters"
 
 // ListClustersRequest generates a "aws/request.Request" representing the
 // client's request for the ListClusters operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -1483,16 +2566,16 @@ func (c *ECS) ListClustersRequest(input *ListClustersInput) (req *request.Reques
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation ListClusters for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
@@ -1529,7 +2612,7 @@ func (c *ECS) ListClustersWithContext(ctx aws.Context, input *ListClustersInput,
 //    // Example iterating over at most 3 pages of a ListClusters operation.
 //    pageNum := 0
 //    err := client.ListClustersPages(params,
-//        func(page *ListClustersOutput, lastPage bool) bool {
+//        func(page *ecs.ListClustersOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
@@ -1561,10 +2644,12 @@ func (c *ECS) ListClustersPagesWithContext(ctx aws.Context, input *ListClustersI
 		},
 	}
 
-	cont := true
-	for p.Next() && cont {
-		cont = fn(p.Page().(*ListClustersOutput), !p.HasNextPage())
+	for p.Next() {
+		if !fn(p.Page().(*ListClustersOutput), !p.HasNextPage()) {
+			break
+		}
 	}
+
 	return p.Err()
 }
 
@@ -1573,7 +2658,7 @@ const opListContainerInstances = "ListContainerInstances"
 // ListContainerInstancesRequest generates a "aws/request.Request" representing the
 // client's request for the ListContainerInstances operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -1621,7 +2706,7 @@ func (c *ECS) ListContainerInstancesRequest(input *ListContainerInstancesInput) 
 // Returns a list of container instances in a specified cluster. You can filter
 // the results of a ListContainerInstances operation with cluster query language
 // statements inside the filter parameter. For more information, see Cluster
-// Query Language (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/cluster-query-language.html)
+// Query Language (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cluster-query-language.html)
 // in the Amazon Elastic Container Service Developer Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -1631,22 +2716,22 @@ func (c *ECS) ListContainerInstancesRequest(input *ListContainerInstancesInput) 
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation ListContainerInstances for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/ListContainerInstances
 func (c *ECS) ListContainerInstances(input *ListContainerInstancesInput) (*ListContainerInstancesOutput, error) {
@@ -1681,7 +2766,7 @@ func (c *ECS) ListContainerInstancesWithContext(ctx aws.Context, input *ListCont
 //    // Example iterating over at most 3 pages of a ListContainerInstances operation.
 //    pageNum := 0
 //    err := client.ListContainerInstancesPages(params,
-//        func(page *ListContainerInstancesOutput, lastPage bool) bool {
+//        func(page *ecs.ListContainerInstancesOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
@@ -1713,10 +2798,12 @@ func (c *ECS) ListContainerInstancesPagesWithContext(ctx aws.Context, input *Lis
 		},
 	}
 
-	cont := true
-	for p.Next() && cont {
-		cont = fn(p.Page().(*ListContainerInstancesOutput), !p.HasNextPage())
+	for p.Next() {
+		if !fn(p.Page().(*ListContainerInstancesOutput), !p.HasNextPage()) {
+			break
+		}
 	}
+
 	return p.Err()
 }
 
@@ -1725,7 +2812,7 @@ const opListServices = "ListServices"
 // ListServicesRequest generates a "aws/request.Request" representing the
 // client's request for the ListServices operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -1770,7 +2857,8 @@ func (c *ECS) ListServicesRequest(input *ListServicesInput) (req *request.Reques
 
 // ListServices API operation for Amazon EC2 Container Service.
 //
-// Lists the services that are running in a specified cluster.
+// Returns a list of services. You can filter the results by cluster, launch
+// type, and scheduling strategy.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -1779,22 +2867,22 @@ func (c *ECS) ListServicesRequest(input *ListServicesInput) (req *request.Reques
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation ListServices for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/ListServices
 func (c *ECS) ListServices(input *ListServicesInput) (*ListServicesOutput, error) {
@@ -1829,7 +2917,7 @@ func (c *ECS) ListServicesWithContext(ctx aws.Context, input *ListServicesInput,
 //    // Example iterating over at most 3 pages of a ListServices operation.
 //    pageNum := 0
 //    err := client.ListServicesPages(params,
-//        func(page *ListServicesOutput, lastPage bool) bool {
+//        func(page *ecs.ListServicesOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
@@ -1861,11 +2949,105 @@ func (c *ECS) ListServicesPagesWithContext(ctx aws.Context, input *ListServicesI
 		},
 	}
 
-	cont := true
-	for p.Next() && cont {
-		cont = fn(p.Page().(*ListServicesOutput), !p.HasNextPage())
+	for p.Next() {
+		if !fn(p.Page().(*ListServicesOutput), !p.HasNextPage()) {
+			break
+		}
 	}
+
 	return p.Err()
+}
+
+const opListTagsForResource = "ListTagsForResource"
+
+// ListTagsForResourceRequest generates a "aws/request.Request" representing the
+// client's request for the ListTagsForResource operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See ListTagsForResource for more information on using the ListTagsForResource
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the ListTagsForResourceRequest method.
+//    req, resp := client.ListTagsForResourceRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/ListTagsForResource
+func (c *ECS) ListTagsForResourceRequest(input *ListTagsForResourceInput) (req *request.Request, output *ListTagsForResourceOutput) {
+	op := &request.Operation{
+		Name:       opListTagsForResource,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &ListTagsForResourceInput{}
+	}
+
+	output = &ListTagsForResourceOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// ListTagsForResource API operation for Amazon EC2 Container Service.
+//
+// List the tags for an Amazon ECS resource.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation ListTagsForResource for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * ClusterNotFoundException
+//   The specified cluster could not be found. You can view your available clusters
+//   with ListClusters. Amazon ECS clusters are Region-specific.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/ListTagsForResource
+func (c *ECS) ListTagsForResource(input *ListTagsForResourceInput) (*ListTagsForResourceOutput, error) {
+	req, out := c.ListTagsForResourceRequest(input)
+	return out, req.Send()
+}
+
+// ListTagsForResourceWithContext is the same as ListTagsForResource with the addition of
+// the ability to pass a context and additional request options.
+//
+// See ListTagsForResource for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) ListTagsForResourceWithContext(ctx aws.Context, input *ListTagsForResourceInput, opts ...request.Option) (*ListTagsForResourceOutput, error) {
+	req, out := c.ListTagsForResourceRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
 }
 
 const opListTaskDefinitionFamilies = "ListTaskDefinitionFamilies"
@@ -1873,7 +3055,7 @@ const opListTaskDefinitionFamilies = "ListTaskDefinitionFamilies"
 // ListTaskDefinitionFamiliesRequest generates a "aws/request.Request" representing the
 // client's request for the ListTaskDefinitionFamilies operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -1933,16 +3115,16 @@ func (c *ECS) ListTaskDefinitionFamiliesRequest(input *ListTaskDefinitionFamilie
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation ListTaskDefinitionFamilies for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
@@ -1979,7 +3161,7 @@ func (c *ECS) ListTaskDefinitionFamiliesWithContext(ctx aws.Context, input *List
 //    // Example iterating over at most 3 pages of a ListTaskDefinitionFamilies operation.
 //    pageNum := 0
 //    err := client.ListTaskDefinitionFamiliesPages(params,
-//        func(page *ListTaskDefinitionFamiliesOutput, lastPage bool) bool {
+//        func(page *ecs.ListTaskDefinitionFamiliesOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
@@ -2011,10 +3193,12 @@ func (c *ECS) ListTaskDefinitionFamiliesPagesWithContext(ctx aws.Context, input 
 		},
 	}
 
-	cont := true
-	for p.Next() && cont {
-		cont = fn(p.Page().(*ListTaskDefinitionFamiliesOutput), !p.HasNextPage())
+	for p.Next() {
+		if !fn(p.Page().(*ListTaskDefinitionFamiliesOutput), !p.HasNextPage()) {
+			break
+		}
 	}
+
 	return p.Err()
 }
 
@@ -2023,7 +3207,7 @@ const opListTaskDefinitions = "ListTaskDefinitions"
 // ListTaskDefinitionsRequest generates a "aws/request.Request" representing the
 // client's request for the ListTaskDefinitions operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -2079,16 +3263,16 @@ func (c *ECS) ListTaskDefinitionsRequest(input *ListTaskDefinitionsInput) (req *
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation ListTaskDefinitions for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
@@ -2125,7 +3309,7 @@ func (c *ECS) ListTaskDefinitionsWithContext(ctx aws.Context, input *ListTaskDef
 //    // Example iterating over at most 3 pages of a ListTaskDefinitions operation.
 //    pageNum := 0
 //    err := client.ListTaskDefinitionsPages(params,
-//        func(page *ListTaskDefinitionsOutput, lastPage bool) bool {
+//        func(page *ecs.ListTaskDefinitionsOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
@@ -2157,10 +3341,12 @@ func (c *ECS) ListTaskDefinitionsPagesWithContext(ctx aws.Context, input *ListTa
 		},
 	}
 
-	cont := true
-	for p.Next() && cont {
-		cont = fn(p.Page().(*ListTaskDefinitionsOutput), !p.HasNextPage())
+	for p.Next() {
+		if !fn(p.Page().(*ListTaskDefinitionsOutput), !p.HasNextPage()) {
+			break
+		}
 	}
+
 	return p.Err()
 }
 
@@ -2169,7 +3355,7 @@ const opListTasks = "ListTasks"
 // ListTasksRequest generates a "aws/request.Request" representing the
 // client's request for the ListTasks operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -2214,9 +3400,9 @@ func (c *ECS) ListTasksRequest(input *ListTasksInput) (req *request.Request, out
 
 // ListTasks API operation for Amazon EC2 Container Service.
 //
-// Returns a list of tasks for a specified cluster. You can filter the results
-// by family name, by a particular container instance, or by the desired status
-// of the task with the family, containerInstance, and desiredStatus parameters.
+// Returns a list of tasks. You can filter the results by cluster, task definition
+// family, container instance, launch type, what IAM principal started the task,
+// or by the desired status of the task.
 //
 // Recently stopped tasks might appear in the returned results. Currently, stopped
 // tasks appear in the returned results for at least one hour.
@@ -2228,26 +3414,26 @@ func (c *ECS) ListTasksRequest(input *ListTasksInput) (req *request.Request, out
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation ListTasks for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
-//   * ErrCodeServiceNotFoundException "ServiceNotFoundException"
+//   * ServiceNotFoundException
 //   The specified service could not be found. You can view your available services
-//   with ListServices. Amazon ECS services are cluster-specific and region-specific.
+//   with ListServices. Amazon ECS services are cluster-specific and Region-specific.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/ListTasks
 func (c *ECS) ListTasks(input *ListTasksInput) (*ListTasksOutput, error) {
@@ -2282,7 +3468,7 @@ func (c *ECS) ListTasksWithContext(ctx aws.Context, input *ListTasksInput, opts 
 //    // Example iterating over at most 3 pages of a ListTasks operation.
 //    pageNum := 0
 //    err := client.ListTasksPages(params,
-//        func(page *ListTasksOutput, lastPage bool) bool {
+//        func(page *ecs.ListTasksOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
@@ -2314,11 +3500,220 @@ func (c *ECS) ListTasksPagesWithContext(ctx aws.Context, input *ListTasksInput, 
 		},
 	}
 
-	cont := true
-	for p.Next() && cont {
-		cont = fn(p.Page().(*ListTasksOutput), !p.HasNextPage())
+	for p.Next() {
+		if !fn(p.Page().(*ListTasksOutput), !p.HasNextPage()) {
+			break
+		}
 	}
+
 	return p.Err()
+}
+
+const opPutAccountSetting = "PutAccountSetting"
+
+// PutAccountSettingRequest generates a "aws/request.Request" representing the
+// client's request for the PutAccountSetting operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See PutAccountSetting for more information on using the PutAccountSetting
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the PutAccountSettingRequest method.
+//    req, resp := client.PutAccountSettingRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/PutAccountSetting
+func (c *ECS) PutAccountSettingRequest(input *PutAccountSettingInput) (req *request.Request, output *PutAccountSettingOutput) {
+	op := &request.Operation{
+		Name:       opPutAccountSetting,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &PutAccountSettingInput{}
+	}
+
+	output = &PutAccountSettingOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// PutAccountSetting API operation for Amazon EC2 Container Service.
+//
+// Modifies an account setting. Account settings are set on a per-Region basis.
+//
+// If you change the account setting for the root user, the default settings
+// for all of the IAM users and roles for which no individual account setting
+// has been specified are reset. For more information, see Account Settings
+// (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-account-settings.html)
+// in the Amazon Elastic Container Service Developer Guide.
+//
+// When serviceLongArnFormat, taskLongArnFormat, or containerInstanceLongArnFormat
+// are specified, the Amazon Resource Name (ARN) and resource ID format of the
+// resource type for a specified IAM user, IAM role, or the root user for an
+// account is affected. The opt-in and opt-out account setting must be set for
+// each Amazon ECS resource separately. The ARN and resource ID format of a
+// resource will be defined by the opt-in status of the IAM user or role that
+// created the resource. You must enable this setting to use Amazon ECS features
+// such as resource tagging.
+//
+// When awsvpcTrunking is specified, the elastic network interface (ENI) limit
+// for any new container instances that support the feature is changed. If awsvpcTrunking
+// is enabled, any new container instances that support the feature are launched
+// have the increased ENI limits available to them. For more information, see
+// Elastic Network Interface Trunking (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/container-instance-eni.html)
+// in the Amazon Elastic Container Service Developer Guide.
+//
+// When containerInsights is specified, the default setting indicating whether
+// CloudWatch Container Insights is enabled for your clusters is changed. If
+// containerInsights is enabled, any new clusters that are created will have
+// Container Insights enabled unless you disable it during cluster creation.
+// For more information, see CloudWatch Container Insights (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cloudwatch-container-insights.html)
+// in the Amazon Elastic Container Service Developer Guide.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation PutAccountSetting for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/PutAccountSetting
+func (c *ECS) PutAccountSetting(input *PutAccountSettingInput) (*PutAccountSettingOutput, error) {
+	req, out := c.PutAccountSettingRequest(input)
+	return out, req.Send()
+}
+
+// PutAccountSettingWithContext is the same as PutAccountSetting with the addition of
+// the ability to pass a context and additional request options.
+//
+// See PutAccountSetting for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) PutAccountSettingWithContext(ctx aws.Context, input *PutAccountSettingInput, opts ...request.Option) (*PutAccountSettingOutput, error) {
+	req, out := c.PutAccountSettingRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
+const opPutAccountSettingDefault = "PutAccountSettingDefault"
+
+// PutAccountSettingDefaultRequest generates a "aws/request.Request" representing the
+// client's request for the PutAccountSettingDefault operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See PutAccountSettingDefault for more information on using the PutAccountSettingDefault
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the PutAccountSettingDefaultRequest method.
+//    req, resp := client.PutAccountSettingDefaultRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/PutAccountSettingDefault
+func (c *ECS) PutAccountSettingDefaultRequest(input *PutAccountSettingDefaultInput) (req *request.Request, output *PutAccountSettingDefaultOutput) {
+	op := &request.Operation{
+		Name:       opPutAccountSettingDefault,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &PutAccountSettingDefaultInput{}
+	}
+
+	output = &PutAccountSettingDefaultOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// PutAccountSettingDefault API operation for Amazon EC2 Container Service.
+//
+// Modifies an account setting for all IAM users on an account for whom no individual
+// account setting has been specified. Account settings are set on a per-Region
+// basis.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation PutAccountSettingDefault for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/PutAccountSettingDefault
+func (c *ECS) PutAccountSettingDefault(input *PutAccountSettingDefaultInput) (*PutAccountSettingDefaultOutput, error) {
+	req, out := c.PutAccountSettingDefaultRequest(input)
+	return out, req.Send()
+}
+
+// PutAccountSettingDefaultWithContext is the same as PutAccountSettingDefault with the addition of
+// the ability to pass a context and additional request options.
+//
+// See PutAccountSettingDefault for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) PutAccountSettingDefaultWithContext(ctx aws.Context, input *PutAccountSettingDefaultInput, opts ...request.Option) (*PutAccountSettingDefaultOutput, error) {
+	req, out := c.PutAccountSettingDefaultRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
 }
 
 const opPutAttributes = "PutAttributes"
@@ -2326,7 +3721,7 @@ const opPutAttributes = "PutAttributes"
 // PutAttributesRequest generates a "aws/request.Request" representing the
 // client's request for the PutAttributes operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -2368,7 +3763,7 @@ func (c *ECS) PutAttributesRequest(input *PutAttributesInput) (req *request.Requ
 // Create or update an attribute on an Amazon ECS resource. If the attribute
 // does not exist, it is created. If the attribute exists, its value is replaced
 // with the specified value. To delete an attribute, use DeleteAttributes. For
-// more information, see Attributes (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html#attributes)
+// more information, see Attributes (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html#attributes)
 // in the Amazon Elastic Container Service Developer Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -2378,22 +3773,22 @@ func (c *ECS) PutAttributesRequest(input *PutAttributesInput) (req *request.Requ
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation PutAttributes for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+// Returned Error Types:
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
-//   * ErrCodeTargetNotFoundException "TargetNotFoundException"
+//   * TargetNotFoundException
 //   The specified target could not be found. You can view your available container
 //   instances with ListContainerInstances. Amazon ECS container instances are
-//   cluster-specific and region-specific.
+//   cluster-specific and Region-specific.
 //
-//   * ErrCodeAttributeLimitExceededException "AttributeLimitExceededException"
+//   * AttributeLimitExceededException
 //   You can apply up to 10 custom attributes per resource. You can view the attributes
 //   of a resource with ListAttributes. You can remove existing attributes on
 //   a resource with DeleteAttributes.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
@@ -2419,12 +3814,130 @@ func (c *ECS) PutAttributesWithContext(ctx aws.Context, input *PutAttributesInpu
 	return out, req.Send()
 }
 
+const opPutClusterCapacityProviders = "PutClusterCapacityProviders"
+
+// PutClusterCapacityProvidersRequest generates a "aws/request.Request" representing the
+// client's request for the PutClusterCapacityProviders operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See PutClusterCapacityProviders for more information on using the PutClusterCapacityProviders
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the PutClusterCapacityProvidersRequest method.
+//    req, resp := client.PutClusterCapacityProvidersRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/PutClusterCapacityProviders
+func (c *ECS) PutClusterCapacityProvidersRequest(input *PutClusterCapacityProvidersInput) (req *request.Request, output *PutClusterCapacityProvidersOutput) {
+	op := &request.Operation{
+		Name:       opPutClusterCapacityProviders,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &PutClusterCapacityProvidersInput{}
+	}
+
+	output = &PutClusterCapacityProvidersOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// PutClusterCapacityProviders API operation for Amazon EC2 Container Service.
+//
+// Modifies the available capacity providers and the default capacity provider
+// strategy for a cluster.
+//
+// You must specify both the available capacity providers and a default capacity
+// provider strategy for the cluster. If the specified cluster has existing
+// capacity providers associated with it, you must specify all existing capacity
+// providers in addition to any new ones you want to add. Any existing capacity
+// providers associated with a cluster that are omitted from a PutClusterCapacityProviders
+// API call will be disassociated with the cluster. You can only disassociate
+// an existing capacity provider from a cluster if it's not being used by any
+// existing tasks.
+//
+// When creating a service or running a task on a cluster, if no capacity provider
+// or launch type is specified, then the cluster's default capacity provider
+// strategy is used. It is recommended to define a default capacity provider
+// strategy for your cluster, however you may specify an empty array ([]) to
+// bypass defining a default strategy.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation PutClusterCapacityProviders for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+//   * ClusterNotFoundException
+//   The specified cluster could not be found. You can view your available clusters
+//   with ListClusters. Amazon ECS clusters are Region-specific.
+//
+//   * ResourceInUseException
+//   The specified resource is in-use and cannot be removed.
+//
+//   * UpdateInProgressException
+//   There is already a current Amazon ECS container agent update in progress
+//   on the specified container instance. If the container agent becomes disconnected
+//   while it is in a transitional stage, such as PENDING or STAGING, the update
+//   process can get stuck in that state. However, when the agent reconnects,
+//   it resumes where it stopped previously.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/PutClusterCapacityProviders
+func (c *ECS) PutClusterCapacityProviders(input *PutClusterCapacityProvidersInput) (*PutClusterCapacityProvidersOutput, error) {
+	req, out := c.PutClusterCapacityProvidersRequest(input)
+	return out, req.Send()
+}
+
+// PutClusterCapacityProvidersWithContext is the same as PutClusterCapacityProviders with the addition of
+// the ability to pass a context and additional request options.
+//
+// See PutClusterCapacityProviders for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) PutClusterCapacityProvidersWithContext(ctx aws.Context, input *PutClusterCapacityProvidersInput, opts ...request.Option) (*PutClusterCapacityProvidersOutput, error) {
+	req, out := c.PutClusterCapacityProvidersRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
 const opRegisterContainerInstance = "RegisterContainerInstance"
 
 // RegisterContainerInstanceRequest generates a "aws/request.Request" representing the
 // client's request for the RegisterContainerInstance operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -2463,6 +3976,7 @@ func (c *ECS) RegisterContainerInstanceRequest(input *RegisterContainerInstanceI
 
 // RegisterContainerInstance API operation for Amazon EC2 Container Service.
 //
+//
 // This action is only used by the Amazon ECS agent, and it is not intended
 // for use outside of the agent.
 //
@@ -2476,16 +3990,16 @@ func (c *ECS) RegisterContainerInstanceRequest(input *RegisterContainerInstanceI
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation RegisterContainerInstance for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
@@ -2516,7 +4030,7 @@ const opRegisterTaskDefinition = "RegisterTaskDefinition"
 // RegisterTaskDefinitionRequest generates a "aws/request.Request" representing the
 // client's request for the RegisterTaskDefinition operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -2558,14 +4072,14 @@ func (c *ECS) RegisterTaskDefinitionRequest(input *RegisterTaskDefinitionInput) 
 // Registers a new task definition from the supplied family and containerDefinitions.
 // Optionally, you can add data volumes to your containers with the volumes
 // parameter. For more information about task definition parameters and defaults,
-// see Amazon ECS Task Definitions (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_defintions.html)
+// see Amazon ECS Task Definitions (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_defintions.html)
 // in the Amazon Elastic Container Service Developer Guide.
 //
 // You can specify an IAM role for your task with the taskRoleArn parameter.
 // When you specify an IAM role for a task, its containers can then use the
-// latest versions of the AWS CLI or SDKs to make API requests to the AWS services
-// that are specified in the IAM policy associated with the role. For more information,
-// see IAM Roles for Tasks (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html)
+// latest versions of the CLI or SDKs to make API requests to the Amazon Web
+// Services services that are specified in the IAM policy associated with the
+// role. For more information, see IAM Roles for Tasks (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html)
 // in the Amazon Elastic Container Service Developer Guide.
 //
 // You can specify a Docker networking mode for the containers in your task
@@ -2574,7 +4088,7 @@ func (c *ECS) RegisterTaskDefinitionRequest(input *RegisterTaskDefinitionInput) 
 // in the Docker run reference. If you specify the awsvpc network mode, the
 // task is allocated an elastic network interface, and you must specify a NetworkConfiguration
 // when you create a service or run a task with the task definition. For more
-// information, see Task Networking (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html)
+// information, see Task Networking (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html)
 // in the Amazon Elastic Container Service Developer Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -2584,16 +4098,16 @@ func (c *ECS) RegisterTaskDefinitionRequest(input *RegisterTaskDefinitionInput) 
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation RegisterTaskDefinition for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
@@ -2624,7 +4138,7 @@ const opRunTask = "RunTask"
 // RunTaskRequest generates a "aws/request.Request" representing the
 // client's request for the RunTask operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -2667,7 +4181,7 @@ func (c *ECS) RunTaskRequest(input *RunTaskInput) (req *request.Request, output 
 //
 // You can allow Amazon ECS to place tasks for you, or you can customize how
 // Amazon ECS places tasks using placement constraints and placement strategies.
-// For more information, see Scheduling Tasks (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/scheduling_tasks.html)
+// For more information, see Scheduling Tasks (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/scheduling_tasks.html)
 // in the Amazon Elastic Container Service Developer Guide.
 //
 // Alternatively, you can use StartTask to use your own scheduler or place tasks
@@ -2676,9 +4190,8 @@ func (c *ECS) RunTaskRequest(input *RunTaskInput) (req *request.Request, output 
 // The Amazon ECS API follows an eventual consistency model, due to the distributed
 // nature of the system supporting the API. This means that the result of an
 // API command you run that affects your Amazon ECS resources might not be immediately
-// visible to all subsequent commands you run. You should keep this in mind
-// when you carry out an API command that immediately follows a previous API
-// command.
+// visible to all subsequent commands you run. Keep this in mind when you carry
+// out an API command that immediately follows a previous API command.
 //
 // To manage eventual consistency, you can do the following:
 //
@@ -2701,39 +4214,39 @@ func (c *ECS) RunTaskRequest(input *RunTaskInput) (req *request.Request, output 
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation RunTask for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
-//   * ErrCodeUnsupportedFeatureException "UnsupportedFeatureException"
-//   The specified task is not supported in this region.
+//   * UnsupportedFeatureException
+//   The specified task is not supported in this Region.
 //
-//   * ErrCodePlatformUnknownException "PlatformUnknownException"
+//   * PlatformUnknownException
 //   The specified platform version does not exist.
 //
-//   * ErrCodePlatformTaskDefinitionIncompatibilityException "PlatformTaskDefinitionIncompatibilityException"
+//   * PlatformTaskDefinitionIncompatibilityException
 //   The specified platform version does not satisfy the task definition's required
 //   capabilities.
 //
-//   * ErrCodeAccessDeniedException "AccessDeniedException"
+//   * AccessDeniedException
 //   You do not have authorization to perform the requested action.
 //
-//   * ErrCodeBlockedException "BlockedException"
-//   Your AWS account has been blocked. Contact AWS Support (http://aws.amazon.com/contact-us/)
-//   for more information.
+//   * BlockedException
+//   Your Amazon Web Services account has been blocked. For more information,
+//   contact Amazon Web Services Support (http://aws.amazon.com/contact-us/).
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/RunTask
 func (c *ECS) RunTask(input *RunTaskInput) (*RunTaskOutput, error) {
@@ -2762,7 +4275,7 @@ const opStartTask = "StartTask"
 // StartTaskRequest generates a "aws/request.Request" representing the
 // client's request for the StartTask operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -2805,7 +4318,7 @@ func (c *ECS) StartTaskRequest(input *StartTaskInput) (req *request.Request, out
 // instance or instances.
 //
 // Alternatively, you can use RunTask to place tasks for you. For more information,
-// see Scheduling Tasks (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/scheduling_tasks.html)
+// see Scheduling Tasks (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/scheduling_tasks.html)
 // in the Amazon Elastic Container Service Developer Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -2815,22 +4328,22 @@ func (c *ECS) StartTaskRequest(input *StartTaskInput) (req *request.Request, out
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation StartTask for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/StartTask
 func (c *ECS) StartTask(input *StartTaskInput) (*StartTaskOutput, error) {
@@ -2859,7 +4372,7 @@ const opStopTask = "StopTask"
 // StopTaskRequest generates a "aws/request.Request" representing the
 // client's request for the StopTask operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -2898,17 +4411,18 @@ func (c *ECS) StopTaskRequest(input *StopTaskInput) (req *request.Request, outpu
 
 // StopTask API operation for Amazon EC2 Container Service.
 //
-// Stops a running task.
+// Stops a running task. Any tags associated with the task will be deleted.
 //
 // When StopTask is called on a task, the equivalent of docker stop is issued
-// to the containers running in the task. This results in a SIGTERM and a default
-// 30-second timeout, after which SIGKILL is sent and the containers are forcibly
-// stopped. If the container handles the SIGTERM gracefully and exits within
-// 30 seconds from receiving it, no SIGKILL is sent.
+// to the containers running in the task. This results in a SIGTERM value and
+// a default 30-second timeout, after which the SIGKILL value is sent and the
+// containers are forcibly stopped. If the container handles the SIGTERM value
+// gracefully and exits within 30 seconds from receiving it, no SIGKILL value
+// is sent.
 //
 // The default 30-second timeout can be configured on the Amazon ECS container
 // agent with the ECS_CONTAINER_STOP_TIMEOUT variable. For more information,
-// see Amazon ECS Container Agent Configuration (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-config.html)
+// see Amazon ECS Container Agent Configuration (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-config.html)
 // in the Amazon Elastic Container Service Developer Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -2918,22 +4432,22 @@ func (c *ECS) StopTaskRequest(input *StopTaskInput) (req *request.Request, outpu
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation StopTask for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/StopTask
 func (c *ECS) StopTask(input *StopTaskInput) (*StopTaskOutput, error) {
@@ -2957,12 +4471,107 @@ func (c *ECS) StopTaskWithContext(ctx aws.Context, input *StopTaskInput, opts ..
 	return out, req.Send()
 }
 
+const opSubmitAttachmentStateChanges = "SubmitAttachmentStateChanges"
+
+// SubmitAttachmentStateChangesRequest generates a "aws/request.Request" representing the
+// client's request for the SubmitAttachmentStateChanges operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See SubmitAttachmentStateChanges for more information on using the SubmitAttachmentStateChanges
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the SubmitAttachmentStateChangesRequest method.
+//    req, resp := client.SubmitAttachmentStateChangesRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/SubmitAttachmentStateChanges
+func (c *ECS) SubmitAttachmentStateChangesRequest(input *SubmitAttachmentStateChangesInput) (req *request.Request, output *SubmitAttachmentStateChangesOutput) {
+	op := &request.Operation{
+		Name:       opSubmitAttachmentStateChanges,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &SubmitAttachmentStateChangesInput{}
+	}
+
+	output = &SubmitAttachmentStateChangesOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// SubmitAttachmentStateChanges API operation for Amazon EC2 Container Service.
+//
+//
+// This action is only used by the Amazon ECS agent, and it is not intended
+// for use outside of the agent.
+//
+// Sent to acknowledge that an attachment changed states.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation SubmitAttachmentStateChanges for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * AccessDeniedException
+//   You do not have authorization to perform the requested action.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/SubmitAttachmentStateChanges
+func (c *ECS) SubmitAttachmentStateChanges(input *SubmitAttachmentStateChangesInput) (*SubmitAttachmentStateChangesOutput, error) {
+	req, out := c.SubmitAttachmentStateChangesRequest(input)
+	return out, req.Send()
+}
+
+// SubmitAttachmentStateChangesWithContext is the same as SubmitAttachmentStateChanges with the addition of
+// the ability to pass a context and additional request options.
+//
+// See SubmitAttachmentStateChanges for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) SubmitAttachmentStateChangesWithContext(ctx aws.Context, input *SubmitAttachmentStateChangesInput, opts ...request.Option) (*SubmitAttachmentStateChangesOutput, error) {
+	req, out := c.SubmitAttachmentStateChangesRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
 const opSubmitContainerStateChange = "SubmitContainerStateChange"
 
 // SubmitContainerStateChangeRequest generates a "aws/request.Request" representing the
 // client's request for the SubmitContainerStateChange operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -3001,6 +4610,7 @@ func (c *ECS) SubmitContainerStateChangeRequest(input *SubmitContainerStateChang
 
 // SubmitContainerStateChange API operation for Amazon EC2 Container Service.
 //
+//
 // This action is only used by the Amazon ECS agent, and it is not intended
 // for use outside of the agent.
 //
@@ -3013,16 +4623,16 @@ func (c *ECS) SubmitContainerStateChangeRequest(input *SubmitContainerStateChang
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation SubmitContainerStateChange for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeAccessDeniedException "AccessDeniedException"
+//   * AccessDeniedException
 //   You do not have authorization to perform the requested action.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/SubmitContainerStateChange
@@ -3052,7 +4662,7 @@ const opSubmitTaskStateChange = "SubmitTaskStateChange"
 // SubmitTaskStateChangeRequest generates a "aws/request.Request" representing the
 // client's request for the SubmitTaskStateChange operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -3091,6 +4701,7 @@ func (c *ECS) SubmitTaskStateChangeRequest(input *SubmitTaskStateChangeInput) (r
 
 // SubmitTaskStateChange API operation for Amazon EC2 Container Service.
 //
+//
 // This action is only used by the Amazon ECS agent, and it is not intended
 // for use outside of the agent.
 //
@@ -3103,17 +4714,21 @@ func (c *ECS) SubmitTaskStateChangeRequest(input *SubmitTaskStateChangeInput) (r
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation SubmitTaskStateChange for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeAccessDeniedException "AccessDeniedException"
+//   * AccessDeniedException
 //   You do not have authorization to perform the requested action.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/SubmitTaskStateChange
 func (c *ECS) SubmitTaskStateChange(input *SubmitTaskStateChangeInput) (*SubmitTaskStateChangeOutput, error) {
@@ -3137,12 +4752,479 @@ func (c *ECS) SubmitTaskStateChangeWithContext(ctx aws.Context, input *SubmitTas
 	return out, req.Send()
 }
 
+const opTagResource = "TagResource"
+
+// TagResourceRequest generates a "aws/request.Request" representing the
+// client's request for the TagResource operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See TagResource for more information on using the TagResource
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the TagResourceRequest method.
+//    req, resp := client.TagResourceRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/TagResource
+func (c *ECS) TagResourceRequest(input *TagResourceInput) (req *request.Request, output *TagResourceOutput) {
+	op := &request.Operation{
+		Name:       opTagResource,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &TagResourceInput{}
+	}
+
+	output = &TagResourceOutput{}
+	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Swap(jsonrpc.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
+	return
+}
+
+// TagResource API operation for Amazon EC2 Container Service.
+//
+// Associates the specified tags to a resource with the specified resourceArn.
+// If existing tags on a resource are not specified in the request parameters,
+// they are not changed. When a resource is deleted, the tags associated with
+// that resource are deleted as well.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation TagResource for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * ClusterNotFoundException
+//   The specified cluster could not be found. You can view your available clusters
+//   with ListClusters. Amazon ECS clusters are Region-specific.
+//
+//   * ResourceNotFoundException
+//   The specified resource could not be found.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/TagResource
+func (c *ECS) TagResource(input *TagResourceInput) (*TagResourceOutput, error) {
+	req, out := c.TagResourceRequest(input)
+	return out, req.Send()
+}
+
+// TagResourceWithContext is the same as TagResource with the addition of
+// the ability to pass a context and additional request options.
+//
+// See TagResource for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) TagResourceWithContext(ctx aws.Context, input *TagResourceInput, opts ...request.Option) (*TagResourceOutput, error) {
+	req, out := c.TagResourceRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
+const opUntagResource = "UntagResource"
+
+// UntagResourceRequest generates a "aws/request.Request" representing the
+// client's request for the UntagResource operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See UntagResource for more information on using the UntagResource
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the UntagResourceRequest method.
+//    req, resp := client.UntagResourceRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/UntagResource
+func (c *ECS) UntagResourceRequest(input *UntagResourceInput) (req *request.Request, output *UntagResourceOutput) {
+	op := &request.Operation{
+		Name:       opUntagResource,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &UntagResourceInput{}
+	}
+
+	output = &UntagResourceOutput{}
+	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Swap(jsonrpc.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
+	return
+}
+
+// UntagResource API operation for Amazon EC2 Container Service.
+//
+// Deletes specified tags from a resource.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation UntagResource for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * ClusterNotFoundException
+//   The specified cluster could not be found. You can view your available clusters
+//   with ListClusters. Amazon ECS clusters are Region-specific.
+//
+//   * ResourceNotFoundException
+//   The specified resource could not be found.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/UntagResource
+func (c *ECS) UntagResource(input *UntagResourceInput) (*UntagResourceOutput, error) {
+	req, out := c.UntagResourceRequest(input)
+	return out, req.Send()
+}
+
+// UntagResourceWithContext is the same as UntagResource with the addition of
+// the ability to pass a context and additional request options.
+//
+// See UntagResource for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) UntagResourceWithContext(ctx aws.Context, input *UntagResourceInput, opts ...request.Option) (*UntagResourceOutput, error) {
+	req, out := c.UntagResourceRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
+const opUpdateCapacityProvider = "UpdateCapacityProvider"
+
+// UpdateCapacityProviderRequest generates a "aws/request.Request" representing the
+// client's request for the UpdateCapacityProvider operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See UpdateCapacityProvider for more information on using the UpdateCapacityProvider
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the UpdateCapacityProviderRequest method.
+//    req, resp := client.UpdateCapacityProviderRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/UpdateCapacityProvider
+func (c *ECS) UpdateCapacityProviderRequest(input *UpdateCapacityProviderInput) (req *request.Request, output *UpdateCapacityProviderOutput) {
+	op := &request.Operation{
+		Name:       opUpdateCapacityProvider,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &UpdateCapacityProviderInput{}
+	}
+
+	output = &UpdateCapacityProviderOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// UpdateCapacityProvider API operation for Amazon EC2 Container Service.
+//
+// Modifies the parameters for a capacity provider.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation UpdateCapacityProvider for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/UpdateCapacityProvider
+func (c *ECS) UpdateCapacityProvider(input *UpdateCapacityProviderInput) (*UpdateCapacityProviderOutput, error) {
+	req, out := c.UpdateCapacityProviderRequest(input)
+	return out, req.Send()
+}
+
+// UpdateCapacityProviderWithContext is the same as UpdateCapacityProvider with the addition of
+// the ability to pass a context and additional request options.
+//
+// See UpdateCapacityProvider for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) UpdateCapacityProviderWithContext(ctx aws.Context, input *UpdateCapacityProviderInput, opts ...request.Option) (*UpdateCapacityProviderOutput, error) {
+	req, out := c.UpdateCapacityProviderRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
+const opUpdateCluster = "UpdateCluster"
+
+// UpdateClusterRequest generates a "aws/request.Request" representing the
+// client's request for the UpdateCluster operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See UpdateCluster for more information on using the UpdateCluster
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the UpdateClusterRequest method.
+//    req, resp := client.UpdateClusterRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/UpdateCluster
+func (c *ECS) UpdateClusterRequest(input *UpdateClusterInput) (req *request.Request, output *UpdateClusterOutput) {
+	op := &request.Operation{
+		Name:       opUpdateCluster,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &UpdateClusterInput{}
+	}
+
+	output = &UpdateClusterOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// UpdateCluster API operation for Amazon EC2 Container Service.
+//
+// Updates the cluster.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation UpdateCluster for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * ClusterNotFoundException
+//   The specified cluster could not be found. You can view your available clusters
+//   with ListClusters. Amazon ECS clusters are Region-specific.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/UpdateCluster
+func (c *ECS) UpdateCluster(input *UpdateClusterInput) (*UpdateClusterOutput, error) {
+	req, out := c.UpdateClusterRequest(input)
+	return out, req.Send()
+}
+
+// UpdateClusterWithContext is the same as UpdateCluster with the addition of
+// the ability to pass a context and additional request options.
+//
+// See UpdateCluster for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) UpdateClusterWithContext(ctx aws.Context, input *UpdateClusterInput, opts ...request.Option) (*UpdateClusterOutput, error) {
+	req, out := c.UpdateClusterRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
+const opUpdateClusterSettings = "UpdateClusterSettings"
+
+// UpdateClusterSettingsRequest generates a "aws/request.Request" representing the
+// client's request for the UpdateClusterSettings operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See UpdateClusterSettings for more information on using the UpdateClusterSettings
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the UpdateClusterSettingsRequest method.
+//    req, resp := client.UpdateClusterSettingsRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/UpdateClusterSettings
+func (c *ECS) UpdateClusterSettingsRequest(input *UpdateClusterSettingsInput) (req *request.Request, output *UpdateClusterSettingsOutput) {
+	op := &request.Operation{
+		Name:       opUpdateClusterSettings,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &UpdateClusterSettingsInput{}
+	}
+
+	output = &UpdateClusterSettingsOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// UpdateClusterSettings API operation for Amazon EC2 Container Service.
+//
+// Modifies the settings to use for a cluster.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation UpdateClusterSettings for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * ClusterNotFoundException
+//   The specified cluster could not be found. You can view your available clusters
+//   with ListClusters. Amazon ECS clusters are Region-specific.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/UpdateClusterSettings
+func (c *ECS) UpdateClusterSettings(input *UpdateClusterSettingsInput) (*UpdateClusterSettingsOutput, error) {
+	req, out := c.UpdateClusterSettingsRequest(input)
+	return out, req.Send()
+}
+
+// UpdateClusterSettingsWithContext is the same as UpdateClusterSettings with the addition of
+// the ability to pass a context and additional request options.
+//
+// See UpdateClusterSettings for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) UpdateClusterSettingsWithContext(ctx aws.Context, input *UpdateClusterSettingsInput, opts ...request.Option) (*UpdateClusterSettingsOutput, error) {
+	req, out := c.UpdateClusterSettingsRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
 const opUpdateContainerAgent = "UpdateContainerAgent"
 
 // UpdateContainerAgentRequest generates a "aws/request.Request" representing the
 // client's request for the UpdateContainerAgent operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -3187,10 +5269,16 @@ func (c *ECS) UpdateContainerAgentRequest(input *UpdateContainerAgentInput) (req
 // differs depending on whether your container instance was launched with the
 // Amazon ECS-optimized AMI or another operating system.
 //
-// UpdateContainerAgent requires the Amazon ECS-optimized AMI or Amazon Linux
-// with the ecs-init service installed and running. For help updating the Amazon
-// ECS container agent on other operating systems, see Manually Updating the
-// Amazon ECS Container Agent (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-update.html#manually_update_agent)
+// The UpdateContainerAgent API isn't supported for container instances using
+// the Amazon ECS-optimized Amazon Linux 2 (arm64) AMI. To update the container
+// agent, you can update the ecs-init package which will update the agent. For
+// more information, see Updating the Amazon ECS container agent (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/agent-update-ecs-ami.html)
+// in the Amazon Elastic Container Service Developer Guide.
+//
+// The UpdateContainerAgent API requires an Amazon ECS-optimized AMI or Amazon
+// Linux AMI with the ecs-init service installed and running. For help updating
+// the Amazon ECS container agent on other operating systems, see Manually updating
+// the Amazon ECS container agent (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-update.html#manually_update_agent)
 // in the Amazon Elastic Container Service Developer Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -3200,36 +5288,36 @@ func (c *ECS) UpdateContainerAgentRequest(input *UpdateContainerAgentInput) (req
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation UpdateContainerAgent for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
-//   * ErrCodeUpdateInProgressException "UpdateInProgressException"
+//   * UpdateInProgressException
 //   There is already a current Amazon ECS container agent update in progress
 //   on the specified container instance. If the container agent becomes disconnected
 //   while it is in a transitional stage, such as PENDING or STAGING, the update
 //   process can get stuck in that state. However, when the agent reconnects,
 //   it resumes where it stopped previously.
 //
-//   * ErrCodeNoUpdateAvailableException "NoUpdateAvailableException"
+//   * NoUpdateAvailableException
 //   There is no update available for this Amazon ECS container agent. This could
 //   be because the agent is already running the latest version, or it is so old
 //   that there is no update path to the current version.
 //
-//   * ErrCodeMissingVersionException "MissingVersionException"
+//   * MissingVersionException
 //   Amazon ECS is unable to determine the current version of the Amazon ECS container
 //   agent on the container instance and does not have enough information to proceed
 //   with an update. This could be because the agent running on the container
@@ -3262,7 +5350,7 @@ const opUpdateContainerInstancesState = "UpdateContainerInstancesState"
 // UpdateContainerInstancesStateRequest generates a "aws/request.Request" representing the
 // client's request for the UpdateContainerInstancesState operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -3303,9 +5391,13 @@ func (c *ECS) UpdateContainerInstancesStateRequest(input *UpdateContainerInstanc
 //
 // Modifies the status of an Amazon ECS container instance.
 //
-// You can change the status of a container instance to DRAINING to manually
-// remove an instance from a cluster, for example to perform system updates,
-// update the Docker daemon, or scale down the cluster size.
+// Once a container instance has reached an ACTIVE state, you can change the
+// status of a container instance to DRAINING to manually remove an instance
+// from a cluster, for example to perform system updates, update the Docker
+// daemon, or scale down the cluster size.
+//
+// A container instance cannot be changed to DRAINING until it has reached an
+// ACTIVE status. If the instance is in any other status, an error will be received.
 //
 // When you set a container instance to DRAINING, Amazon ECS prevents new tasks
 // from being scheduled for placement on the container instance and replacement
@@ -3331,20 +5423,21 @@ func (c *ECS) UpdateContainerInstancesStateRequest(input *UpdateContainerInstanc
 //
 //    * The maximumPercent parameter represents an upper limit on the number
 //    of running tasks during task replacement, which enables you to define
-//    the replacement batch size. For example, if desiredCount of four tasks,
+//    the replacement batch size. For example, if desiredCount is four tasks,
 //    a maximum of 200% starts four new tasks before stopping the four tasks
-//    to be drained (provided that the cluster resources required to do this
-//    are available). If the maximum is 100%, then replacement tasks can't start
+//    to be drained, provided that the cluster resources required to do this
+//    are available. If the maximum is 100%, then replacement tasks can't start
 //    until the draining tasks have stopped.
 //
-// Any PENDING or RUNNING tasks that do not belong to a service are not affected;
-// you must wait for them to finish or stop them manually.
+// Any PENDING or RUNNING tasks that do not belong to a service are not affected.
+// You must wait for them to finish or stop them manually.
 //
 // A container instance has completed draining when it has no more RUNNING tasks.
 // You can verify this using ListTasks.
 //
-// When you set a container instance to ACTIVE, the Amazon ECS scheduler can
-// begin scheduling tasks on the instance again.
+// When a container instance has been drained, you can set a container instance
+// to ACTIVE status and once it has reached that status the Amazon ECS scheduler
+// can begin scheduling tasks on the instance again.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -3353,22 +5446,22 @@ func (c *ECS) UpdateContainerInstancesStateRequest(input *UpdateContainerInstanc
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation UpdateContainerInstancesState for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/UpdateContainerInstancesState
 func (c *ECS) UpdateContainerInstancesState(input *UpdateContainerInstancesStateInput) (*UpdateContainerInstancesStateOutput, error) {
@@ -3397,7 +5490,7 @@ const opUpdateService = "UpdateService"
 // UpdateServiceRequest generates a "aws/request.Request" representing the
 // client's request for the UpdateService operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -3436,8 +5529,32 @@ func (c *ECS) UpdateServiceRequest(input *UpdateServiceInput) (req *request.Requ
 
 // UpdateService API operation for Amazon EC2 Container Service.
 //
-// Modifies the desired count, deployment configuration, network configuration,
-// or task definition used in a service.
+//
+// Updating the task placement strategies and constraints on an Amazon ECS service
+// remains in preview and is a Beta Service as defined by and subject to the
+// Beta Service Participation Service Terms located at https://aws.amazon.com/service-terms
+// (https://aws.amazon.com/service-terms) ("Beta Terms"). These Beta Terms apply
+// to your participation in this preview.
+//
+// Modifies the parameters of a service.
+//
+// For services using the rolling update (ECS) deployment controller, the desired
+// count, deployment configuration, network configuration, task placement constraints
+// and strategies, or task definition used can be updated.
+//
+// For services using the blue/green (CODE_DEPLOY) deployment controller, only
+// the desired count, deployment configuration, task placement constraints and
+// strategies, and health check grace period can be updated using this API.
+// If the network configuration, platform version, or task definition need to
+// be updated, a new CodeDeploy deployment should be created. For more information,
+// see CreateDeployment (https://docs.aws.amazon.com/codedeploy/latest/APIReference/API_CreateDeployment.html)
+// in the CodeDeploy API Reference.
+//
+// For services using an external deployment controller, you can update only
+// the desired count, task placement constraints and strategies, and health
+// check grace period using this API. If the launch type, load balancer, network
+// configuration, platform version, or task definition need to be updated, you
+// should create a new task set. For more information, see CreateTaskSet.
 //
 // You can add to or subtract from the number of instantiations of a task definition
 // in a service by specifying the cluster that the service is running in and
@@ -3490,16 +5607,13 @@ func (c *ECS) UpdateServiceRequest(input *UpdateServiceInput) (req *request.Requ
 //
 //    * By default, the service scheduler attempts to balance tasks across Availability
 //    Zones in this manner (although you can choose a different placement strategy):
-//
-// Sort the valid container instances by the fewest number of running tasks
+//    Sort the valid container instances by the fewest number of running tasks
 //    for this service in the same Availability Zone as the instance. For example,
 //    if zone A has one running service task and zones B and C each have zero,
 //    valid container instances in either zone B or C are considered optimal
-//    for placement.
-//
-// Place the new service task on a valid container instance in an optimal Availability
-//    Zone (based on the previous steps), favoring container instances with
-//    the fewest number of running tasks for this service.
+//    for placement. Place the new service task on a valid container instance
+//    in an optimal Availability Zone (based on the previous steps), favoring
+//    container instances with the fewest number of running tasks for this service.
 //
 // When the service scheduler stops running tasks, it attempts to maintain balance
 // across the Availability Zones in your cluster using the following logic:
@@ -3520,39 +5634,39 @@ func (c *ECS) UpdateServiceRequest(input *UpdateServiceInput) (req *request.Requ
 // See the AWS API reference guide for Amazon EC2 Container Service's
 // API operation UpdateService for usage and error information.
 //
-// Returned Error Codes:
-//   * ErrCodeServerException "ServerException"
+// Returned Error Types:
+//   * ServerException
 //   These errors are usually caused by a server issue.
 //
-//   * ErrCodeClientException "ClientException"
+//   * ClientException
 //   These errors are usually caused by a client action, such as using an action
 //   or resource on behalf of a user that doesn't have permissions to use the
 //   action or resource, or specifying an identifier that is not valid.
 //
-//   * ErrCodeInvalidParameterException "InvalidParameterException"
+//   * InvalidParameterException
 //   The specified parameter is invalid. Review the available parameters for the
 //   API request.
 //
-//   * ErrCodeClusterNotFoundException "ClusterNotFoundException"
+//   * ClusterNotFoundException
 //   The specified cluster could not be found. You can view your available clusters
-//   with ListClusters. Amazon ECS clusters are region-specific.
+//   with ListClusters. Amazon ECS clusters are Region-specific.
 //
-//   * ErrCodeServiceNotFoundException "ServiceNotFoundException"
+//   * ServiceNotFoundException
 //   The specified service could not be found. You can view your available services
-//   with ListServices. Amazon ECS services are cluster-specific and region-specific.
+//   with ListServices. Amazon ECS services are cluster-specific and Region-specific.
 //
-//   * ErrCodeServiceNotActiveException "ServiceNotActiveException"
+//   * ServiceNotActiveException
 //   The specified service is not active. You can't update a service that is inactive.
 //   If you have previously deleted a service, you can re-create it with CreateService.
 //
-//   * ErrCodePlatformUnknownException "PlatformUnknownException"
+//   * PlatformUnknownException
 //   The specified platform version does not exist.
 //
-//   * ErrCodePlatformTaskDefinitionIncompatibilityException "PlatformTaskDefinitionIncompatibilityException"
+//   * PlatformTaskDefinitionIncompatibilityException
 //   The specified platform version does not satisfy the task definition's required
 //   capabilities.
 //
-//   * ErrCodeAccessDeniedException "AccessDeniedException"
+//   * AccessDeniedException
 //   You do not have authorization to perform the requested action.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/UpdateService
@@ -3577,6 +5691,298 @@ func (c *ECS) UpdateServiceWithContext(ctx aws.Context, input *UpdateServiceInpu
 	return out, req.Send()
 }
 
+const opUpdateServicePrimaryTaskSet = "UpdateServicePrimaryTaskSet"
+
+// UpdateServicePrimaryTaskSetRequest generates a "aws/request.Request" representing the
+// client's request for the UpdateServicePrimaryTaskSet operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See UpdateServicePrimaryTaskSet for more information on using the UpdateServicePrimaryTaskSet
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the UpdateServicePrimaryTaskSetRequest method.
+//    req, resp := client.UpdateServicePrimaryTaskSetRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/UpdateServicePrimaryTaskSet
+func (c *ECS) UpdateServicePrimaryTaskSetRequest(input *UpdateServicePrimaryTaskSetInput) (req *request.Request, output *UpdateServicePrimaryTaskSetOutput) {
+	op := &request.Operation{
+		Name:       opUpdateServicePrimaryTaskSet,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &UpdateServicePrimaryTaskSetInput{}
+	}
+
+	output = &UpdateServicePrimaryTaskSetOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// UpdateServicePrimaryTaskSet API operation for Amazon EC2 Container Service.
+//
+// Modifies which task set in a service is the primary task set. Any parameters
+// that are updated on the primary task set in a service will transition to
+// the service. This is used when a service uses the EXTERNAL deployment controller
+// type. For more information, see Amazon ECS Deployment Types (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-types.html)
+// in the Amazon Elastic Container Service Developer Guide.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation UpdateServicePrimaryTaskSet for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+//   * ClusterNotFoundException
+//   The specified cluster could not be found. You can view your available clusters
+//   with ListClusters. Amazon ECS clusters are Region-specific.
+//
+//   * UnsupportedFeatureException
+//   The specified task is not supported in this Region.
+//
+//   * ServiceNotFoundException
+//   The specified service could not be found. You can view your available services
+//   with ListServices. Amazon ECS services are cluster-specific and Region-specific.
+//
+//   * ServiceNotActiveException
+//   The specified service is not active. You can't update a service that is inactive.
+//   If you have previously deleted a service, you can re-create it with CreateService.
+//
+//   * TaskSetNotFoundException
+//   The specified task set could not be found. You can view your available task
+//   sets with DescribeTaskSets. Task sets are specific to each cluster, service
+//   and Region.
+//
+//   * AccessDeniedException
+//   You do not have authorization to perform the requested action.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/UpdateServicePrimaryTaskSet
+func (c *ECS) UpdateServicePrimaryTaskSet(input *UpdateServicePrimaryTaskSetInput) (*UpdateServicePrimaryTaskSetOutput, error) {
+	req, out := c.UpdateServicePrimaryTaskSetRequest(input)
+	return out, req.Send()
+}
+
+// UpdateServicePrimaryTaskSetWithContext is the same as UpdateServicePrimaryTaskSet with the addition of
+// the ability to pass a context and additional request options.
+//
+// See UpdateServicePrimaryTaskSet for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) UpdateServicePrimaryTaskSetWithContext(ctx aws.Context, input *UpdateServicePrimaryTaskSetInput, opts ...request.Option) (*UpdateServicePrimaryTaskSetOutput, error) {
+	req, out := c.UpdateServicePrimaryTaskSetRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
+const opUpdateTaskSet = "UpdateTaskSet"
+
+// UpdateTaskSetRequest generates a "aws/request.Request" representing the
+// client's request for the UpdateTaskSet operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfully.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See UpdateTaskSet for more information on using the UpdateTaskSet
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or configuration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the UpdateTaskSetRequest method.
+//    req, resp := client.UpdateTaskSetRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now filled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/UpdateTaskSet
+func (c *ECS) UpdateTaskSetRequest(input *UpdateTaskSetInput) (req *request.Request, output *UpdateTaskSetOutput) {
+	op := &request.Operation{
+		Name:       opUpdateTaskSet,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &UpdateTaskSetInput{}
+	}
+
+	output = &UpdateTaskSetOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// UpdateTaskSet API operation for Amazon EC2 Container Service.
+//
+// Modifies a task set. This is used when a service uses the EXTERNAL deployment
+// controller type. For more information, see Amazon ECS Deployment Types (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-types.html)
+// in the Amazon Elastic Container Service Developer Guide.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon EC2 Container Service's
+// API operation UpdateTaskSet for usage and error information.
+//
+// Returned Error Types:
+//   * ServerException
+//   These errors are usually caused by a server issue.
+//
+//   * ClientException
+//   These errors are usually caused by a client action, such as using an action
+//   or resource on behalf of a user that doesn't have permissions to use the
+//   action or resource, or specifying an identifier that is not valid.
+//
+//   * InvalidParameterException
+//   The specified parameter is invalid. Review the available parameters for the
+//   API request.
+//
+//   * ClusterNotFoundException
+//   The specified cluster could not be found. You can view your available clusters
+//   with ListClusters. Amazon ECS clusters are Region-specific.
+//
+//   * UnsupportedFeatureException
+//   The specified task is not supported in this Region.
+//
+//   * AccessDeniedException
+//   You do not have authorization to perform the requested action.
+//
+//   * ServiceNotFoundException
+//   The specified service could not be found. You can view your available services
+//   with ListServices. Amazon ECS services are cluster-specific and Region-specific.
+//
+//   * ServiceNotActiveException
+//   The specified service is not active. You can't update a service that is inactive.
+//   If you have previously deleted a service, you can re-create it with CreateService.
+//
+//   * TaskSetNotFoundException
+//   The specified task set could not be found. You can view your available task
+//   sets with DescribeTaskSets. Task sets are specific to each cluster, service
+//   and Region.
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/ecs-2014-11-13/UpdateTaskSet
+func (c *ECS) UpdateTaskSet(input *UpdateTaskSetInput) (*UpdateTaskSetOutput, error) {
+	req, out := c.UpdateTaskSetRequest(input)
+	return out, req.Send()
+}
+
+// UpdateTaskSetWithContext is the same as UpdateTaskSet with the addition of
+// the ability to pass a context and additional request options.
+//
+// See UpdateTaskSet for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *ECS) UpdateTaskSetWithContext(ctx aws.Context, input *UpdateTaskSetInput, opts ...request.Option) (*UpdateTaskSetOutput, error) {
+	req, out := c.UpdateTaskSetRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
+// You do not have authorization to perform the requested action.
+type AccessDeniedException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s AccessDeniedException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s AccessDeniedException) GoString() string {
+	return s.String()
+}
+
+func newErrorAccessDeniedException(v protocol.ResponseMetadata) error {
+	return &AccessDeniedException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *AccessDeniedException) Code() string {
+	return "AccessDeniedException"
+}
+
+// Message returns the exception's message.
+func (s *AccessDeniedException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *AccessDeniedException) OrigErr() error {
+	return nil
+}
+
+func (s *AccessDeniedException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *AccessDeniedException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *AccessDeniedException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
 // An object representing a container instance or task attachment.
 type Attachment struct {
 	_ struct{} `type:"structure"`
@@ -3597,12 +6003,20 @@ type Attachment struct {
 	Type *string `locationName:"type" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Attachment) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Attachment) GoString() string {
 	return s.String()
 }
@@ -3646,12 +6060,20 @@ type AttachmentStateChange struct {
 	Status *string `locationName:"status" type:"string" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s AttachmentStateChange) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s AttachmentStateChange) GoString() string {
 	return s.String()
 }
@@ -3686,13 +6108,14 @@ func (s *AttachmentStateChange) SetStatus(v string) *AttachmentStateChange {
 
 // An attribute is a name-value pair associated with an Amazon ECS object. Attributes
 // enable you to extend the Amazon ECS data model by adding custom metadata
-// to your resources. For more information, see Attributes (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html#attributes)
+// to your resources. For more information, see Attributes (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html#attributes)
 // in the Amazon Elastic Container Service Developer Guide.
 type Attribute struct {
 	_ struct{} `type:"structure"`
 
-	// The name of the attribute. Up to 128 letters (uppercase and lowercase), numbers,
-	// hyphens, underscores, and periods are allowed.
+	// The name of the attribute. The name must contain between 1 and 128 characters
+	// and name may contain letters (uppercase and lowercase), numbers, hyphens,
+	// underscores, forward slashes, back slashes, or periods.
 	//
 	// Name is a required field
 	Name *string `locationName:"name" type:"string" required:"true"`
@@ -3706,18 +6129,27 @@ type Attribute struct {
 	// ARN.
 	TargetType *string `locationName:"targetType" type:"string" enum:"TargetType"`
 
-	// The value of the attribute. Up to 128 letters (uppercase and lowercase),
-	// numbers, hyphens, underscores, periods, at signs (@), forward slashes, colons,
-	// and spaces are allowed.
+	// The value of the attribute. The value must contain between 1 and 128 characters
+	// and may contain letters (uppercase and lowercase), numbers, hyphens, underscores,
+	// periods, at signs (@), forward slashes, back slashes, colons, or spaces.
+	// The value cannot contain any leading or trailing whitespace.
 	Value *string `locationName:"value" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Attribute) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Attribute) GoString() string {
 	return s.String()
 }
@@ -3759,22 +6191,245 @@ func (s *Attribute) SetValue(v string) *Attribute {
 	return s
 }
 
+// You can apply up to 10 custom attributes per resource. You can view the attributes
+// of a resource with ListAttributes. You can remove existing attributes on
+// a resource with DeleteAttributes.
+type AttributeLimitExceededException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s AttributeLimitExceededException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s AttributeLimitExceededException) GoString() string {
+	return s.String()
+}
+
+func newErrorAttributeLimitExceededException(v protocol.ResponseMetadata) error {
+	return &AttributeLimitExceededException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *AttributeLimitExceededException) Code() string {
+	return "AttributeLimitExceededException"
+}
+
+// Message returns the exception's message.
+func (s *AttributeLimitExceededException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *AttributeLimitExceededException) OrigErr() error {
+	return nil
+}
+
+func (s *AttributeLimitExceededException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *AttributeLimitExceededException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *AttributeLimitExceededException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
+// The details of the Auto Scaling group for the capacity provider.
+type AutoScalingGroupProvider struct {
+	_ struct{} `type:"structure"`
+
+	// The Amazon Resource Name (ARN) that identifies the Auto Scaling group.
+	//
+	// AutoScalingGroupArn is a required field
+	AutoScalingGroupArn *string `locationName:"autoScalingGroupArn" type:"string" required:"true"`
+
+	// The managed scaling settings for the Auto Scaling group capacity provider.
+	ManagedScaling *ManagedScaling `locationName:"managedScaling" type:"structure"`
+
+	// The managed termination protection setting to use for the Auto Scaling group
+	// capacity provider. This determines whether the Auto Scaling group has managed
+	// termination protection.
+	//
+	// When using managed termination protection, managed scaling must also be used
+	// otherwise managed termination protection will not work.
+	//
+	// When managed termination protection is enabled, Amazon ECS prevents the Amazon
+	// EC2 instances in an Auto Scaling group that contain tasks from being terminated
+	// during a scale-in action. The Auto Scaling group and each instance in the
+	// Auto Scaling group must have instance protection from scale-in actions enabled
+	// as well. For more information, see Instance Protection (https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-instance-termination.html#instance-protection)
+	// in the Auto Scaling User Guide.
+	//
+	// When managed termination protection is disabled, your Amazon EC2 instances
+	// are not protected from termination when the Auto Scaling group scales in.
+	ManagedTerminationProtection *string `locationName:"managedTerminationProtection" type:"string" enum:"ManagedTerminationProtection"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s AutoScalingGroupProvider) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s AutoScalingGroupProvider) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *AutoScalingGroupProvider) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AutoScalingGroupProvider"}
+	if s.AutoScalingGroupArn == nil {
+		invalidParams.Add(request.NewErrParamRequired("AutoScalingGroupArn"))
+	}
+	if s.ManagedScaling != nil {
+		if err := s.ManagedScaling.Validate(); err != nil {
+			invalidParams.AddNested("ManagedScaling", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetAutoScalingGroupArn sets the AutoScalingGroupArn field's value.
+func (s *AutoScalingGroupProvider) SetAutoScalingGroupArn(v string) *AutoScalingGroupProvider {
+	s.AutoScalingGroupArn = &v
+	return s
+}
+
+// SetManagedScaling sets the ManagedScaling field's value.
+func (s *AutoScalingGroupProvider) SetManagedScaling(v *ManagedScaling) *AutoScalingGroupProvider {
+	s.ManagedScaling = v
+	return s
+}
+
+// SetManagedTerminationProtection sets the ManagedTerminationProtection field's value.
+func (s *AutoScalingGroupProvider) SetManagedTerminationProtection(v string) *AutoScalingGroupProvider {
+	s.ManagedTerminationProtection = &v
+	return s
+}
+
+// The details of the Auto Scaling group capacity provider to update.
+type AutoScalingGroupProviderUpdate struct {
+	_ struct{} `type:"structure"`
+
+	// The managed scaling settings for the Auto Scaling group capacity provider.
+	ManagedScaling *ManagedScaling `locationName:"managedScaling" type:"structure"`
+
+	// The managed termination protection setting to use for the Auto Scaling group
+	// capacity provider. This determines whether the Auto Scaling group has managed
+	// termination protection.
+	//
+	// When using managed termination protection, managed scaling must also be used
+	// otherwise managed termination protection will not work.
+	//
+	// When managed termination protection is enabled, Amazon ECS prevents the Amazon
+	// EC2 instances in an Auto Scaling group that contain tasks from being terminated
+	// during a scale-in action. The Auto Scaling group and each instance in the
+	// Auto Scaling group must have instance protection from scale-in actions enabled
+	// as well. For more information, see Instance Protection (https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-instance-termination.html#instance-protection)
+	// in the Auto Scaling User Guide.
+	//
+	// When managed termination protection is disabled, your Amazon EC2 instances
+	// are not protected from termination when the Auto Scaling group scales in.
+	ManagedTerminationProtection *string `locationName:"managedTerminationProtection" type:"string" enum:"ManagedTerminationProtection"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s AutoScalingGroupProviderUpdate) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s AutoScalingGroupProviderUpdate) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *AutoScalingGroupProviderUpdate) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AutoScalingGroupProviderUpdate"}
+	if s.ManagedScaling != nil {
+		if err := s.ManagedScaling.Validate(); err != nil {
+			invalidParams.AddNested("ManagedScaling", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetManagedScaling sets the ManagedScaling field's value.
+func (s *AutoScalingGroupProviderUpdate) SetManagedScaling(v *ManagedScaling) *AutoScalingGroupProviderUpdate {
+	s.ManagedScaling = v
+	return s
+}
+
+// SetManagedTerminationProtection sets the ManagedTerminationProtection field's value.
+func (s *AutoScalingGroupProviderUpdate) SetManagedTerminationProtection(v string) *AutoScalingGroupProviderUpdate {
+	s.ManagedTerminationProtection = &v
+	return s
+}
+
 // An object representing the networking details for a task or service.
 type AwsVpcConfiguration struct {
 	_ struct{} `type:"structure"`
 
 	// Whether the task's elastic network interface receives a public IP address.
+	// The default value is DISABLED.
 	AssignPublicIp *string `locationName:"assignPublicIp" type:"string" enum:"AssignPublicIp"`
 
-	// The security groups associated with the task or service. If you do not specify
-	// a security group, the default security group for the VPC is used. There is
-	// a limit of 5 security groups able to be specified per AwsVpcConfiguration.
+	// The IDs of the security groups associated with the task or service. If you
+	// do not specify a security group, the default security group for the VPC is
+	// used. There is a limit of 5 security groups that can be specified per AwsVpcConfiguration.
 	//
 	// All specified security groups must be from the same VPC.
 	SecurityGroups []*string `locationName:"securityGroups" type:"list"`
 
-	// The subnets associated with the task or service. There is a limit of 10 subnets
-	// able to be specified per AwsVpcConfiguration.
+	// The IDs of the subnets associated with the task or service. There is a limit
+	// of 16 subnets that can be specified per AwsVpcConfiguration.
 	//
 	// All specified subnets must be from the same VPC.
 	//
@@ -3782,12 +6437,20 @@ type AwsVpcConfiguration struct {
 	Subnets []*string `locationName:"subnets" type:"list" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s AwsVpcConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s AwsVpcConfiguration) GoString() string {
 	return s.String()
 }
@@ -3823,6 +6486,369 @@ func (s *AwsVpcConfiguration) SetSubnets(v []*string) *AwsVpcConfiguration {
 	return s
 }
 
+// Your Amazon Web Services account has been blocked. For more information,
+// contact Amazon Web Services Support (http://aws.amazon.com/contact-us/).
+type BlockedException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s BlockedException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s BlockedException) GoString() string {
+	return s.String()
+}
+
+func newErrorBlockedException(v protocol.ResponseMetadata) error {
+	return &BlockedException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *BlockedException) Code() string {
+	return "BlockedException"
+}
+
+// Message returns the exception's message.
+func (s *BlockedException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *BlockedException) OrigErr() error {
+	return nil
+}
+
+func (s *BlockedException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *BlockedException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *BlockedException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
+// The details of a capacity provider.
+type CapacityProvider struct {
+	_ struct{} `type:"structure"`
+
+	// The Auto Scaling group settings for the capacity provider.
+	AutoScalingGroupProvider *AutoScalingGroupProvider `locationName:"autoScalingGroupProvider" type:"structure"`
+
+	// The Amazon Resource Name (ARN) that identifies the capacity provider.
+	CapacityProviderArn *string `locationName:"capacityProviderArn" type:"string"`
+
+	// The name of the capacity provider.
+	Name *string `locationName:"name" type:"string"`
+
+	// The current status of the capacity provider. Only capacity providers in an
+	// ACTIVE state can be used in a cluster. When a capacity provider is successfully
+	// deleted, it will have an INACTIVE status.
+	Status *string `locationName:"status" type:"string" enum:"CapacityProviderStatus"`
+
+	// The metadata that you apply to the capacity provider to help you categorize
+	// and organize it. Each tag consists of a key and an optional value, both of
+	// which you define.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	Tags []*Tag `locationName:"tags" type:"list"`
+
+	// The update status of the capacity provider. The following are the possible
+	// states that will be returned.
+	//
+	// DELETE_IN_PROGRESS
+	//
+	// The capacity provider is in the process of being deleted.
+	//
+	// DELETE_COMPLETE
+	//
+	// The capacity provider has been successfully deleted and will have an INACTIVE
+	// status.
+	//
+	// DELETE_FAILED
+	//
+	// The capacity provider was unable to be deleted. The update status reason
+	// will provide further details about why the delete failed.
+	UpdateStatus *string `locationName:"updateStatus" type:"string" enum:"CapacityProviderUpdateStatus"`
+
+	// The update status reason. This provides further details about the update
+	// status for the capacity provider.
+	UpdateStatusReason *string `locationName:"updateStatusReason" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s CapacityProvider) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s CapacityProvider) GoString() string {
+	return s.String()
+}
+
+// SetAutoScalingGroupProvider sets the AutoScalingGroupProvider field's value.
+func (s *CapacityProvider) SetAutoScalingGroupProvider(v *AutoScalingGroupProvider) *CapacityProvider {
+	s.AutoScalingGroupProvider = v
+	return s
+}
+
+// SetCapacityProviderArn sets the CapacityProviderArn field's value.
+func (s *CapacityProvider) SetCapacityProviderArn(v string) *CapacityProvider {
+	s.CapacityProviderArn = &v
+	return s
+}
+
+// SetName sets the Name field's value.
+func (s *CapacityProvider) SetName(v string) *CapacityProvider {
+	s.Name = &v
+	return s
+}
+
+// SetStatus sets the Status field's value.
+func (s *CapacityProvider) SetStatus(v string) *CapacityProvider {
+	s.Status = &v
+	return s
+}
+
+// SetTags sets the Tags field's value.
+func (s *CapacityProvider) SetTags(v []*Tag) *CapacityProvider {
+	s.Tags = v
+	return s
+}
+
+// SetUpdateStatus sets the UpdateStatus field's value.
+func (s *CapacityProvider) SetUpdateStatus(v string) *CapacityProvider {
+	s.UpdateStatus = &v
+	return s
+}
+
+// SetUpdateStatusReason sets the UpdateStatusReason field's value.
+func (s *CapacityProvider) SetUpdateStatusReason(v string) *CapacityProvider {
+	s.UpdateStatusReason = &v
+	return s
+}
+
+// The details of a capacity provider strategy. A capacity provider strategy
+// can be set when using the RunTask or CreateCluster APIs or as the default
+// capacity provider strategy for a cluster with the CreateCluster API.
+//
+// Only capacity providers that are already associated with a cluster and have
+// an ACTIVE or UPDATING status can be used in a capacity provider strategy.
+// The PutClusterCapacityProviders API is used to associate a capacity provider
+// with a cluster.
+//
+// If specifying a capacity provider that uses an Auto Scaling group, the capacity
+// provider must already be created. New Auto Scaling group capacity providers
+// can be created with the CreateCapacityProvider API operation.
+//
+// To use a Fargate capacity provider, specify either the FARGATE or FARGATE_SPOT
+// capacity providers. The Fargate capacity providers are available to all accounts
+// and only need to be associated with a cluster to be used in a capacity provider
+// strategy.
+//
+// A capacity provider strategy may contain a maximum of 6 capacity providers.
+type CapacityProviderStrategyItem struct {
+	_ struct{} `type:"structure"`
+
+	// The base value designates how many tasks, at a minimum, to run on the specified
+	// capacity provider. Only one capacity provider in a capacity provider strategy
+	// can have a base defined. If no value is specified, the default value of 0
+	// is used.
+	Base *int64 `locationName:"base" type:"integer"`
+
+	// The short name of the capacity provider.
+	//
+	// CapacityProvider is a required field
+	CapacityProvider *string `locationName:"capacityProvider" type:"string" required:"true"`
+
+	// The weight value designates the relative percentage of the total number of
+	// tasks launched that should use the specified capacity provider. The weight
+	// value is taken into consideration after the base value, if defined, is satisfied.
+	//
+	// If no weight value is specified, the default value of 0 is used. When multiple
+	// capacity providers are specified within a capacity provider strategy, at
+	// least one of the capacity providers must have a weight value greater than
+	// zero and any capacity providers with a weight of 0 will not be used to place
+	// tasks. If you specify multiple capacity providers in a strategy that all
+	// have a weight of 0, any RunTask or CreateService actions using the capacity
+	// provider strategy will fail.
+	//
+	// An example scenario for using weights is defining a strategy that contains
+	// two capacity providers and both have a weight of 1, then when the base is
+	// satisfied, the tasks will be split evenly across the two capacity providers.
+	// Using that same logic, if you specify a weight of 1 for capacityProviderA
+	// and a weight of 4 for capacityProviderB, then for every one task that is
+	// run using capacityProviderA, four tasks would use capacityProviderB.
+	Weight *int64 `locationName:"weight" type:"integer"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s CapacityProviderStrategyItem) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s CapacityProviderStrategyItem) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CapacityProviderStrategyItem) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CapacityProviderStrategyItem"}
+	if s.CapacityProvider == nil {
+		invalidParams.Add(request.NewErrParamRequired("CapacityProvider"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetBase sets the Base field's value.
+func (s *CapacityProviderStrategyItem) SetBase(v int64) *CapacityProviderStrategyItem {
+	s.Base = &v
+	return s
+}
+
+// SetCapacityProvider sets the CapacityProvider field's value.
+func (s *CapacityProviderStrategyItem) SetCapacityProvider(v string) *CapacityProviderStrategyItem {
+	s.CapacityProvider = &v
+	return s
+}
+
+// SetWeight sets the Weight field's value.
+func (s *CapacityProviderStrategyItem) SetWeight(v int64) *CapacityProviderStrategyItem {
+	s.Weight = &v
+	return s
+}
+
+// These errors are usually caused by a client action, such as using an action
+// or resource on behalf of a user that doesn't have permissions to use the
+// action or resource, or specifying an identifier that is not valid.
+type ClientException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ClientException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ClientException) GoString() string {
+	return s.String()
+}
+
+func newErrorClientException(v protocol.ResponseMetadata) error {
+	return &ClientException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *ClientException) Code() string {
+	return "ClientException"
+}
+
+// Message returns the exception's message.
+func (s *ClientException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *ClientException) OrigErr() error {
+	return nil
+}
+
+func (s *ClientException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *ClientException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *ClientException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
 // A regional grouping of one or more container instances on which you can run
 // task requests. Each account receives a default cluster the first time you
 // use the Amazon ECS service, but you may also create other clusters. Clusters
@@ -3834,23 +6860,61 @@ type Cluster struct {
 	// You can view these services with ListServices.
 	ActiveServicesCount *int64 `locationName:"activeServicesCount" type:"integer"`
 
+	// The resources attached to a cluster. When using a capacity provider with
+	// a cluster, the Auto Scaling plan that is created will be returned as a cluster
+	// attachment.
+	Attachments []*Attachment `locationName:"attachments" type:"list"`
+
+	// The status of the capacity providers associated with the cluster. The following
+	// are the states that will be returned:
+	//
+	// UPDATE_IN_PROGRESS
+	//
+	// The available capacity providers for the cluster are updating. This occurs
+	// when the Auto Scaling plan is provisioning or deprovisioning.
+	//
+	// UPDATE_COMPLETE
+	//
+	// The capacity providers have successfully updated.
+	//
+	// UPDATE_FAILED
+	//
+	// The capacity provider updates failed.
+	AttachmentsStatus *string `locationName:"attachmentsStatus" type:"string"`
+
+	// The capacity providers associated with the cluster.
+	CapacityProviders []*string `locationName:"capacityProviders" type:"list"`
+
 	// The Amazon Resource Name (ARN) that identifies the cluster. The ARN contains
-	// the arn:aws:ecs namespace, followed by the Region of the cluster, the AWS
-	// account ID of the cluster owner, the cluster namespace, and then the cluster
-	// name. For example, arn:aws:ecs:region:012345678910:cluster/test..
+	// the arn:aws:ecs namespace, followed by the Region of the cluster, the Amazon
+	// Web Services account ID of the cluster owner, the cluster namespace, and
+	// then the cluster name. For example, arn:aws:ecs:region:012345678910:cluster/test.
 	ClusterArn *string `locationName:"clusterArn" type:"string"`
 
 	// A user-generated string that you use to identify your cluster.
 	ClusterName *string `locationName:"clusterName" type:"string"`
 
+	// The execute command configuration for the cluster.
+	Configuration *ClusterConfiguration `locationName:"configuration" type:"structure"`
+
+	// The default capacity provider strategy for the cluster. When services or
+	// tasks are run in the cluster with no launch type or capacity provider strategy
+	// specified, the default capacity provider strategy is used.
+	DefaultCapacityProviderStrategy []*CapacityProviderStrategyItem `locationName:"defaultCapacityProviderStrategy" type:"list"`
+
 	// The number of tasks in the cluster that are in the PENDING state.
 	PendingTasksCount *int64 `locationName:"pendingTasksCount" type:"integer"`
 
-	// The number of container instances registered into the cluster.
+	// The number of container instances registered into the cluster. This includes
+	// container instances in both ACTIVE and DRAINING status.
 	RegisteredContainerInstancesCount *int64 `locationName:"registeredContainerInstancesCount" type:"integer"`
 
 	// The number of tasks in the cluster that are in the RUNNING state.
 	RunningTasksCount *int64 `locationName:"runningTasksCount" type:"integer"`
+
+	// The settings for the cluster. This parameter indicates whether CloudWatch
+	// Container Insights is enabled or disabled for a cluster.
+	Settings []*ClusterSetting `locationName:"settings" type:"list"`
 
 	// Additional information about your clusters that are separated by launch type,
 	// including:
@@ -3872,18 +6936,80 @@ type Cluster struct {
 	//    * drainingFargateServiceCount
 	Statistics []*KeyValuePair `locationName:"statistics" type:"list"`
 
-	// The status of the cluster. The valid values are ACTIVE or INACTIVE. ACTIVE
-	// indicates that you can register container instances with the cluster and
-	// the associated instances can accept tasks.
+	// The status of the cluster. The following are the possible states that will
+	// be returned.
+	//
+	// ACTIVE
+	//
+	// The cluster is ready to accept tasks and if applicable you can register container
+	// instances with the cluster.
+	//
+	// PROVISIONING
+	//
+	// The cluster has capacity providers associated with it and the resources needed
+	// for the capacity provider are being created.
+	//
+	// DEPROVISIONING
+	//
+	// The cluster has capacity providers associated with it and the resources needed
+	// for the capacity provider are being deleted.
+	//
+	// FAILED
+	//
+	// The cluster has capacity providers associated with it and the resources needed
+	// for the capacity provider have failed to create.
+	//
+	// INACTIVE
+	//
+	// The cluster has been deleted. Clusters with an INACTIVE status may remain
+	// discoverable in your account for a period of time. However, this behavior
+	// is subject to change in the future, so you should not rely on INACTIVE clusters
+	// persisting.
 	Status *string `locationName:"status" type:"string"`
+
+	// The metadata that you apply to the cluster to help you categorize and organize
+	// them. Each tag consists of a key and an optional value, both of which you
+	// define.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	Tags []*Tag `locationName:"tags" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Cluster) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Cluster) GoString() string {
 	return s.String()
 }
@@ -3891,6 +7017,24 @@ func (s Cluster) GoString() string {
 // SetActiveServicesCount sets the ActiveServicesCount field's value.
 func (s *Cluster) SetActiveServicesCount(v int64) *Cluster {
 	s.ActiveServicesCount = &v
+	return s
+}
+
+// SetAttachments sets the Attachments field's value.
+func (s *Cluster) SetAttachments(v []*Attachment) *Cluster {
+	s.Attachments = v
+	return s
+}
+
+// SetAttachmentsStatus sets the AttachmentsStatus field's value.
+func (s *Cluster) SetAttachmentsStatus(v string) *Cluster {
+	s.AttachmentsStatus = &v
+	return s
+}
+
+// SetCapacityProviders sets the CapacityProviders field's value.
+func (s *Cluster) SetCapacityProviders(v []*string) *Cluster {
+	s.CapacityProviders = v
 	return s
 }
 
@@ -3903,6 +7047,18 @@ func (s *Cluster) SetClusterArn(v string) *Cluster {
 // SetClusterName sets the ClusterName field's value.
 func (s *Cluster) SetClusterName(v string) *Cluster {
 	s.ClusterName = &v
+	return s
+}
+
+// SetConfiguration sets the Configuration field's value.
+func (s *Cluster) SetConfiguration(v *ClusterConfiguration) *Cluster {
+	s.Configuration = v
+	return s
+}
+
+// SetDefaultCapacityProviderStrategy sets the DefaultCapacityProviderStrategy field's value.
+func (s *Cluster) SetDefaultCapacityProviderStrategy(v []*CapacityProviderStrategyItem) *Cluster {
+	s.DefaultCapacityProviderStrategy = v
 	return s
 }
 
@@ -3924,6 +7080,12 @@ func (s *Cluster) SetRunningTasksCount(v int64) *Cluster {
 	return s
 }
 
+// SetSettings sets the Settings field's value.
+func (s *Cluster) SetSettings(v []*ClusterSetting) *Cluster {
+	s.Settings = v
+	return s
+}
+
 // SetStatistics sets the Statistics field's value.
 func (s *Cluster) SetStatistics(v []*KeyValuePair) *Cluster {
 	s.Statistics = v
@@ -3936,6 +7098,351 @@ func (s *Cluster) SetStatus(v string) *Cluster {
 	return s
 }
 
+// SetTags sets the Tags field's value.
+func (s *Cluster) SetTags(v []*Tag) *Cluster {
+	s.Tags = v
+	return s
+}
+
+// The execute command configuration for the cluster.
+type ClusterConfiguration struct {
+	_ struct{} `type:"structure"`
+
+	// The details of the execute command configuration.
+	ExecuteCommandConfiguration *ExecuteCommandConfiguration `locationName:"executeCommandConfiguration" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ClusterConfiguration) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ClusterConfiguration) GoString() string {
+	return s.String()
+}
+
+// SetExecuteCommandConfiguration sets the ExecuteCommandConfiguration field's value.
+func (s *ClusterConfiguration) SetExecuteCommandConfiguration(v *ExecuteCommandConfiguration) *ClusterConfiguration {
+	s.ExecuteCommandConfiguration = v
+	return s
+}
+
+// You cannot delete a cluster that has registered container instances. First,
+// deregister the container instances before you can delete the cluster. For
+// more information, see DeregisterContainerInstance.
+type ClusterContainsContainerInstancesException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ClusterContainsContainerInstancesException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ClusterContainsContainerInstancesException) GoString() string {
+	return s.String()
+}
+
+func newErrorClusterContainsContainerInstancesException(v protocol.ResponseMetadata) error {
+	return &ClusterContainsContainerInstancesException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *ClusterContainsContainerInstancesException) Code() string {
+	return "ClusterContainsContainerInstancesException"
+}
+
+// Message returns the exception's message.
+func (s *ClusterContainsContainerInstancesException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *ClusterContainsContainerInstancesException) OrigErr() error {
+	return nil
+}
+
+func (s *ClusterContainsContainerInstancesException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *ClusterContainsContainerInstancesException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *ClusterContainsContainerInstancesException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
+// You cannot delete a cluster that contains services. First, update the service
+// to reduce its desired task count to 0 and then delete the service. For more
+// information, see UpdateService and DeleteService.
+type ClusterContainsServicesException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ClusterContainsServicesException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ClusterContainsServicesException) GoString() string {
+	return s.String()
+}
+
+func newErrorClusterContainsServicesException(v protocol.ResponseMetadata) error {
+	return &ClusterContainsServicesException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *ClusterContainsServicesException) Code() string {
+	return "ClusterContainsServicesException"
+}
+
+// Message returns the exception's message.
+func (s *ClusterContainsServicesException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *ClusterContainsServicesException) OrigErr() error {
+	return nil
+}
+
+func (s *ClusterContainsServicesException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *ClusterContainsServicesException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *ClusterContainsServicesException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
+// You cannot delete a cluster that has active tasks.
+type ClusterContainsTasksException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ClusterContainsTasksException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ClusterContainsTasksException) GoString() string {
+	return s.String()
+}
+
+func newErrorClusterContainsTasksException(v protocol.ResponseMetadata) error {
+	return &ClusterContainsTasksException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *ClusterContainsTasksException) Code() string {
+	return "ClusterContainsTasksException"
+}
+
+// Message returns the exception's message.
+func (s *ClusterContainsTasksException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *ClusterContainsTasksException) OrigErr() error {
+	return nil
+}
+
+func (s *ClusterContainsTasksException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *ClusterContainsTasksException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *ClusterContainsTasksException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
+// The specified cluster could not be found. You can view your available clusters
+// with ListClusters. Amazon ECS clusters are Region-specific.
+type ClusterNotFoundException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ClusterNotFoundException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ClusterNotFoundException) GoString() string {
+	return s.String()
+}
+
+func newErrorClusterNotFoundException(v protocol.ResponseMetadata) error {
+	return &ClusterNotFoundException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *ClusterNotFoundException) Code() string {
+	return "ClusterNotFoundException"
+}
+
+// Message returns the exception's message.
+func (s *ClusterNotFoundException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *ClusterNotFoundException) OrigErr() error {
+	return nil
+}
+
+func (s *ClusterNotFoundException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *ClusterNotFoundException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *ClusterNotFoundException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
+// The settings to use when creating a cluster. This parameter is used to enable
+// CloudWatch Container Insights for a cluster.
+type ClusterSetting struct {
+	_ struct{} `type:"structure"`
+
+	// The name of the cluster setting. The only supported value is containerInsights.
+	Name *string `locationName:"name" type:"string" enum:"ClusterSettingName"`
+
+	// The value to set for the cluster setting. The supported values are enabled
+	// and disabled. If enabled is specified, CloudWatch Container Insights will
+	// be enabled for the cluster, otherwise it will be disabled unless the containerInsights
+	// account setting is enabled. If a cluster value is specified, it will override
+	// the containerInsights value set with PutAccountSetting or PutAccountSettingDefault.
+	Value *string `locationName:"value" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ClusterSetting) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ClusterSetting) GoString() string {
+	return s.String()
+}
+
+// SetName sets the Name field's value.
+func (s *ClusterSetting) SetName(v string) *ClusterSetting {
+	s.Name = &v
+	return s
+}
+
+// SetValue sets the Value field's value.
+func (s *ClusterSetting) SetValue(v string) *ClusterSetting {
+	s.Value = &v
+	return s
+}
+
 // A Docker container that is part of a task.
 type Container struct {
 	_ struct{} `type:"structure"`
@@ -3943,15 +7450,42 @@ type Container struct {
 	// The Amazon Resource Name (ARN) of the container.
 	ContainerArn *string `locationName:"containerArn" type:"string"`
 
+	// The number of CPU units set for the container. The value will be 0 if no
+	// value was specified in the container definition when the task definition
+	// was registered.
+	Cpu *string `locationName:"cpu" type:"string"`
+
 	// The exit code returned from the container.
 	ExitCode *int64 `locationName:"exitCode" type:"integer"`
 
+	// The IDs of each GPU assigned to the container.
+	GpuIds []*string `locationName:"gpuIds" type:"list"`
+
 	// The health status of the container. If health checks are not configured for
-	// this container in its task definition, then it reports health status as UNKNOWN.
+	// this container in its task definition, then it reports the health status
+	// as UNKNOWN.
 	HealthStatus *string `locationName:"healthStatus" type:"string" enum:"HealthStatus"`
+
+	// The image used for the container.
+	Image *string `locationName:"image" type:"string"`
+
+	// The container image manifest digest.
+	//
+	// The imageDigest is only returned if the container is using an image hosted
+	// in Amazon ECR, otherwise it is omitted.
+	ImageDigest *string `locationName:"imageDigest" type:"string"`
 
 	// The last known status of the container.
 	LastStatus *string `locationName:"lastStatus" type:"string"`
+
+	// The details of any Amazon ECS managed agents associated with the container.
+	ManagedAgents []*ManagedAgent `locationName:"managedAgents" type:"list"`
+
+	// The hard limit (in MiB) of memory set for the container.
+	Memory *string `locationName:"memory" type:"string"`
+
+	// The soft limit (in MiB) of memory set for the container.
+	MemoryReservation *string `locationName:"memoryReservation" type:"string"`
 
 	// The name of the container.
 	Name *string `locationName:"name" type:"string"`
@@ -3966,16 +7500,27 @@ type Container struct {
 	// details about a running or stopped container.
 	Reason *string `locationName:"reason" type:"string"`
 
+	// The ID of the Docker container.
+	RuntimeId *string `locationName:"runtimeId" type:"string"`
+
 	// The ARN of the task.
 	TaskArn *string `locationName:"taskArn" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Container) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Container) GoString() string {
 	return s.String()
 }
@@ -3986,9 +7531,21 @@ func (s *Container) SetContainerArn(v string) *Container {
 	return s
 }
 
+// SetCpu sets the Cpu field's value.
+func (s *Container) SetCpu(v string) *Container {
+	s.Cpu = &v
+	return s
+}
+
 // SetExitCode sets the ExitCode field's value.
 func (s *Container) SetExitCode(v int64) *Container {
 	s.ExitCode = &v
+	return s
+}
+
+// SetGpuIds sets the GpuIds field's value.
+func (s *Container) SetGpuIds(v []*string) *Container {
+	s.GpuIds = v
 	return s
 }
 
@@ -3998,9 +7555,39 @@ func (s *Container) SetHealthStatus(v string) *Container {
 	return s
 }
 
+// SetImage sets the Image field's value.
+func (s *Container) SetImage(v string) *Container {
+	s.Image = &v
+	return s
+}
+
+// SetImageDigest sets the ImageDigest field's value.
+func (s *Container) SetImageDigest(v string) *Container {
+	s.ImageDigest = &v
+	return s
+}
+
 // SetLastStatus sets the LastStatus field's value.
 func (s *Container) SetLastStatus(v string) *Container {
 	s.LastStatus = &v
+	return s
+}
+
+// SetManagedAgents sets the ManagedAgents field's value.
+func (s *Container) SetManagedAgents(v []*ManagedAgent) *Container {
+	s.ManagedAgents = v
+	return s
+}
+
+// SetMemory sets the Memory field's value.
+func (s *Container) SetMemory(v string) *Container {
+	s.Memory = &v
+	return s
+}
+
+// SetMemoryReservation sets the MemoryReservation field's value.
+func (s *Container) SetMemoryReservation(v string) *Container {
+	s.MemoryReservation = &v
 	return s
 }
 
@@ -4028,6 +7615,12 @@ func (s *Container) SetReason(v string) *Container {
 	return s
 }
 
+// SetRuntimeId sets the RuntimeId field's value.
+func (s *Container) SetRuntimeId(v string) *Container {
+	s.RuntimeId = &v
+	return s
+}
+
 // SetTaskArn sets the TaskArn field's value.
 func (s *Container) SetTaskArn(v string) *Container {
 	s.TaskArn = &v
@@ -4040,17 +7633,18 @@ type ContainerDefinition struct {
 	_ struct{} `type:"structure"`
 
 	// The command that is passed to the container. This parameter maps to Cmd in
-	// the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the COMMAND parameter to docker run (https://docs.docker.com/engine/reference/run/).
+	// the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the COMMAND parameter to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	// For more information, see https://docs.docker.com/engine/reference/builder/#cmd
-	// (https://docs.docker.com/engine/reference/builder/#cmd).
+	// (https://docs.docker.com/engine/reference/builder/#cmd). If there are multiple
+	// arguments, each argument should be a separated string in the array.
 	Command []*string `locationName:"command" type:"list"`
 
 	// The number of cpu units reserved for the container. This parameter maps to
-	// CpuShares in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --cpu-shares option to docker run (https://docs.docker.com/engine/reference/run/).
+	// CpuShares in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --cpu-shares option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
 	// This field is optional for tasks using the Fargate launch type, and the only
 	// requirement is that the total amount of CPU reserved for all containers within
@@ -4060,15 +7654,6 @@ type ContainerDefinition struct {
 	// type by multiplying the vCPUs listed for that instance type on the Amazon
 	// EC2 Instances (http://aws.amazon.com/ec2/instance-types/) detail page by
 	// 1,024.
-	//
-	// For example, if you run a single-container task on a single-core instance
-	// type with 512 CPU units specified for that container, and that is the only
-	// task running on the container instance, that container could use the full
-	// 1,024 CPU unit share at any given time. However, if you launched another
-	// copy of the same task on that container instance, each task would be guaranteed
-	// a minimum of 512 CPU units when needed, and each container could float to
-	// higher CPU usage if the other container was not using it, but if both tasks
-	// were 100% active all of the time, they would be limited to 512 CPU units.
 	//
 	// Linux containers share unallocated CPU units with other containers on the
 	// container instance with the same ratio as their allocated amount. For example,
@@ -4085,7 +7670,7 @@ type ContainerDefinition struct {
 	// uses the CPU value to calculate the relative CPU share ratios for running
 	// containers. For more information, see CPU share constraint (https://docs.docker.com/engine/reference/run/#cpu-share-constraint)
 	// in the Docker documentation. The minimum valid CPU share value that the Linux
-	// kernel allows is 2; however, the CPU parameter is not required, and you can
+	// kernel allows is 2. However, the CPU parameter is not required, and you can
 	// use CPU values below 2 in your container definitions. For CPU values below
 	// 2 (including null), the behavior varies based on your Amazon ECS container
 	// agent version:
@@ -4093,87 +7678,141 @@ type ContainerDefinition struct {
 	//    * Agent versions less than or equal to 1.1.0: Null and zero CPU values
 	//    are passed to Docker as 0, which Docker then converts to 1,024 CPU shares.
 	//    CPU values of 1 are passed to Docker as 1, which the Linux kernel converts
-	//    to 2 CPU shares.
+	//    to two CPU shares.
 	//
 	//    * Agent versions greater than or equal to 1.2.0: Null, zero, and CPU values
 	//    of 1 are passed to Docker as 2.
 	//
 	// On Windows container instances, the CPU limit is enforced as an absolute
 	// limit, or a quota. Windows containers only have access to the specified amount
-	// of CPU that is described in the task definition.
+	// of CPU that is described in the task definition. A null or zero CPU value
+	// is passed to Docker as 0, which Windows interprets as 1% of one CPU.
 	Cpu *int64 `locationName:"cpu" type:"integer"`
 
+	// The dependencies defined for container startup and shutdown. A container
+	// can contain multiple dependencies. When a dependency is defined for container
+	// startup, for container shutdown it is reversed.
+	//
+	// For tasks using the EC2 launch type, the container instances require at least
+	// version 1.26.0 of the container agent to enable container dependencies. However,
+	// we recommend using the latest container agent version. For information about
+	// checking your agent version and updating to the latest version, see Updating
+	// the Amazon ECS Container Agent (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-update.html)
+	// in the Amazon Elastic Container Service Developer Guide. If you are using
+	// an Amazon ECS-optimized Linux AMI, your instance needs at least version 1.26.0-1
+	// of the ecs-init package. If your container instances are launched from version
+	// 20190301 or later, then they contain the required versions of the container
+	// agent and ecs-init. For more information, see Amazon ECS-optimized Linux
+	// AMI (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	//
+	// For tasks using the Fargate launch type, the task or service requires the
+	// followiwng platforms:
+	//
+	//    * Linux platform version 1.3.0 or later.
+	//
+	//    * Windows platform version 1.0.0 or later.
+	DependsOn []*ContainerDependency `locationName:"dependsOn" type:"list"`
+
 	// When this parameter is true, networking is disabled within the container.
-	// This parameter maps to NetworkDisabled in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/).
+	// This parameter maps to NetworkDisabled in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/).
 	//
 	// This parameter is not supported for Windows containers.
 	DisableNetworking *bool `locationName:"disableNetworking" type:"boolean"`
 
 	// A list of DNS search domains that are presented to the container. This parameter
-	// maps to DnsSearch in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --dns-search option to docker run (https://docs.docker.com/engine/reference/run/).
+	// maps to DnsSearch in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --dns-search option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
 	// This parameter is not supported for Windows containers.
 	DnsSearchDomains []*string `locationName:"dnsSearchDomains" type:"list"`
 
 	// A list of DNS servers that are presented to the container. This parameter
-	// maps to Dns in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --dns option to docker run (https://docs.docker.com/engine/reference/run/).
+	// maps to Dns in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --dns option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
 	// This parameter is not supported for Windows containers.
 	DnsServers []*string `locationName:"dnsServers" type:"list"`
 
 	// A key/value map of labels to add to the container. This parameter maps to
-	// Labels in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --label option to docker run (https://docs.docker.com/engine/reference/run/).
+	// Labels in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --label option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	// This parameter requires version 1.18 of the Docker Remote API or greater
 	// on your container instance. To check the Docker Remote API version on your
 	// container instance, log in to your container instance and run the following
-	// command: sudo docker version | grep "Server API version"
+	// command: sudo docker version --format '{{.Server.APIVersion}}'
 	DockerLabels map[string]*string `locationName:"dockerLabels" type:"map"`
 
 	// A list of strings to provide custom labels for SELinux and AppArmor multi-level
 	// security systems. This field is not valid for containers in tasks using the
 	// Fargate launch type.
 	//
-	// This parameter maps to SecurityOpt in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --security-opt option to docker run (https://docs.docker.com/engine/reference/run/).
+	// With Windows containers, this parameter can be used to reference a credential
+	// spec file when configuring a container for Active Directory authentication.
+	// For more information, see Using gMSAs for Windows Containers (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/windows-gmsa.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	//
+	// This parameter maps to SecurityOpt in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --security-opt option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
 	// The Amazon ECS container agent running on a container instance must register
 	// with the ECS_SELINUX_CAPABLE=true or ECS_APPARMOR_CAPABLE=true environment
 	// variables before containers placed on that instance can use these security
 	// options. For more information, see Amazon ECS Container Agent Configuration
-	// (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-config.html)
+	// (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-config.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	//
-	// This parameter is not supported for Windows containers.
+	// For more information about valid values, see Docker Run Security Configuration
+	// (https://docs.docker.com/engine/reference/run/#security-configuration).
+	//
+	// Valid values: "no-new-privileges" | "apparmor:PROFILE" | "label:value" |
+	// "credentialspec:CredentialSpecFilePath"
 	DockerSecurityOptions []*string `locationName:"dockerSecurityOptions" type:"list"`
 
+	//
 	// Early versions of the Amazon ECS container agent do not properly handle entryPoint
 	// parameters. If you have problems using entryPoint, update your container
 	// agent or enter your commands and arguments as command array items instead.
 	//
 	// The entry point that is passed to the container. This parameter maps to Entrypoint
-	// in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --entrypoint option to docker run (https://docs.docker.com/engine/reference/run/).
+	// in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --entrypoint option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	// For more information, see https://docs.docker.com/engine/reference/builder/#entrypoint
 	// (https://docs.docker.com/engine/reference/builder/#entrypoint).
 	EntryPoint []*string `locationName:"entryPoint" type:"list"`
 
 	// The environment variables to pass to a container. This parameter maps to
-	// Env in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --env option to docker run (https://docs.docker.com/engine/reference/run/).
+	// Env in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --env option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
 	// We do not recommend using plaintext environment variables for sensitive information,
 	// such as credential data.
 	Environment []*KeyValuePair `locationName:"environment" type:"list"`
+
+	// A list of files containing the environment variables to pass to a container.
+	// This parameter maps to the --env-file option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
+	//
+	// You can specify up to ten environment files. The file must have a .env file
+	// extension. Each line in an environment file should contain an environment
+	// variable in VARIABLE=VALUE format. Lines beginning with # are treated as
+	// comments and are ignored. For more information on the environment variable
+	// file syntax, see Declare default environment variables in file (https://docs.docker.com/compose/env-file/).
+	//
+	// If there are environment variables specified using the environment parameter
+	// in a container definition, they take precedence over the variables contained
+	// within an environment file. If multiple environment files are specified that
+	// contain the same variable, they are processed from the top down. It is recommended
+	// to use unique variable names. For more information, see Specifying Environment
+	// Variables (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/taskdef-envfiles.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	EnvironmentFiles []*EnvironmentFile `locationName:"environmentFiles" type:"list"`
 
 	// If the essential parameter of a container is marked as true, and that container
 	// fails or stops for any reason, all other containers that are part of the
@@ -4185,43 +7824,51 @@ type ContainerDefinition struct {
 	// that is composed of multiple containers, you should group containers that
 	// are used for a common purpose into components, and separate the different
 	// components into multiple task definitions. For more information, see Application
-	// Architecture (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/application_architecture.html)
+	// Architecture (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/application_architecture.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	Essential *bool `locationName:"essential" type:"boolean"`
 
 	// A list of hostnames and IP address mappings to append to the /etc/hosts file
-	// on the container. If using the Fargate launch type, this may be used to list
-	// non-Fargate hosts to which the container can talk. This parameter maps to
-	// ExtraHosts in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --add-host option to docker run (https://docs.docker.com/engine/reference/run/).
+	// on the container. This parameter maps to ExtraHosts in the Create a container
+	// (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate) section
+	// of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/) and
+	// the --add-host option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
-	// This parameter is not supported for Windows containers.
+	// This parameter is not supported for Windows containers or tasks that use
+	// the awsvpc network mode.
 	ExtraHosts []*HostEntry `locationName:"extraHosts" type:"list"`
 
-	// The health check command and associated configuration parameters for the
-	// container. This parameter maps to HealthCheck in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the HEALTHCHECK parameter of docker run (https://docs.docker.com/engine/reference/run/).
+	// The FireLens configuration for the container. This is used to specify and
+	// configure a log router for container logs. For more information, see Custom
+	// Log Routing (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_firelens.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	FirelensConfiguration *FirelensConfiguration `locationName:"firelensConfiguration" type:"structure"`
+
+	// The container health check command and associated configuration parameters
+	// for the container. This parameter maps to HealthCheck in the Create a container
+	// (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate) section
+	// of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/) and
+	// the HEALTHCHECK parameter of docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	HealthCheck *HealthCheck `locationName:"healthCheck" type:"structure"`
 
 	// The hostname to use for your container. This parameter maps to Hostname in
-	// the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --hostname option to docker run (https://docs.docker.com/engine/reference/run/).
+	// the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --hostname option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
-	// The hostname parameter is not supported if using the awsvpc networkMode.
+	// The hostname parameter is not supported if you are using the awsvpc network
+	// mode.
 	Hostname *string `locationName:"hostname" type:"string"`
 
 	// The image used to start a container. This string is passed directly to the
 	// Docker daemon. Images in the Docker Hub registry are available by default.
 	// Other repositories are specified with either repository-url/image:tag or
-	// repository-url/image@digest. Up to 255 letters (uppercase and lowercase),
+	// repository-url/image@digest . Up to 255 letters (uppercase and lowercase),
 	// numbers, hyphens, underscores, colons, periods, forward slashes, and number
 	// signs are allowed. This parameter maps to Image in the Create a container
-	// (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the IMAGE parameter of docker run (https://docs.docker.com/engine/reference/run/).
+	// (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate) section
+	// of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/) and
+	// the IMAGE parameter of docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
 	//    * When a new task starts, the Amazon ECS container agent pulls the latest
 	//    version of the specified image and tag for the container to use. However,
@@ -4233,7 +7880,6 @@ type ContainerDefinition struct {
 	//    012345678910.dkr.ecr.<region-name>.amazonaws.com/<repository-name>:latest
 	//    or 012345678910.dkr.ecr.<region-name>.amazonaws.com/<repository-name>@sha256:94afd1f2e64d908bc90dbca0035a5b567EXAMPLE.
 	//
-	//
 	//    * Images in official repositories on Docker Hub use a single name (for
 	//    example, ubuntu or mongo).
 	//
@@ -4244,16 +7890,23 @@ type ContainerDefinition struct {
 	//    name (for example, quay.io/assemblyline/ubuntu).
 	Image *string `locationName:"image" type:"string"`
 
-	// The link parameter allows containers to communicate with each other without
-	// the need for port mappings. Only supported if the network mode of a task
-	// definition is set to bridge. The name:internalName construct is analogous
+	// When this parameter is true, this allows you to deploy containerized applications
+	// that require stdin or a tty to be allocated. This parameter maps to OpenStdin
+	// in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --interactive option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
+	Interactive *bool `locationName:"interactive" type:"boolean"`
+
+	// The links parameter allows containers to communicate with each other without
+	// the need for port mappings. This parameter is only supported if the network
+	// mode of a task definition is bridge. The name:internalName construct is analogous
 	// to name:alias in Docker links. Up to 255 letters (uppercase and lowercase),
-	// numbers, hyphens, and underscores are allowed. For more information about
-	// linking Docker containers, go to https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/
-	// (https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/).
-	// This parameter maps to Links in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --link option to docker run (https://docs.docker.com/engine/reference/commandline/run/).
+	// numbers, underscores, and hyphens are allowed. For more information about
+	// linking Docker containers, go to Legacy container links (https://docs.docker.com/network/links/)
+	// in the Docker documentation. This parameter maps to Links in the Create a
+	// container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --link option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
 	// This parameter is not supported for Windows containers.
 	//
@@ -4264,20 +7917,18 @@ type ContainerDefinition struct {
 	Links []*string `locationName:"links" type:"list"`
 
 	// Linux-specific modifications that are applied to the container, such as Linux
-	// KernelCapabilities.
+	// kernel capabilities. For more information see KernelCapabilities.
 	//
 	// This parameter is not supported for Windows containers.
 	LinuxParameters *LinuxParameters `locationName:"linuxParameters" type:"structure"`
 
 	// The log configuration specification for the container.
 	//
-	// If using the Fargate launch type, the only supported value is awslogs.
-	//
-	// This parameter maps to LogConfig in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --log-driver option to docker run (https://docs.docker.com/engine/reference/run/).
+	// This parameter maps to LogConfig in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --log-driver option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	// By default, containers use the same logging driver that the Docker daemon
-	// uses; however the container may use a different logging driver than the Docker
+	// uses. However the container may use a different logging driver than the Docker
 	// daemon by specifying a log driver with this parameter in the container definition.
 	// To use a different logging driver for a container, the log system must be
 	// configured properly on the container instance (or on a different log server
@@ -4292,32 +7943,32 @@ type ContainerDefinition struct {
 	// This parameter requires version 1.18 of the Docker Remote API or greater
 	// on your container instance. To check the Docker Remote API version on your
 	// container instance, log in to your container instance and run the following
-	// command: sudo docker version | grep "Server API version"
+	// command: sudo docker version --format '{{.Server.APIVersion}}'
 	//
 	// The Amazon ECS container agent running on a container instance must register
 	// the logging drivers available on that instance with the ECS_AVAILABLE_LOGGING_DRIVERS
 	// environment variable before containers placed on that instance can use these
 	// log configuration options. For more information, see Amazon ECS Container
-	// Agent Configuration (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-config.html)
+	// Agent Configuration (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-config.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	LogConfiguration *LogConfiguration `locationName:"logConfiguration" type:"structure"`
 
-	// The hard limit (in MiB) of memory to present to the container. If your container
-	// attempts to exceed the memory specified here, the container is killed. This
-	// parameter maps to Memory in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --memory option to docker run (https://docs.docker.com/engine/reference/run/).
+	// The amount (in MiB) of memory to present to the container. If your container
+	// attempts to exceed the memory specified here, the container is killed. The
+	// total amount of memory reserved for all containers within a task must be
+	// lower than the task memory value, if one is specified. This parameter maps
+	// to Memory in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --memory option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
-	// If your containers are part of a task using the Fargate launch type, this
-	// field is optional and the only requirement is that the total amount of memory
-	// reserved for all containers within a task be lower than the task memory value.
+	// If using the Fargate launch type, this parameter is optional.
 	//
-	// For containers that are part of a task using the EC2 launch type, you must
-	// specify a non-zero integer for one or both of memory or memoryReservation
-	// in container definitions. If you specify both, memory must be greater than
-	// memoryReservation. If you specify memoryReservation, then that value is subtracted
-	// from the available memory resources for the container instance on which the
-	// container is placed; otherwise, the value of memory is used.
+	// If using the EC2 launch type, you must specify either a task-level memory
+	// value or a container-level memory value. If you specify both a container-level
+	// memory and memoryReservation value, memory must be greater than memoryReservation.
+	// If you specify memoryReservation, then that value is subtracted from the
+	// available memory resources for the container instance on which the container
+	// is placed. Otherwise, the value of memory is used.
 	//
 	// The Docker daemon reserves a minimum of 4 MiB of memory for a container,
 	// so you should not specify fewer than 4 MiB of memory for your containers.
@@ -4325,19 +7976,20 @@ type ContainerDefinition struct {
 
 	// The soft limit (in MiB) of memory to reserve for the container. When system
 	// memory is under heavy contention, Docker attempts to keep the container memory
-	// to this soft limit; however, your container can consume more memory when
+	// to this soft limit. However, your container can consume more memory when
 	// it needs to, up to either the hard limit specified with the memory parameter
 	// (if applicable), or all of the available memory on the container instance,
 	// whichever comes first. This parameter maps to MemoryReservation in the Create
-	// a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --memory-reservation option to docker run (https://docs.docker.com/engine/reference/run/).
+	// a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --memory-reservation option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
-	// You must specify a non-zero integer for one or both of memory or memoryReservation
-	// in container definitions. If you specify both, memory must be greater than
-	// memoryReservation. If you specify memoryReservation, then that value is subtracted
-	// from the available memory resources for the container instance on which the
-	// container is placed; otherwise, the value of memory is used.
+	// If a task-level memory value is not specified, you must specify a non-zero
+	// integer for one or both of memory or memoryReservation in a container definition.
+	// If you specify both, memory must be greater than memoryReservation. If you
+	// specify memoryReservation, then that value is subtracted from the available
+	// memory resources for the container instance on which the container is placed.
+	// Otherwise, the value of memory is used.
 	//
 	// For example, if your container normally uses 128 MiB of memory, but occasionally
 	// bursts to 256 MiB of memory for short periods of time, you can set a memoryReservation
@@ -4352,9 +8004,9 @@ type ContainerDefinition struct {
 
 	// The mount points for data volumes in your container.
 	//
-	// This parameter maps to Volumes in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --volume option to docker run (https://docs.docker.com/engine/reference/run/).
+	// This parameter maps to Volumes in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --volume option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
 	// Windows containers can mount whole directories on the same drive as $env:ProgramData.
 	// Windows containers cannot mount directories on a different drive, and mount
@@ -4364,10 +8016,10 @@ type ContainerDefinition struct {
 	// The name of a container. If you are linking multiple containers together
 	// in a task definition, the name of one container can be entered in the links
 	// of another container to connect the containers. Up to 255 letters (uppercase
-	// and lowercase), numbers, hyphens, and underscores are allowed. This parameter
-	// maps to name in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --name option to docker run (https://docs.docker.com/engine/reference/run/).
+	// and lowercase), numbers, underscores, and hyphens are allowed. This parameter
+	// maps to name in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --name option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	Name *string `locationName:"name" type:"string"`
 
 	// The list of port mappings for the container. Port mappings allow containers
@@ -4381,9 +8033,9 @@ type ContainerDefinition struct {
 	// There is no loopback for port mappings on Windows, so you cannot access a
 	// container's mapped port from the host itself.
 	//
-	// This parameter maps to PortBindings in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --publish option to docker run (https://docs.docker.com/engine/reference/run/).
+	// This parameter maps to PortBindings in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --publish option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	// If the network mode of a task definition is set to none, then you can't specify
 	// port mappings. If the network mode of a task definition is set to host, then
 	// host ports must either be undefined or they must match the container port
@@ -4397,19 +8049,24 @@ type ContainerDefinition struct {
 
 	// When this parameter is true, the container is given elevated privileges on
 	// the host container instance (similar to the root user). This parameter maps
-	// to Privileged in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --privileged option to docker run (https://docs.docker.com/engine/reference/run/).
+	// to Privileged in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --privileged option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
-	// This parameter is not supported for Windows containers or tasks using the
-	// Fargate launch type.
+	// This parameter is not supported for Windows containers or tasks run on Fargate.
 	Privileged *bool `locationName:"privileged" type:"boolean"`
+
+	// When this parameter is true, a TTY is allocated. This parameter maps to Tty
+	// in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --tty option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
+	PseudoTerminal *bool `locationName:"pseudoTerminal" type:"boolean"`
 
 	// When this parameter is true, the container is given read-only access to its
 	// root file system. This parameter maps to ReadonlyRootfs in the Create a container
-	// (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --read-only option to docker run.
+	// (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate) section
+	// of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/) and
+	// the --read-only option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
 	// This parameter is not supported for Windows containers.
 	ReadonlyRootFilesystem *bool `locationName:"readonlyRootFilesystem" type:"boolean"`
@@ -4417,46 +8074,167 @@ type ContainerDefinition struct {
 	// The private repository authentication credentials to use.
 	RepositoryCredentials *RepositoryCredentials `locationName:"repositoryCredentials" type:"structure"`
 
-	// A list of ulimits to set in the container. This parameter maps to Ulimits
-	// in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --ulimit option to docker run (https://docs.docker.com/engine/reference/run/).
-	// Valid naming values are displayed in the Ulimit data type. This parameter
-	// requires version 1.18 of the Docker Remote API or greater on your container
-	// instance. To check the Docker Remote API version on your container instance,
-	// log in to your container instance and run the following command: sudo docker
-	// version | grep "Server API version"
+	// The type and amount of a resource to assign to a container. The only supported
+	// resource is a GPU.
+	ResourceRequirements []*ResourceRequirement `locationName:"resourceRequirements" type:"list"`
+
+	// The secrets to pass to the container. For more information, see Specifying
+	// Sensitive Data (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	Secrets []*Secret `locationName:"secrets" type:"list"`
+
+	// Time duration (in seconds) to wait before giving up on resolving dependencies
+	// for a container. For example, you specify two containers in a task definition
+	// with containerA having a dependency on containerB reaching a COMPLETE, SUCCESS,
+	// or HEALTHY status. If a startTimeout value is specified for containerB and
+	// it does not reach the desired status within that time then containerA will
+	// give up and not start. This results in the task transitioning to a STOPPED
+	// state.
+	//
+	// When the ECS_CONTAINER_START_TIMEOUT container agent configuration variable
+	// is used, it is enforced indendently from this start timeout value.
+	//
+	// For tasks using the Fargate launch type, the task or service requires the
+	// followiwng platforms:
+	//
+	//    * Linux platform version 1.3.0 or later.
+	//
+	//    * Windows platform version 1.0.0 or later.
+	//
+	// For tasks using the EC2 launch type, your container instances require at
+	// least version 1.26.0 of the container agent to enable a container start timeout
+	// value. However, we recommend using the latest container agent version. For
+	// information about checking your agent version and updating to the latest
+	// version, see Updating the Amazon ECS Container Agent (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-update.html)
+	// in the Amazon Elastic Container Service Developer Guide. If you are using
+	// an Amazon ECS-optimized Linux AMI, your instance needs at least version 1.26.0-1
+	// of the ecs-init package. If your container instances are launched from version
+	// 20190301 or later, then they contain the required versions of the container
+	// agent and ecs-init. For more information, see Amazon ECS-optimized Linux
+	// AMI (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	StartTimeout *int64 `locationName:"startTimeout" type:"integer"`
+
+	// Time duration (in seconds) to wait before the container is forcefully killed
+	// if it doesn't exit normally on its own.
+	//
+	// For tasks using the Fargate launch type, the task or service requires the
+	// followiwng platforms:
+	//
+	//    * Linux platform version 1.3.0 or later.
+	//
+	//    * Windows platform version 1.0.0 or later.
+	//
+	// The max stop timeout value is 120 seconds and if the parameter is not specified,
+	// the default value of 30 seconds is used.
+	//
+	// For tasks using the EC2 launch type, if the stopTimeout parameter is not
+	// specified, the value set for the Amazon ECS container agent configuration
+	// variable ECS_CONTAINER_STOP_TIMEOUT is used by default. If neither the stopTimeout
+	// parameter or the ECS_CONTAINER_STOP_TIMEOUT agent configuration variable
+	// are set, then the default values of 30 seconds for Linux containers and 30
+	// seconds on Windows containers are used. Your container instances require
+	// at least version 1.26.0 of the container agent to enable a container stop
+	// timeout value. However, we recommend using the latest container agent version.
+	// For information about checking your agent version and updating to the latest
+	// version, see Updating the Amazon ECS Container Agent (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-update.html)
+	// in the Amazon Elastic Container Service Developer Guide. If you are using
+	// an Amazon ECS-optimized Linux AMI, your instance needs at least version 1.26.0-1
+	// of the ecs-init package. If your container instances are launched from version
+	// 20190301 or later, then they contain the required versions of the container
+	// agent and ecs-init. For more information, see Amazon ECS-optimized Linux
+	// AMI (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	StopTimeout *int64 `locationName:"stopTimeout" type:"integer"`
+
+	// A list of namespaced kernel parameters to set in the container. This parameter
+	// maps to Sysctls in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --sysctl option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
+	//
+	// It is not recommended that you specify network-related systemControls parameters
+	// for multiple containers in a single task that also uses either the awsvpc
+	// or host network modes. For tasks that use the awsvpc network mode, the container
+	// that is started last determines which systemControls parameters take effect.
+	// For tasks that use the host network mode, it changes the container instance's
+	// namespaced kernel parameters as well as the containers.
+	SystemControls []*SystemControl `locationName:"systemControls" type:"list"`
+
+	// A list of ulimits to set in the container. If a ulimit value is specified
+	// in a task definition, it will override the default values set by Docker.
+	// This parameter maps to Ulimits in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --ulimit option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
+	// Valid naming values are displayed in the Ulimit data type.
+	//
+	// Amazon ECS tasks hosted on Fargate use the default resource limit values
+	// set by the operating system with the exception of the nofile resource limit
+	// parameter which Fargate overrides. The nofile resource limit sets a restriction
+	// on the number of open files that a container can use. The default nofile
+	// soft limit is 1024 and hard limit is 4096.
+	//
+	// This parameter requires version 1.18 of the Docker Remote API or greater
+	// on your container instance. To check the Docker Remote API version on your
+	// container instance, log in to your container instance and run the following
+	// command: sudo docker version --format '{{.Server.APIVersion}}'
 	//
 	// This parameter is not supported for Windows containers.
 	Ulimits []*Ulimit `locationName:"ulimits" type:"list"`
 
-	// The user name to use inside the container. This parameter maps to User in
-	// the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --user option to docker run (https://docs.docker.com/engine/reference/run/).
+	// The user to use inside the container. This parameter maps to User in the
+	// Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --user option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
+	//
+	// When running tasks using the host network mode, you should not run containers
+	// using the root user (UID 0). It is considered best practice to use a non-root
+	// user.
+	//
+	// You can specify the user using the following formats. If specifying a UID
+	// or GID, you must specify it as a positive integer.
+	//
+	//    * user
+	//
+	//    * user:group
+	//
+	//    * uid
+	//
+	//    * uid:gid
+	//
+	//    * user:gid
+	//
+	//    * uid:group
 	//
 	// This parameter is not supported for Windows containers.
 	User *string `locationName:"user" type:"string"`
 
 	// Data volumes to mount from another container. This parameter maps to VolumesFrom
-	// in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --volumes-from option to docker run (https://docs.docker.com/engine/reference/run/).
+	// in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --volumes-from option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	VolumesFrom []*VolumeFrom `locationName:"volumesFrom" type:"list"`
 
 	// The working directory in which to run commands inside the container. This
-	// parameter maps to WorkingDir in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --workdir option to docker run (https://docs.docker.com/engine/reference/run/).
+	// parameter maps to WorkingDir in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --workdir option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	WorkingDirectory *string `locationName:"workingDirectory" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ContainerDefinition) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ContainerDefinition) GoString() string {
 	return s.String()
 }
@@ -4464,6 +8242,26 @@ func (s ContainerDefinition) GoString() string {
 // Validate inspects the fields of the type to determine if they are valid.
 func (s *ContainerDefinition) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "ContainerDefinition"}
+	if s.DependsOn != nil {
+		for i, v := range s.DependsOn {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "DependsOn", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+	if s.EnvironmentFiles != nil {
+		for i, v := range s.EnvironmentFiles {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "EnvironmentFiles", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
 	if s.ExtraHosts != nil {
 		for i, v := range s.ExtraHosts {
 			if v == nil {
@@ -4472,6 +8270,11 @@ func (s *ContainerDefinition) Validate() error {
 			if err := v.Validate(); err != nil {
 				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "ExtraHosts", i), err.(request.ErrInvalidParams))
 			}
+		}
+	}
+	if s.FirelensConfiguration != nil {
+		if err := s.FirelensConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("FirelensConfiguration", err.(request.ErrInvalidParams))
 		}
 	}
 	if s.HealthCheck != nil {
@@ -4492,6 +8295,26 @@ func (s *ContainerDefinition) Validate() error {
 	if s.RepositoryCredentials != nil {
 		if err := s.RepositoryCredentials.Validate(); err != nil {
 			invalidParams.AddNested("RepositoryCredentials", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.ResourceRequirements != nil {
+		for i, v := range s.ResourceRequirements {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "ResourceRequirements", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+	if s.Secrets != nil {
+		for i, v := range s.Secrets {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Secrets", i), err.(request.ErrInvalidParams))
+			}
 		}
 	}
 	if s.Ulimits != nil {
@@ -4520,6 +8343,12 @@ func (s *ContainerDefinition) SetCommand(v []*string) *ContainerDefinition {
 // SetCpu sets the Cpu field's value.
 func (s *ContainerDefinition) SetCpu(v int64) *ContainerDefinition {
 	s.Cpu = &v
+	return s
+}
+
+// SetDependsOn sets the DependsOn field's value.
+func (s *ContainerDefinition) SetDependsOn(v []*ContainerDependency) *ContainerDefinition {
+	s.DependsOn = v
 	return s
 }
 
@@ -4565,6 +8394,12 @@ func (s *ContainerDefinition) SetEnvironment(v []*KeyValuePair) *ContainerDefini
 	return s
 }
 
+// SetEnvironmentFiles sets the EnvironmentFiles field's value.
+func (s *ContainerDefinition) SetEnvironmentFiles(v []*EnvironmentFile) *ContainerDefinition {
+	s.EnvironmentFiles = v
+	return s
+}
+
 // SetEssential sets the Essential field's value.
 func (s *ContainerDefinition) SetEssential(v bool) *ContainerDefinition {
 	s.Essential = &v
@@ -4574,6 +8409,12 @@ func (s *ContainerDefinition) SetEssential(v bool) *ContainerDefinition {
 // SetExtraHosts sets the ExtraHosts field's value.
 func (s *ContainerDefinition) SetExtraHosts(v []*HostEntry) *ContainerDefinition {
 	s.ExtraHosts = v
+	return s
+}
+
+// SetFirelensConfiguration sets the FirelensConfiguration field's value.
+func (s *ContainerDefinition) SetFirelensConfiguration(v *FirelensConfiguration) *ContainerDefinition {
+	s.FirelensConfiguration = v
 	return s
 }
 
@@ -4592,6 +8433,12 @@ func (s *ContainerDefinition) SetHostname(v string) *ContainerDefinition {
 // SetImage sets the Image field's value.
 func (s *ContainerDefinition) SetImage(v string) *ContainerDefinition {
 	s.Image = &v
+	return s
+}
+
+// SetInteractive sets the Interactive field's value.
+func (s *ContainerDefinition) SetInteractive(v bool) *ContainerDefinition {
+	s.Interactive = &v
 	return s
 }
 
@@ -4649,6 +8496,12 @@ func (s *ContainerDefinition) SetPrivileged(v bool) *ContainerDefinition {
 	return s
 }
 
+// SetPseudoTerminal sets the PseudoTerminal field's value.
+func (s *ContainerDefinition) SetPseudoTerminal(v bool) *ContainerDefinition {
+	s.PseudoTerminal = &v
+	return s
+}
+
 // SetReadonlyRootFilesystem sets the ReadonlyRootFilesystem field's value.
 func (s *ContainerDefinition) SetReadonlyRootFilesystem(v bool) *ContainerDefinition {
 	s.ReadonlyRootFilesystem = &v
@@ -4658,6 +8511,36 @@ func (s *ContainerDefinition) SetReadonlyRootFilesystem(v bool) *ContainerDefini
 // SetRepositoryCredentials sets the RepositoryCredentials field's value.
 func (s *ContainerDefinition) SetRepositoryCredentials(v *RepositoryCredentials) *ContainerDefinition {
 	s.RepositoryCredentials = v
+	return s
+}
+
+// SetResourceRequirements sets the ResourceRequirements field's value.
+func (s *ContainerDefinition) SetResourceRequirements(v []*ResourceRequirement) *ContainerDefinition {
+	s.ResourceRequirements = v
+	return s
+}
+
+// SetSecrets sets the Secrets field's value.
+func (s *ContainerDefinition) SetSecrets(v []*Secret) *ContainerDefinition {
+	s.Secrets = v
+	return s
+}
+
+// SetStartTimeout sets the StartTimeout field's value.
+func (s *ContainerDefinition) SetStartTimeout(v int64) *ContainerDefinition {
+	s.StartTimeout = &v
+	return s
+}
+
+// SetStopTimeout sets the StopTimeout field's value.
+func (s *ContainerDefinition) SetStopTimeout(v int64) *ContainerDefinition {
+	s.StopTimeout = &v
+	return s
+}
+
+// SetSystemControls sets the SystemControls field's value.
+func (s *ContainerDefinition) SetSystemControls(v []*SystemControl) *ContainerDefinition {
+	s.SystemControls = v
 	return s
 }
 
@@ -4685,6 +8568,108 @@ func (s *ContainerDefinition) SetWorkingDirectory(v string) *ContainerDefinition
 	return s
 }
 
+// The dependencies defined for container startup and shutdown. A container
+// can contain multiple dependencies. When a dependency is defined for container
+// startup, for container shutdown it is reversed.
+//
+// Your Amazon ECS container instances require at least version 1.26.0 of the
+// container agent to enable container dependencies. However, we recommend using
+// the latest container agent version. For information about checking your agent
+// version and updating to the latest version, see Updating the Amazon ECS Container
+// Agent (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-update.html)
+// in the Amazon Elastic Container Service Developer Guide. If you are using
+// an Amazon ECS-optimized Linux AMI, your instance needs at least version 1.26.0-1
+// of the ecs-init package. If your container instances are launched from version
+// 20190301 or later, then they contain the required versions of the container
+// agent and ecs-init. For more information, see Amazon ECS-optimized Linux
+// AMI (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html)
+// in the Amazon Elastic Container Service Developer Guide.
+//
+// For tasks using the Fargate launch type, the task or service requires the
+// followiwng platforms:
+//
+//    * Linux platform version 1.3.0 or later.
+//
+//    * Windows platform version 1.0.0 or later.
+type ContainerDependency struct {
+	_ struct{} `type:"structure"`
+
+	// The dependency condition of the container. The following are the available
+	// conditions and their behavior:
+	//
+	//    * START - This condition emulates the behavior of links and volumes today.
+	//    It validates that a dependent container is started before permitting other
+	//    containers to start.
+	//
+	//    * COMPLETE - This condition validates that a dependent container runs
+	//    to completion (exits) before permitting other containers to start. This
+	//    can be useful for nonessential containers that run a script and then exit.
+	//    This condition cannot be set on an essential container.
+	//
+	//    * SUCCESS - This condition is the same as COMPLETE, but it also requires
+	//    that the container exits with a zero status. This condition cannot be
+	//    set on an essential container.
+	//
+	//    * HEALTHY - This condition validates that the dependent container passes
+	//    its Docker health check before permitting other containers to start. This
+	//    requires that the dependent container has health checks configured. This
+	//    condition is confirmed only at task startup.
+	//
+	// Condition is a required field
+	Condition *string `locationName:"condition" type:"string" required:"true" enum:"ContainerCondition"`
+
+	// The name of a container.
+	//
+	// ContainerName is a required field
+	ContainerName *string `locationName:"containerName" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ContainerDependency) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ContainerDependency) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ContainerDependency) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ContainerDependency"}
+	if s.Condition == nil {
+		invalidParams.Add(request.NewErrParamRequired("Condition"))
+	}
+	if s.ContainerName == nil {
+		invalidParams.Add(request.NewErrParamRequired("ContainerName"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetCondition sets the Condition field's value.
+func (s *ContainerDependency) SetCondition(v string) *ContainerDependency {
+	s.Condition = &v
+	return s
+}
+
+// SetContainerName sets the ContainerName field's value.
+func (s *ContainerDependency) SetContainerName(v string) *ContainerDependency {
+	s.ContainerName = &v
+	return s
+}
+
 // An EC2 instance that is running the Amazon ECS agent and has been registered
 // with a cluster.
 type ContainerInstance struct {
@@ -4699,31 +8684,36 @@ type ContainerInstance struct {
 	// this value is NULL.
 	AgentUpdateStatus *string `locationName:"agentUpdateStatus" type:"string" enum:"AgentUpdateStatus"`
 
-	// The elastic network interfaces associated with the container instance.
+	// The resources attached to a container instance, such as elastic network interfaces.
 	Attachments []*Attachment `locationName:"attachments" type:"list"`
 
 	// The attributes set for the container instance, either by the Amazon ECS container
 	// agent at instance registration or manually with the PutAttributes operation.
 	Attributes []*Attribute `locationName:"attributes" type:"list"`
 
+	// The capacity provider associated with the container instance.
+	CapacityProviderName *string `locationName:"capacityProviderName" type:"string"`
+
 	// The Amazon Resource Name (ARN) of the container instance. The ARN contains
 	// the arn:aws:ecs namespace, followed by the Region of the container instance,
-	// the AWS account ID of the container instance owner, the container-instance
+	// the Amazon Web Services account ID of the container instance owner, the container-instance
 	// namespace, and then the container instance ID. For example, arn:aws:ecs:region:aws_account_id:container-instance/container_instance_ID.
 	ContainerInstanceArn *string `locationName:"containerInstanceArn" type:"string"`
 
-	// The EC2 instance ID of the container instance.
+	// The ID of the container instance. For Amazon EC2 instances, this value is
+	// the Amazon EC2 instance ID. For external instances, this value is the Amazon
+	// Web Services Systems Manager managed instance ID.
 	Ec2InstanceId *string `locationName:"ec2InstanceId" type:"string"`
 
 	// The number of tasks on the container instance that are in the PENDING status.
 	PendingTasksCount *int64 `locationName:"pendingTasksCount" type:"integer"`
 
-	// The Unix time stamp for when the container instance was registered.
+	// The Unix timestamp for when the container instance was registered.
 	RegisteredAt *time.Time `locationName:"registeredAt" type:"timestamp"`
 
 	// For CPU and memory resource types, this parameter describes the amount of
 	// each resource that was available on the container instance when the container
-	// agent registered it with Amazon ECS; this value represents the total amount
+	// agent registered it with Amazon ECS. This value represents the total amount
 	// of CPU and memory that can be allocated on this container instance to tasks.
 	// For port resource types, this parameter describes the ports that were reserved
 	// by the Amazon ECS container agent when it registered the container instance
@@ -4742,13 +8732,56 @@ type ContainerInstance struct {
 	// The number of tasks on the container instance that are in the RUNNING status.
 	RunningTasksCount *int64 `locationName:"runningTasksCount" type:"integer"`
 
-	// The status of the container instance. The valid values are ACTIVE, INACTIVE,
-	// or DRAINING. ACTIVE indicates that the container instance can accept tasks.
-	// DRAINING indicates that new tasks are not placed on the container instance
+	// The status of the container instance. The valid values are REGISTERING, REGISTRATION_FAILED,
+	// ACTIVE, INACTIVE, DEREGISTERING, or DRAINING.
+	//
+	// If your account has opted in to the awsvpcTrunking account setting, then
+	// any newly registered container instance will transition to a REGISTERING
+	// status while the trunk elastic network interface is provisioned for the instance.
+	// If the registration fails, the instance will transition to a REGISTRATION_FAILED
+	// status. You can describe the container instance and see the reason for failure
+	// in the statusReason parameter. Once the container instance is terminated,
+	// the instance transitions to a DEREGISTERING status while the trunk elastic
+	// network interface is deprovisioned. The instance then transitions to an INACTIVE
+	// status.
+	//
+	// The ACTIVE status indicates that the container instance can accept tasks.
+	// The DRAINING indicates that new tasks are not placed on the container instance
 	// and any service tasks running on the container instance are removed if possible.
-	// For more information, see Container Instance Draining (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/container-instance-draining.html)
+	// For more information, see Container Instance Draining (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/container-instance-draining.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	Status *string `locationName:"status" type:"string"`
+
+	// The reason that the container instance reached its current status.
+	StatusReason *string `locationName:"statusReason" type:"string"`
+
+	// The metadata that you apply to the container instance to help you categorize
+	// and organize them. Each tag consists of a key and an optional value, both
+	// of which you define.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	Tags []*Tag `locationName:"tags" type:"list"`
 
 	// The version counter for the container instance. Every time a container instance
 	// experiences a change that triggers a CloudWatch event, the version counter
@@ -4764,12 +8797,20 @@ type ContainerInstance struct {
 	VersionInfo *VersionInfo `locationName:"versionInfo" type:"structure"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ContainerInstance) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ContainerInstance) GoString() string {
 	return s.String()
 }
@@ -4795,6 +8836,12 @@ func (s *ContainerInstance) SetAttachments(v []*Attachment) *ContainerInstance {
 // SetAttributes sets the Attributes field's value.
 func (s *ContainerInstance) SetAttributes(v []*Attribute) *ContainerInstance {
 	s.Attributes = v
+	return s
+}
+
+// SetCapacityProviderName sets the CapacityProviderName field's value.
+func (s *ContainerInstance) SetCapacityProviderName(v string) *ContainerInstance {
+	s.CapacityProviderName = &v
 	return s
 }
 
@@ -4846,6 +8893,18 @@ func (s *ContainerInstance) SetStatus(v string) *ContainerInstance {
 	return s
 }
 
+// SetStatusReason sets the StatusReason field's value.
+func (s *ContainerInstance) SetStatusReason(v string) *ContainerInstance {
+	s.StatusReason = &v
+	return s
+}
+
+// SetTags sets the Tags field's value.
+func (s *ContainerInstance) SetTags(v []*Tag) *ContainerInstance {
+	s.Tags = v
+	return s
+}
+
 // SetVersion sets the Version field's value.
 func (s *ContainerInstance) SetVersion(v int64) *ContainerInstance {
 	s.Version = &v
@@ -4858,7 +8917,10 @@ func (s *ContainerInstance) SetVersionInfo(v *VersionInfo) *ContainerInstance {
 	return s
 }
 
-// The overrides that should be sent to a container.
+// The overrides that should be sent to a container. An empty container override
+// can be passed in. An example of an empty container override would be {"containerOverrides":
+// [ ] }. If a non-empty container override is specified, the name parameter
+// must be included.
 type ContainerOverride struct {
 	_ struct{} `type:"structure"`
 
@@ -4877,6 +8939,10 @@ type ContainerOverride struct {
 	// You must also specify a container name.
 	Environment []*KeyValuePair `locationName:"environment" type:"list"`
 
+	// A list of files containing the environment variables to pass to a container,
+	// instead of the value from the container definition.
+	EnvironmentFiles []*EnvironmentFile `locationName:"environmentFiles" type:"list"`
+
 	// The hard limit (in MiB) of memory to present to the container, instead of
 	// the default value from the task definition. If your container attempts to
 	// exceed the memory specified here, the container is killed. You must also
@@ -4891,16 +8957,59 @@ type ContainerOverride struct {
 	// The name of the container that receives the override. This parameter is required
 	// if any override is specified.
 	Name *string `locationName:"name" type:"string"`
+
+	// The type and amount of a resource to assign to a container, instead of the
+	// default value from the task definition. The only supported resource is a
+	// GPU.
+	ResourceRequirements []*ResourceRequirement `locationName:"resourceRequirements" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ContainerOverride) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ContainerOverride) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ContainerOverride) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ContainerOverride"}
+	if s.EnvironmentFiles != nil {
+		for i, v := range s.EnvironmentFiles {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "EnvironmentFiles", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+	if s.ResourceRequirements != nil {
+		for i, v := range s.ResourceRequirements {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "ResourceRequirements", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // SetCommand sets the Command field's value.
@@ -4918,6 +9027,12 @@ func (s *ContainerOverride) SetCpu(v int64) *ContainerOverride {
 // SetEnvironment sets the Environment field's value.
 func (s *ContainerOverride) SetEnvironment(v []*KeyValuePair) *ContainerOverride {
 	s.Environment = v
+	return s
+}
+
+// SetEnvironmentFiles sets the EnvironmentFiles field's value.
+func (s *ContainerOverride) SetEnvironmentFiles(v []*EnvironmentFile) *ContainerOverride {
+	s.EnvironmentFiles = v
 	return s
 }
 
@@ -4939,6 +9054,12 @@ func (s *ContainerOverride) SetName(v string) *ContainerOverride {
 	return s
 }
 
+// SetResourceRequirements sets the ResourceRequirements field's value.
+func (s *ContainerOverride) SetResourceRequirements(v []*ResourceRequirement) *ContainerOverride {
+	s.ResourceRequirements = v
+	return s
+}
+
 // An object representing a change in state for a container.
 type ContainerStateChange struct {
 	_ struct{} `type:"structure"`
@@ -4950,22 +9071,36 @@ type ContainerStateChange struct {
 	// exiting.
 	ExitCode *int64 `locationName:"exitCode" type:"integer"`
 
+	// The container image SHA 256 digest.
+	ImageDigest *string `locationName:"imageDigest" type:"string"`
+
 	// Any network bindings associated with the container.
 	NetworkBindings []*NetworkBinding `locationName:"networkBindings" type:"list"`
 
 	// The reason for the state change.
 	Reason *string `locationName:"reason" type:"string"`
 
+	// The ID of the Docker container.
+	RuntimeId *string `locationName:"runtimeId" type:"string"`
+
 	// The status of the container.
 	Status *string `locationName:"status" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ContainerStateChange) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ContainerStateChange) GoString() string {
 	return s.String()
 }
@@ -4982,6 +9117,12 @@ func (s *ContainerStateChange) SetExitCode(v int64) *ContainerStateChange {
 	return s
 }
 
+// SetImageDigest sets the ImageDigest field's value.
+func (s *ContainerStateChange) SetImageDigest(v string) *ContainerStateChange {
+	s.ImageDigest = &v
+	return s
+}
+
 // SetNetworkBindings sets the NetworkBindings field's value.
 func (s *ContainerStateChange) SetNetworkBindings(v []*NetworkBinding) *ContainerStateChange {
 	s.NetworkBindings = v
@@ -4994,34 +9135,317 @@ func (s *ContainerStateChange) SetReason(v string) *ContainerStateChange {
 	return s
 }
 
+// SetRuntimeId sets the RuntimeId field's value.
+func (s *ContainerStateChange) SetRuntimeId(v string) *ContainerStateChange {
+	s.RuntimeId = &v
+	return s
+}
+
 // SetStatus sets the Status field's value.
 func (s *ContainerStateChange) SetStatus(v string) *ContainerStateChange {
 	s.Status = &v
 	return s
 }
 
+type CreateCapacityProviderInput struct {
+	_ struct{} `type:"structure"`
+
+	// The details of the Auto Scaling group for the capacity provider.
+	//
+	// AutoScalingGroupProvider is a required field
+	AutoScalingGroupProvider *AutoScalingGroupProvider `locationName:"autoScalingGroupProvider" type:"structure" required:"true"`
+
+	// The name of the capacity provider. Up to 255 characters are allowed, including
+	// letters (upper and lowercase), numbers, underscores, and hyphens. The name
+	// cannot be prefixed with "aws", "ecs", or "fargate".
+	//
+	// Name is a required field
+	Name *string `locationName:"name" type:"string" required:"true"`
+
+	// The metadata that you apply to the capacity provider to help you categorize
+	// and organize them. Each tag consists of a key and an optional value, both
+	// of which you define.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	Tags []*Tag `locationName:"tags" type:"list"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s CreateCapacityProviderInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s CreateCapacityProviderInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateCapacityProviderInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateCapacityProviderInput"}
+	if s.AutoScalingGroupProvider == nil {
+		invalidParams.Add(request.NewErrParamRequired("AutoScalingGroupProvider"))
+	}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+	if s.AutoScalingGroupProvider != nil {
+		if err := s.AutoScalingGroupProvider.Validate(); err != nil {
+			invalidParams.AddNested("AutoScalingGroupProvider", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.Tags != nil {
+		for i, v := range s.Tags {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Tags", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetAutoScalingGroupProvider sets the AutoScalingGroupProvider field's value.
+func (s *CreateCapacityProviderInput) SetAutoScalingGroupProvider(v *AutoScalingGroupProvider) *CreateCapacityProviderInput {
+	s.AutoScalingGroupProvider = v
+	return s
+}
+
+// SetName sets the Name field's value.
+func (s *CreateCapacityProviderInput) SetName(v string) *CreateCapacityProviderInput {
+	s.Name = &v
+	return s
+}
+
+// SetTags sets the Tags field's value.
+func (s *CreateCapacityProviderInput) SetTags(v []*Tag) *CreateCapacityProviderInput {
+	s.Tags = v
+	return s
+}
+
+type CreateCapacityProviderOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The full description of the new capacity provider.
+	CapacityProvider *CapacityProvider `locationName:"capacityProvider" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s CreateCapacityProviderOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s CreateCapacityProviderOutput) GoString() string {
+	return s.String()
+}
+
+// SetCapacityProvider sets the CapacityProvider field's value.
+func (s *CreateCapacityProviderOutput) SetCapacityProvider(v *CapacityProvider) *CreateCapacityProviderOutput {
+	s.CapacityProvider = v
+	return s
+}
+
 type CreateClusterInput struct {
 	_ struct{} `type:"structure"`
 
+	// The short name of one or more capacity providers to associate with the cluster.
+	// A capacity provider must be associated with a cluster before it can be included
+	// as part of the default capacity provider strategy of the cluster or used
+	// in a capacity provider strategy when calling the CreateService or RunTask
+	// actions.
+	//
+	// If specifying a capacity provider that uses an Auto Scaling group, the capacity
+	// provider must already be created and not already associated with another
+	// cluster. New Auto Scaling group capacity providers can be created with the
+	// CreateCapacityProvider API operation.
+	//
+	// To use a Fargate capacity provider, specify either the FARGATE or FARGATE_SPOT
+	// capacity providers. The Fargate capacity providers are available to all accounts
+	// and only need to be associated with a cluster to be used.
+	//
+	// The PutClusterCapacityProviders API operation is used to update the list
+	// of available capacity providers for a cluster after the cluster is created.
+	CapacityProviders []*string `locationName:"capacityProviders" type:"list"`
+
 	// The name of your cluster. If you do not specify a name for your cluster,
 	// you create a cluster named default. Up to 255 letters (uppercase and lowercase),
-	// numbers, hyphens, and underscores are allowed.
+	// numbers, underscores, and hyphens are allowed.
 	ClusterName *string `locationName:"clusterName" type:"string"`
+
+	// The execute command configuration for the cluster.
+	Configuration *ClusterConfiguration `locationName:"configuration" type:"structure"`
+
+	// The capacity provider strategy to set as the default for the cluster. When
+	// a default capacity provider strategy is set for a cluster, when calling the
+	// RunTask or CreateService APIs with no capacity provider strategy or launch
+	// type specified, the default capacity provider strategy for the cluster is
+	// used.
+	//
+	// If a default capacity provider strategy is not defined for a cluster during
+	// creation, it can be defined later with the PutClusterCapacityProviders API
+	// operation.
+	DefaultCapacityProviderStrategy []*CapacityProviderStrategyItem `locationName:"defaultCapacityProviderStrategy" type:"list"`
+
+	// The setting to use when creating a cluster. This parameter is used to enable
+	// CloudWatch Container Insights for a cluster. If this value is specified,
+	// it will override the containerInsights value set with PutAccountSetting or
+	// PutAccountSettingDefault.
+	Settings []*ClusterSetting `locationName:"settings" type:"list"`
+
+	// The metadata that you apply to the cluster to help you categorize and organize
+	// them. Each tag consists of a key and an optional value, both of which you
+	// define.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	Tags []*Tag `locationName:"tags" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s CreateClusterInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s CreateClusterInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateClusterInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateClusterInput"}
+	if s.DefaultCapacityProviderStrategy != nil {
+		for i, v := range s.DefaultCapacityProviderStrategy {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "DefaultCapacityProviderStrategy", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+	if s.Tags != nil {
+		for i, v := range s.Tags {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Tags", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetCapacityProviders sets the CapacityProviders field's value.
+func (s *CreateClusterInput) SetCapacityProviders(v []*string) *CreateClusterInput {
+	s.CapacityProviders = v
+	return s
 }
 
 // SetClusterName sets the ClusterName field's value.
 func (s *CreateClusterInput) SetClusterName(v string) *CreateClusterInput {
 	s.ClusterName = &v
+	return s
+}
+
+// SetConfiguration sets the Configuration field's value.
+func (s *CreateClusterInput) SetConfiguration(v *ClusterConfiguration) *CreateClusterInput {
+	s.Configuration = v
+	return s
+}
+
+// SetDefaultCapacityProviderStrategy sets the DefaultCapacityProviderStrategy field's value.
+func (s *CreateClusterInput) SetDefaultCapacityProviderStrategy(v []*CapacityProviderStrategyItem) *CreateClusterInput {
+	s.DefaultCapacityProviderStrategy = v
+	return s
+}
+
+// SetSettings sets the Settings field's value.
+func (s *CreateClusterInput) SetSettings(v []*ClusterSetting) *CreateClusterInput {
+	s.Settings = v
+	return s
+}
+
+// SetTags sets the Tags field's value.
+func (s *CreateClusterInput) SetTags(v []*Tag) *CreateClusterInput {
+	s.Tags = v
 	return s
 }
 
@@ -5032,12 +9456,20 @@ type CreateClusterOutput struct {
 	Cluster *Cluster `locationName:"cluster" type:"structure"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s CreateClusterOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s CreateClusterOutput) GoString() string {
 	return s.String()
 }
@@ -5050,6 +9482,15 @@ func (s *CreateClusterOutput) SetCluster(v *Cluster) *CreateClusterOutput {
 
 type CreateServiceInput struct {
 	_ struct{} `type:"structure"`
+
+	// The capacity provider strategy to use for the service.
+	//
+	// If a capacityProviderStrategy is specified, the launchType parameter must
+	// be omitted. If no capacityProviderStrategy or launchType is specified, the
+	// defaultCapacityProviderStrategy for the cluster is used.
+	//
+	// A capacity provider strategy may contain a maximum of 6 capacity providers.
+	CapacityProviderStrategy []*CapacityProviderStrategyItem `locationName:"capacityProviderStrategy" type:"list"`
 
 	// Unique, case-sensitive identifier that you provide to ensure the idempotency
 	// of the request. Up to 32 ASCII characters are allowed.
@@ -5064,69 +9505,142 @@ type CreateServiceInput struct {
 	// deployment and the ordering of stopping and starting tasks.
 	DeploymentConfiguration *DeploymentConfiguration `locationName:"deploymentConfiguration" type:"structure"`
 
+	// The deployment controller to use for the service. If no deployment controller
+	// is specified, the default value of ECS is used.
+	DeploymentController *DeploymentController `locationName:"deploymentController" type:"structure"`
+
 	// The number of instantiations of the specified task definition to place and
 	// keep running on your cluster.
+	//
+	// This is required if schedulingStrategy is REPLICA or is not specified. If
+	// schedulingStrategy is DAEMON then this is not required.
 	DesiredCount *int64 `locationName:"desiredCount" type:"integer"`
+
+	// Specifies whether to enable Amazon ECS managed tags for the tasks within
+	// the service. For more information, see Tagging Your Amazon ECS Resources
+	// (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-using-tags.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	EnableECSManagedTags *bool `locationName:"enableECSManagedTags" type:"boolean"`
+
+	// Whether or not the execute command functionality is enabled for the service.
+	// If true, this enables execute command functionality on all containers in
+	// the service tasks.
+	EnableExecuteCommand *bool `locationName:"enableExecuteCommand" type:"boolean"`
 
 	// The period of time, in seconds, that the Amazon ECS service scheduler should
 	// ignore unhealthy Elastic Load Balancing target health checks after a task
-	// has first started. This is only valid if your service is configured to use
-	// a load balancer. If your service's tasks take a while to start and respond
-	// to Elastic Load Balancing health checks, you can specify a health check grace
-	// period of up to 7,200 seconds during which the ECS service scheduler ignores
-	// health check status. This grace period can prevent the ECS service scheduler
+	// has first started. This is only used when your service is configured to use
+	// a load balancer. If your service has a load balancer defined and you don't
+	// specify a health check grace period value, the default value of 0 is used.
+	//
+	// If your service's tasks take a while to start and respond to Elastic Load
+	// Balancing health checks, you can specify a health check grace period of up
+	// to 2,147,483,647 seconds. During that time, the Amazon ECS service scheduler
+	// ignores health check status. This grace period can prevent the service scheduler
 	// from marking tasks as unhealthy and stopping them before they have time to
 	// come up.
 	HealthCheckGracePeriodSeconds *int64 `locationName:"healthCheckGracePeriodSeconds" type:"integer"`
 
-	// The launch type on which to run your service.
+	// The infrastructure on which to run your service. For more information, see
+	// Amazon ECS launch types (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	//
+	// The FARGATE launch type runs your tasks on Fargate On-Demand infrastructure.
+	//
+	// Fargate Spot infrastructure is available for use but a capacity provider
+	// strategy must be used. For more information, see Fargate capacity providers
+	// (https://docs.aws.amazon.com/AmazonECS/latest/userguide/fargate-capacity-providers.html)
+	// in the Amazon ECS User Guide for Fargate.
+	//
+	// The EC2 launch type runs your tasks on Amazon EC2 instances registered to
+	// your cluster.
+	//
+	// The EXTERNAL launch type runs your tasks on your on-premise server or virtual
+	// machine (VM) capacity registered to your cluster.
+	//
+	// A service can use either a launch type or a capacity provider strategy. If
+	// a launchType is specified, the capacityProviderStrategy parameter must be
+	// omitted.
 	LaunchType *string `locationName:"launchType" type:"string" enum:"LaunchType"`
 
-	// A load balancer object representing the load balancer to use with your service.
-	// Currently, you are limited to one load balancer or target group per service.
-	// After you create a service, the load balancer name or target group ARN, container
-	// name, and container port specified in the service definition are immutable.
+	// A load balancer object representing the load balancers to use with your service.
+	// For more information, see Service Load Balancing (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-load-balancing.html)
+	// in the Amazon Elastic Container Service Developer Guide.
 	//
-	// For Classic Load Balancers, this object must contain the load balancer name,
-	// the container name (as it appears in a container definition), and the container
-	// port to access from the load balancer. When a task from this service is placed
-	// on a container instance, the container instance is registered with the load
-	// balancer specified here.
+	// If the service is using the rolling update (ECS) deployment controller and
+	// using either an Application Load Balancer or Network Load Balancer, you must
+	// specify one or more target group ARNs to attach to the service. The service-linked
+	// role is required for services that make use of multiple target groups. For
+	// more information, see Using service-linked roles for Amazon ECS (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using-service-linked-roles.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	//
+	// If the service is using the CODE_DEPLOY deployment controller, the service
+	// is required to use either an Application Load Balancer or Network Load Balancer.
+	// When creating an CodeDeploy deployment group, you specify two target groups
+	// (referred to as a targetGroupPair). During a deployment, CodeDeploy determines
+	// which task set in your service has the status PRIMARY and associates one
+	// target group with it, and then associates the other target group with the
+	// replacement task set. The load balancer can also have up to two listeners:
+	// a required listener for production traffic and an optional listener that
+	// allows you perform validation tests with Lambda functions before routing
+	// production traffic to it.
+	//
+	// After you create a service using the ECS deployment controller, the load
+	// balancer name or target group ARN, container name, and container port specified
+	// in the service definition are immutable. If you are using the CODE_DEPLOY
+	// deployment controller, these values can be changed when updating the service.
 	//
 	// For Application Load Balancers and Network Load Balancers, this object must
 	// contain the load balancer target group ARN, the container name (as it appears
 	// in a container definition), and the container port to access from the load
-	// balancer. When a task from this service is placed on a container instance,
-	// the container instance and port combination is registered as a target in
-	// the target group specified here.
+	// balancer. The load balancer name parameter must be omitted. When a task from
+	// this service is placed on a container instance, the container instance and
+	// port combination is registered as a target in the target group specified
+	// here.
+	//
+	// For Classic Load Balancers, this object must contain the load balancer name,
+	// the container name (as it appears in a container definition), and the container
+	// port to access from the load balancer. The target group ARN parameter must
+	// be omitted. When a task from this service is placed on a container instance,
+	// the container instance is registered with the load balancer specified here.
 	//
 	// Services with tasks that use the awsvpc network mode (for example, those
 	// with the Fargate launch type) only support Application Load Balancers and
-	// Network Load Balancers; Classic Load Balancers are not supported. Also, when
+	// Network Load Balancers. Classic Load Balancers are not supported. Also, when
 	// you create any target groups for these services, you must choose ip as the
 	// target type, not instance, because tasks that use the awsvpc network mode
 	// are associated with an elastic network interface, not an Amazon EC2 instance.
 	LoadBalancers []*LoadBalancer `locationName:"loadBalancers" type:"list"`
 
 	// The network configuration for the service. This parameter is required for
-	// task definitions that use the awsvpc network mode to receive their own Elastic
-	// Network Interface, and it is not supported for other network modes. For more
-	// information, see Task Networking (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html)
+	// task definitions that use the awsvpc network mode to receive their own elastic
+	// network interface, and it is not supported for other network modes. For more
+	// information, see Task networking (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	NetworkConfiguration *NetworkConfiguration `locationName:"networkConfiguration" type:"structure"`
 
 	// An array of placement constraint objects to use for tasks in your service.
 	// You can specify a maximum of 10 constraints per task (this limit includes
-	// constraints in the task definition and those specified at run time).
+	// constraints in the task definition and those specified at runtime).
 	PlacementConstraints []*PlacementConstraint `locationName:"placementConstraints" type:"list"`
 
 	// The placement strategy objects to use for tasks in your service. You can
-	// specify a maximum of five strategy rules per service.
+	// specify a maximum of 5 strategy rules per service.
 	PlacementStrategy []*PlacementStrategy `locationName:"placementStrategy" type:"list"`
 
-	// The platform version on which to run your service. If one is not specified,
-	// the latest version is used by default.
+	// The platform version that your tasks in the service are running on. A platform
+	// version is specified only for tasks using the Fargate launch type. If one
+	// isn't specified, the LATEST platform version is used by default. For more
+	// information, see Fargate platform versions (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html)
+	// in the Amazon Elastic Container Service Developer Guide.
 	PlatformVersion *string `locationName:"platformVersion" type:"string"`
+
+	// Specifies whether to propagate the tags from the task definition or the service
+	// to the tasks in the service. If no value is specified, the tags are not propagated.
+	// Tags can only be propagated to the tasks within the service during service
+	// creation. To add tags to a task after service creation or task creation,
+	// use the TagResource API action.
+	PropagateTags *string `locationName:"propagateTags" type:"string" enum:"PropagateTags"`
 
 	// The name or full Amazon Resource Name (ARN) of the IAM role that allows Amazon
 	// ECS to make calls to your load balancer on your behalf. This parameter is
@@ -5138,67 +9652,109 @@ type CreateServiceInput struct {
 	// If your account has already created the Amazon ECS service-linked role, that
 	// role is used by default for your service unless you specify a role here.
 	// The service-linked role is required if your task definition uses the awsvpc
-	// network mode, in which case you should not specify a role here. For more
-	// information, see Using Service-Linked Roles for Amazon ECS (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/using-service-linked-roles.html)
+	// network mode or if the service is configured to use service discovery, an
+	// external deployment controller, multiple target groups, or Elastic Inference
+	// accelerators in which case you should not specify a role here. For more information,
+	// see Using service-linked roles for Amazon ECS (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using-service-linked-roles.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	//
 	// If your specified role has a path other than /, then you must either specify
 	// the full role ARN (this is recommended) or prefix the role name with the
 	// path. For example, if a role with the name bar has a path of /foo/ then you
 	// would specify /foo/bar as the role name. For more information, see Friendly
-	// Names and Paths (http://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-friendly-names)
+	// names and paths (https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-friendly-names)
 	// in the IAM User Guide.
 	Role *string `locationName:"role" type:"string"`
 
 	// The scheduling strategy to use for the service. For more information, see
-	// Services (http://docs.aws.amazon.com/AmazonECS/latest/developerguideecs_services.html).
+	// Services (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_services.html).
 	//
 	// There are two service scheduler strategies available:
 	//
 	//    * REPLICA-The replica scheduling strategy places and maintains the desired
 	//    number of tasks across your cluster. By default, the service scheduler
 	//    spreads tasks across Availability Zones. You can use task placement strategies
-	//    and constraints to customize task placement decisions.
+	//    and constraints to customize task placement decisions. This scheduler
+	//    strategy is required if the service is using the CODE_DEPLOY or EXTERNAL
+	//    deployment controller types.
 	//
 	//    * DAEMON-The daemon scheduling strategy deploys exactly one task on each
 	//    active container instance that meets all of the task placement constraints
-	//    that you specify in your cluster. When using this strategy, there is no
-	//    need to specify a desired number of tasks, a task placement strategy,
-	//    or use Service Auto Scaling policies.
-	//
-	// Fargate tasks do not support the DAEMON scheduling strategy.
+	//    that you specify in your cluster. The service scheduler also evaluates
+	//    the task placement constraints for running tasks and will stop tasks that
+	//    do not meet the placement constraints. When you're using this strategy,
+	//    you don't need to specify a desired number of tasks, a task placement
+	//    strategy, or use Service Auto Scaling policies. Tasks using the Fargate
+	//    launch type or the CODE_DEPLOY or EXTERNAL deployment controller types
+	//    don't support the DAEMON scheduling strategy.
 	SchedulingStrategy *string `locationName:"schedulingStrategy" type:"string" enum:"SchedulingStrategy"`
 
 	// The name of your service. Up to 255 letters (uppercase and lowercase), numbers,
-	// hyphens, and underscores are allowed. Service names must be unique within
+	// underscores, and hyphens are allowed. Service names must be unique within
 	// a cluster, but you can have similarly named services in multiple clusters
 	// within a Region or across multiple Regions.
 	//
 	// ServiceName is a required field
 	ServiceName *string `locationName:"serviceName" type:"string" required:"true"`
 
-	// The details of the service discovery registries to assign to this service.
-	// For more information, see Service Discovery (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-discovery.html).
+	// The details of the service discovery registry to associate with this service.
+	// For more information, see Service discovery (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-discovery.html).
 	//
-	// Service discovery is supported for Fargate tasks if using platform version
-	// v1.1.0 or later. For more information, see AWS Fargate Platform Versions
-	// (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html).
+	// Each service may be associated with one service registry. Multiple service
+	// registries per service isn't supported.
 	ServiceRegistries []*ServiceRegistry `locationName:"serviceRegistries" type:"list"`
+
+	// The metadata that you apply to the service to help you categorize and organize
+	// them. Each tag consists of a key and an optional value, both of which you
+	// define. When a service is deleted, the tags are deleted as well.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	Tags []*Tag `locationName:"tags" type:"list"`
 
 	// The family and revision (family:revision) or full ARN of the task definition
 	// to run in your service. If a revision is not specified, the latest ACTIVE
 	// revision is used.
 	//
-	// TaskDefinition is a required field
-	TaskDefinition *string `locationName:"taskDefinition" type:"string" required:"true"`
+	// A task definition must be specified if the service is using either the ECS
+	// or CODE_DEPLOY deployment controllers.
+	TaskDefinition *string `locationName:"taskDefinition" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s CreateServiceInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s CreateServiceInput) GoString() string {
 	return s.String()
 }
@@ -5209,12 +9765,39 @@ func (s *CreateServiceInput) Validate() error {
 	if s.ServiceName == nil {
 		invalidParams.Add(request.NewErrParamRequired("ServiceName"))
 	}
-	if s.TaskDefinition == nil {
-		invalidParams.Add(request.NewErrParamRequired("TaskDefinition"))
+	if s.CapacityProviderStrategy != nil {
+		for i, v := range s.CapacityProviderStrategy {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "CapacityProviderStrategy", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+	if s.DeploymentConfiguration != nil {
+		if err := s.DeploymentConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("DeploymentConfiguration", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.DeploymentController != nil {
+		if err := s.DeploymentController.Validate(); err != nil {
+			invalidParams.AddNested("DeploymentController", err.(request.ErrInvalidParams))
+		}
 	}
 	if s.NetworkConfiguration != nil {
 		if err := s.NetworkConfiguration.Validate(); err != nil {
 			invalidParams.AddNested("NetworkConfiguration", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.Tags != nil {
+		for i, v := range s.Tags {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Tags", i), err.(request.ErrInvalidParams))
+			}
 		}
 	}
 
@@ -5222,6 +9805,12 @@ func (s *CreateServiceInput) Validate() error {
 		return invalidParams
 	}
 	return nil
+}
+
+// SetCapacityProviderStrategy sets the CapacityProviderStrategy field's value.
+func (s *CreateServiceInput) SetCapacityProviderStrategy(v []*CapacityProviderStrategyItem) *CreateServiceInput {
+	s.CapacityProviderStrategy = v
+	return s
 }
 
 // SetClientToken sets the ClientToken field's value.
@@ -5242,9 +9831,27 @@ func (s *CreateServiceInput) SetDeploymentConfiguration(v *DeploymentConfigurati
 	return s
 }
 
+// SetDeploymentController sets the DeploymentController field's value.
+func (s *CreateServiceInput) SetDeploymentController(v *DeploymentController) *CreateServiceInput {
+	s.DeploymentController = v
+	return s
+}
+
 // SetDesiredCount sets the DesiredCount field's value.
 func (s *CreateServiceInput) SetDesiredCount(v int64) *CreateServiceInput {
 	s.DesiredCount = &v
+	return s
+}
+
+// SetEnableECSManagedTags sets the EnableECSManagedTags field's value.
+func (s *CreateServiceInput) SetEnableECSManagedTags(v bool) *CreateServiceInput {
+	s.EnableECSManagedTags = &v
+	return s
+}
+
+// SetEnableExecuteCommand sets the EnableExecuteCommand field's value.
+func (s *CreateServiceInput) SetEnableExecuteCommand(v bool) *CreateServiceInput {
+	s.EnableExecuteCommand = &v
 	return s
 }
 
@@ -5290,6 +9897,12 @@ func (s *CreateServiceInput) SetPlatformVersion(v string) *CreateServiceInput {
 	return s
 }
 
+// SetPropagateTags sets the PropagateTags field's value.
+func (s *CreateServiceInput) SetPropagateTags(v string) *CreateServiceInput {
+	s.PropagateTags = &v
+	return s
+}
+
 // SetRole sets the Role field's value.
 func (s *CreateServiceInput) SetRole(v string) *CreateServiceInput {
 	s.Role = &v
@@ -5314,6 +9927,12 @@ func (s *CreateServiceInput) SetServiceRegistries(v []*ServiceRegistry) *CreateS
 	return s
 }
 
+// SetTags sets the Tags field's value.
+func (s *CreateServiceInput) SetTags(v []*Tag) *CreateServiceInput {
+	s.Tags = v
+	return s
+}
+
 // SetTaskDefinition sets the TaskDefinition field's value.
 func (s *CreateServiceInput) SetTaskDefinition(v string) *CreateServiceInput {
 	s.TaskDefinition = &v
@@ -5324,15 +9943,33 @@ type CreateServiceOutput struct {
 	_ struct{} `type:"structure"`
 
 	// The full description of your service following the create call.
+	//
+	// A service will return either a capacityProviderStrategy or launchType parameter,
+	// but not both, depending on which one was specified during creation.
+	//
+	// If a service is using the ECS deployment controller, the deploymentController
+	// and taskSets parameters will not be returned.
+	//
+	// If the service is using the CODE_DEPLOY deployment controller, the deploymentController,
+	// taskSets and deployments parameters will be returned, however the deployments
+	// parameter will be an empty list.
 	Service *Service `locationName:"service" type:"structure"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s CreateServiceOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s CreateServiceOutput) GoString() string {
 	return s.String()
 }
@@ -5340,6 +9977,387 @@ func (s CreateServiceOutput) GoString() string {
 // SetService sets the Service field's value.
 func (s *CreateServiceOutput) SetService(v *Service) *CreateServiceOutput {
 	s.Service = v
+	return s
+}
+
+type CreateTaskSetInput struct {
+	_ struct{} `type:"structure"`
+
+	// The capacity provider strategy to use for the task set.
+	//
+	// A capacity provider strategy consists of one or more capacity providers along
+	// with the base and weight to assign to them. A capacity provider must be associated
+	// with the cluster to be used in a capacity provider strategy. The PutClusterCapacityProviders
+	// API is used to associate a capacity provider with a cluster. Only capacity
+	// providers with an ACTIVE or UPDATING status can be used.
+	//
+	// If a capacityProviderStrategy is specified, the launchType parameter must
+	// be omitted. If no capacityProviderStrategy or launchType is specified, the
+	// defaultCapacityProviderStrategy for the cluster is used.
+	//
+	// If specifying a capacity provider that uses an Auto Scaling group, the capacity
+	// provider must already be created. New capacity providers can be created with
+	// the CreateCapacityProvider API operation.
+	//
+	// To use a Fargate capacity provider, specify either the FARGATE or FARGATE_SPOT
+	// capacity providers. The Fargate capacity providers are available to all accounts
+	// and only need to be associated with a cluster to be used.
+	//
+	// The PutClusterCapacityProviders API operation is used to update the list
+	// of available capacity providers for a cluster after the cluster is created.
+	CapacityProviderStrategy []*CapacityProviderStrategyItem `locationName:"capacityProviderStrategy" type:"list"`
+
+	// Unique, case-sensitive identifier that you provide to ensure the idempotency
+	// of the request. Up to 32 ASCII characters are allowed.
+	ClientToken *string `locationName:"clientToken" type:"string"`
+
+	// The short name or full Amazon Resource Name (ARN) of the cluster that hosts
+	// the service to create the task set in.
+	//
+	// Cluster is a required field
+	Cluster *string `locationName:"cluster" type:"string" required:"true"`
+
+	// An optional non-unique tag that identifies this task set in external systems.
+	// If the task set is associated with a service discovery registry, the tasks
+	// in this task set will have the ECS_TASK_SET_EXTERNAL_ID Cloud Map attribute
+	// set to the provided value.
+	ExternalId *string `locationName:"externalId" type:"string"`
+
+	// The launch type that new tasks in the task set will use. For more information,
+	// see Amazon ECS Launch Types (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	//
+	// If a launchType is specified, the capacityProviderStrategy parameter must
+	// be omitted.
+	LaunchType *string `locationName:"launchType" type:"string" enum:"LaunchType"`
+
+	// A load balancer object representing the load balancer to use with the task
+	// set. The supported load balancer types are either an Application Load Balancer
+	// or a Network Load Balancer.
+	LoadBalancers []*LoadBalancer `locationName:"loadBalancers" type:"list"`
+
+	// An object representing the network configuration for a task set.
+	NetworkConfiguration *NetworkConfiguration `locationName:"networkConfiguration" type:"structure"`
+
+	// The platform version that the tasks in the task set should use. A platform
+	// version is specified only for tasks using the Fargate launch type. If one
+	// isn't specified, the LATEST platform version is used by default.
+	PlatformVersion *string `locationName:"platformVersion" type:"string"`
+
+	// A floating-point percentage of the desired number of tasks to place and keep
+	// running in the task set.
+	Scale *Scale `locationName:"scale" type:"structure"`
+
+	// The short name or full Amazon Resource Name (ARN) of the service to create
+	// the task set in.
+	//
+	// Service is a required field
+	Service *string `locationName:"service" type:"string" required:"true"`
+
+	// The details of the service discovery registries to assign to this task set.
+	// For more information, see Service Discovery (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-discovery.html).
+	ServiceRegistries []*ServiceRegistry `locationName:"serviceRegistries" type:"list"`
+
+	// The metadata that you apply to the task set to help you categorize and organize
+	// them. Each tag consists of a key and an optional value, both of which you
+	// define. When a service is deleted, the tags are deleted as well.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	Tags []*Tag `locationName:"tags" type:"list"`
+
+	// The task definition for the tasks in the task set to use.
+	//
+	// TaskDefinition is a required field
+	TaskDefinition *string `locationName:"taskDefinition" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s CreateTaskSetInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s CreateTaskSetInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateTaskSetInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateTaskSetInput"}
+	if s.Cluster == nil {
+		invalidParams.Add(request.NewErrParamRequired("Cluster"))
+	}
+	if s.Service == nil {
+		invalidParams.Add(request.NewErrParamRequired("Service"))
+	}
+	if s.TaskDefinition == nil {
+		invalidParams.Add(request.NewErrParamRequired("TaskDefinition"))
+	}
+	if s.CapacityProviderStrategy != nil {
+		for i, v := range s.CapacityProviderStrategy {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "CapacityProviderStrategy", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+	if s.NetworkConfiguration != nil {
+		if err := s.NetworkConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("NetworkConfiguration", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.Tags != nil {
+		for i, v := range s.Tags {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Tags", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetCapacityProviderStrategy sets the CapacityProviderStrategy field's value.
+func (s *CreateTaskSetInput) SetCapacityProviderStrategy(v []*CapacityProviderStrategyItem) *CreateTaskSetInput {
+	s.CapacityProviderStrategy = v
+	return s
+}
+
+// SetClientToken sets the ClientToken field's value.
+func (s *CreateTaskSetInput) SetClientToken(v string) *CreateTaskSetInput {
+	s.ClientToken = &v
+	return s
+}
+
+// SetCluster sets the Cluster field's value.
+func (s *CreateTaskSetInput) SetCluster(v string) *CreateTaskSetInput {
+	s.Cluster = &v
+	return s
+}
+
+// SetExternalId sets the ExternalId field's value.
+func (s *CreateTaskSetInput) SetExternalId(v string) *CreateTaskSetInput {
+	s.ExternalId = &v
+	return s
+}
+
+// SetLaunchType sets the LaunchType field's value.
+func (s *CreateTaskSetInput) SetLaunchType(v string) *CreateTaskSetInput {
+	s.LaunchType = &v
+	return s
+}
+
+// SetLoadBalancers sets the LoadBalancers field's value.
+func (s *CreateTaskSetInput) SetLoadBalancers(v []*LoadBalancer) *CreateTaskSetInput {
+	s.LoadBalancers = v
+	return s
+}
+
+// SetNetworkConfiguration sets the NetworkConfiguration field's value.
+func (s *CreateTaskSetInput) SetNetworkConfiguration(v *NetworkConfiguration) *CreateTaskSetInput {
+	s.NetworkConfiguration = v
+	return s
+}
+
+// SetPlatformVersion sets the PlatformVersion field's value.
+func (s *CreateTaskSetInput) SetPlatformVersion(v string) *CreateTaskSetInput {
+	s.PlatformVersion = &v
+	return s
+}
+
+// SetScale sets the Scale field's value.
+func (s *CreateTaskSetInput) SetScale(v *Scale) *CreateTaskSetInput {
+	s.Scale = v
+	return s
+}
+
+// SetService sets the Service field's value.
+func (s *CreateTaskSetInput) SetService(v string) *CreateTaskSetInput {
+	s.Service = &v
+	return s
+}
+
+// SetServiceRegistries sets the ServiceRegistries field's value.
+func (s *CreateTaskSetInput) SetServiceRegistries(v []*ServiceRegistry) *CreateTaskSetInput {
+	s.ServiceRegistries = v
+	return s
+}
+
+// SetTags sets the Tags field's value.
+func (s *CreateTaskSetInput) SetTags(v []*Tag) *CreateTaskSetInput {
+	s.Tags = v
+	return s
+}
+
+// SetTaskDefinition sets the TaskDefinition field's value.
+func (s *CreateTaskSetInput) SetTaskDefinition(v string) *CreateTaskSetInput {
+	s.TaskDefinition = &v
+	return s
+}
+
+type CreateTaskSetOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Information about a set of Amazon ECS tasks in either an CodeDeploy or an
+	// EXTERNAL deployment. A task set includes details such as the desired number
+	// of tasks, how many tasks are running, and whether the task set serves production
+	// traffic.
+	TaskSet *TaskSet `locationName:"taskSet" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s CreateTaskSetOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s CreateTaskSetOutput) GoString() string {
+	return s.String()
+}
+
+// SetTaskSet sets the TaskSet field's value.
+func (s *CreateTaskSetOutput) SetTaskSet(v *TaskSet) *CreateTaskSetOutput {
+	s.TaskSet = v
+	return s
+}
+
+type DeleteAccountSettingInput struct {
+	_ struct{} `type:"structure"`
+
+	// The resource name for which to disable the account setting. If serviceLongArnFormat
+	// is specified, the ARN for your Amazon ECS services is affected. If taskLongArnFormat
+	// is specified, the ARN and resource ID for your Amazon ECS tasks is affected.
+	// If containerInstanceLongArnFormat is specified, the ARN and resource ID for
+	// your Amazon ECS container instances is affected. If awsvpcTrunking is specified,
+	// the ENI limit for your Amazon ECS container instances is affected.
+	//
+	// Name is a required field
+	Name *string `locationName:"name" type:"string" required:"true" enum:"SettingName"`
+
+	// The ARN of the principal, which can be an IAM user, IAM role, or the root
+	// user. If you specify the root user, it disables the account setting for all
+	// IAM users, IAM roles, and the root user of the account unless an IAM user
+	// or role explicitly overrides these settings. If this field is omitted, the
+	// setting is changed only for the authenticated user.
+	PrincipalArn *string `locationName:"principalArn" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeleteAccountSettingInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeleteAccountSettingInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteAccountSettingInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteAccountSettingInput"}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetName sets the Name field's value.
+func (s *DeleteAccountSettingInput) SetName(v string) *DeleteAccountSettingInput {
+	s.Name = &v
+	return s
+}
+
+// SetPrincipalArn sets the PrincipalArn field's value.
+func (s *DeleteAccountSettingInput) SetPrincipalArn(v string) *DeleteAccountSettingInput {
+	s.PrincipalArn = &v
+	return s
+}
+
+type DeleteAccountSettingOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The account setting for the specified principal ARN.
+	Setting *Setting `locationName:"setting" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeleteAccountSettingOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeleteAccountSettingOutput) GoString() string {
+	return s.String()
+}
+
+// SetSetting sets the Setting field's value.
+func (s *DeleteAccountSettingOutput) SetSetting(v *Setting) *DeleteAccountSettingOutput {
+	s.Setting = v
 	return s
 }
 
@@ -5360,12 +10378,20 @@ type DeleteAttributesInput struct {
 	Cluster *string `locationName:"cluster" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeleteAttributesInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeleteAttributesInput) GoString() string {
 	return s.String()
 }
@@ -5412,12 +10438,20 @@ type DeleteAttributesOutput struct {
 	Attributes []*Attribute `locationName:"attributes" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeleteAttributesOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeleteAttributesOutput) GoString() string {
 	return s.String()
 }
@@ -5425,6 +10459,84 @@ func (s DeleteAttributesOutput) GoString() string {
 // SetAttributes sets the Attributes field's value.
 func (s *DeleteAttributesOutput) SetAttributes(v []*Attribute) *DeleteAttributesOutput {
 	s.Attributes = v
+	return s
+}
+
+type DeleteCapacityProviderInput struct {
+	_ struct{} `type:"structure"`
+
+	// The short name or full Amazon Resource Name (ARN) of the capacity provider
+	// to delete.
+	//
+	// CapacityProvider is a required field
+	CapacityProvider *string `locationName:"capacityProvider" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeleteCapacityProviderInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeleteCapacityProviderInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteCapacityProviderInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteCapacityProviderInput"}
+	if s.CapacityProvider == nil {
+		invalidParams.Add(request.NewErrParamRequired("CapacityProvider"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetCapacityProvider sets the CapacityProvider field's value.
+func (s *DeleteCapacityProviderInput) SetCapacityProvider(v string) *DeleteCapacityProviderInput {
+	s.CapacityProvider = &v
+	return s
+}
+
+type DeleteCapacityProviderOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The details of the capacity provider.
+	CapacityProvider *CapacityProvider `locationName:"capacityProvider" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeleteCapacityProviderOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeleteCapacityProviderOutput) GoString() string {
+	return s.String()
+}
+
+// SetCapacityProvider sets the CapacityProvider field's value.
+func (s *DeleteCapacityProviderOutput) SetCapacityProvider(v *CapacityProvider) *DeleteCapacityProviderOutput {
+	s.CapacityProvider = v
 	return s
 }
 
@@ -5437,12 +10549,20 @@ type DeleteClusterInput struct {
 	Cluster *string `locationName:"cluster" type:"string" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeleteClusterInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeleteClusterInput) GoString() string {
 	return s.String()
 }
@@ -5473,12 +10593,20 @@ type DeleteClusterOutput struct {
 	Cluster *Cluster `locationName:"cluster" type:"structure"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeleteClusterOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeleteClusterOutput) GoString() string {
 	return s.String()
 }
@@ -5508,12 +10636,20 @@ type DeleteServiceInput struct {
 	Service *string `locationName:"service" type:"string" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeleteServiceInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeleteServiceInput) GoString() string {
 	return s.String()
 }
@@ -5556,12 +10692,20 @@ type DeleteServiceOutput struct {
 	Service *Service `locationName:"service" type:"structure"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeleteServiceOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeleteServiceOutput) GoString() string {
 	return s.String()
 }
@@ -5572,21 +10716,153 @@ func (s *DeleteServiceOutput) SetService(v *Service) *DeleteServiceOutput {
 	return s
 }
 
-// The details of an Amazon ECS service deployment.
+type DeleteTaskSetInput struct {
+	_ struct{} `type:"structure"`
+
+	// The short name or full Amazon Resource Name (ARN) of the cluster that hosts
+	// the service that the task set exists in to delete.
+	//
+	// Cluster is a required field
+	Cluster *string `locationName:"cluster" type:"string" required:"true"`
+
+	// If true, this allows you to delete a task set even if it hasn't been scaled
+	// down to zero.
+	Force *bool `locationName:"force" type:"boolean"`
+
+	// The short name or full Amazon Resource Name (ARN) of the service that hosts
+	// the task set to delete.
+	//
+	// Service is a required field
+	Service *string `locationName:"service" type:"string" required:"true"`
+
+	// The task set ID or full Amazon Resource Name (ARN) of the task set to delete.
+	//
+	// TaskSet is a required field
+	TaskSet *string `locationName:"taskSet" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeleteTaskSetInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeleteTaskSetInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteTaskSetInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteTaskSetInput"}
+	if s.Cluster == nil {
+		invalidParams.Add(request.NewErrParamRequired("Cluster"))
+	}
+	if s.Service == nil {
+		invalidParams.Add(request.NewErrParamRequired("Service"))
+	}
+	if s.TaskSet == nil {
+		invalidParams.Add(request.NewErrParamRequired("TaskSet"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetCluster sets the Cluster field's value.
+func (s *DeleteTaskSetInput) SetCluster(v string) *DeleteTaskSetInput {
+	s.Cluster = &v
+	return s
+}
+
+// SetForce sets the Force field's value.
+func (s *DeleteTaskSetInput) SetForce(v bool) *DeleteTaskSetInput {
+	s.Force = &v
+	return s
+}
+
+// SetService sets the Service field's value.
+func (s *DeleteTaskSetInput) SetService(v string) *DeleteTaskSetInput {
+	s.Service = &v
+	return s
+}
+
+// SetTaskSet sets the TaskSet field's value.
+func (s *DeleteTaskSetInput) SetTaskSet(v string) *DeleteTaskSetInput {
+	s.TaskSet = &v
+	return s
+}
+
+type DeleteTaskSetOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Details about the task set.
+	TaskSet *TaskSet `locationName:"taskSet" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeleteTaskSetOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeleteTaskSetOutput) GoString() string {
+	return s.String()
+}
+
+// SetTaskSet sets the TaskSet field's value.
+func (s *DeleteTaskSetOutput) SetTaskSet(v *TaskSet) *DeleteTaskSetOutput {
+	s.TaskSet = v
+	return s
+}
+
+// The details of an Amazon ECS service deployment. This is used only when a
+// service uses the ECS deployment controller type.
 type Deployment struct {
 	_ struct{} `type:"structure"`
 
-	// The Unix time stamp for when the service was created.
+	// The capacity provider strategy that the deployment is using.
+	CapacityProviderStrategy []*CapacityProviderStrategyItem `locationName:"capacityProviderStrategy" type:"list"`
+
+	// The Unix timestamp for when the service deployment was created.
 	CreatedAt *time.Time `locationName:"createdAt" type:"timestamp"`
 
 	// The most recent desired count of tasks that was specified for the service
 	// to deploy or maintain.
 	DesiredCount *int64 `locationName:"desiredCount" type:"integer"`
 
+	// The number of consecutively failed tasks in the deployment. A task is considered
+	// a failure if the service scheduler can't launch the task, the task doesn't
+	// transition to a RUNNING state, or if it fails any of its defined health checks
+	// and is stopped.
+	//
+	// Once a service deployment has one or more successfully running tasks, the
+	// failed task count resets to zero and stops being evaluated.
+	FailedTasks *int64 `locationName:"failedTasks" type:"integer"`
+
 	// The ID of the deployment.
 	Id *string `locationName:"id" type:"string"`
 
-	// The launch type on which your service is running.
+	// The launch type the tasks in the service are using. For more information,
+	// see Amazon ECS Launch Types (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html)
+	// in the Amazon Elastic Container Service Developer Guide.
 	LaunchType *string `locationName:"launchType" type:"string" enum:"LaunchType"`
 
 	// The VPC subnet and security group configuration for tasks that receive their
@@ -5596,33 +10872,85 @@ type Deployment struct {
 	// The number of tasks in the deployment that are in the PENDING status.
 	PendingCount *int64 `locationName:"pendingCount" type:"integer"`
 
-	// The platform version on which your service is running.
+	// The operating system that your tasks in the service, or tasks are running
+	// on. A platform family is specified only for tasks using the Fargate launch
+	// type.
+	//
+	// All tasks that run as part of this service must use the same platformFamily
+	// value as the service, for example, LINUX..
+	PlatformFamily *string `locationName:"platformFamily" type:"string"`
+
+	// The platform version on which your tasks in the service are running. A platform
+	// version is only specified for tasks using the Fargate launch type. If one
+	// is not specified, the LATEST platform version is used by default. For more
+	// information, see Fargate Platform Versions (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html)
+	// in the Amazon Elastic Container Service Developer Guide.
 	PlatformVersion *string `locationName:"platformVersion" type:"string"`
+
+	//
+	// The rolloutState of a service is only returned for services that use the
+	// rolling update (ECS) deployment type that are not behind a Classic Load Balancer.
+	//
+	// The rollout state of the deployment. When a service deployment is started,
+	// it begins in an IN_PROGRESS state. When the service reaches a steady state,
+	// the deployment will transition to a COMPLETED state. If the service fails
+	// to reach a steady state and circuit breaker is enabled, the deployment will
+	// transition to a FAILED state. A deployment in FAILED state will launch no
+	// new tasks. For more information, see DeploymentCircuitBreaker.
+	RolloutState *string `locationName:"rolloutState" type:"string" enum:"DeploymentRolloutState"`
+
+	// A description of the rollout state of a deployment.
+	RolloutStateReason *string `locationName:"rolloutStateReason" type:"string"`
 
 	// The number of tasks in the deployment that are in the RUNNING status.
 	RunningCount *int64 `locationName:"runningCount" type:"integer"`
 
-	// The status of the deployment. Valid values are PRIMARY (for the most recent
-	// deployment), ACTIVE (for previous deployments that still have tasks running,
-	// but are being replaced with the PRIMARY deployment), and INACTIVE (for deployments
-	// that have been completely replaced).
+	// The status of the deployment. The following describes each state:
+	//
+	// PRIMARY
+	//
+	// The most recent deployment of a service.
+	//
+	// ACTIVE
+	//
+	// A service deployment that still has running tasks, but are in the process
+	// of being replaced with a new PRIMARY deployment.
+	//
+	// INACTIVE
+	//
+	// A deployment that has been completely replaced.
 	Status *string `locationName:"status" type:"string"`
 
-	// The most recent task definition that was specified for the service to use.
+	// The most recent task definition that was specified for the tasks in the service
+	// to use.
 	TaskDefinition *string `locationName:"taskDefinition" type:"string"`
 
-	// The Unix time stamp for when the service was last updated.
+	// The Unix timestamp for when the service deployment was last updated.
 	UpdatedAt *time.Time `locationName:"updatedAt" type:"timestamp"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Deployment) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Deployment) GoString() string {
 	return s.String()
+}
+
+// SetCapacityProviderStrategy sets the CapacityProviderStrategy field's value.
+func (s *Deployment) SetCapacityProviderStrategy(v []*CapacityProviderStrategyItem) *Deployment {
+	s.CapacityProviderStrategy = v
+	return s
 }
 
 // SetCreatedAt sets the CreatedAt field's value.
@@ -5634,6 +10962,12 @@ func (s *Deployment) SetCreatedAt(v time.Time) *Deployment {
 // SetDesiredCount sets the DesiredCount field's value.
 func (s *Deployment) SetDesiredCount(v int64) *Deployment {
 	s.DesiredCount = &v
+	return s
+}
+
+// SetFailedTasks sets the FailedTasks field's value.
+func (s *Deployment) SetFailedTasks(v int64) *Deployment {
+	s.FailedTasks = &v
 	return s
 }
 
@@ -5661,9 +10995,27 @@ func (s *Deployment) SetPendingCount(v int64) *Deployment {
 	return s
 }
 
+// SetPlatformFamily sets the PlatformFamily field's value.
+func (s *Deployment) SetPlatformFamily(v string) *Deployment {
+	s.PlatformFamily = &v
+	return s
+}
+
 // SetPlatformVersion sets the PlatformVersion field's value.
 func (s *Deployment) SetPlatformVersion(v string) *Deployment {
 	s.PlatformVersion = &v
+	return s
+}
+
+// SetRolloutState sets the RolloutState field's value.
+func (s *Deployment) SetRolloutState(v string) *Deployment {
+	s.RolloutState = &v
+	return s
+}
+
+// SetRolloutStateReason sets the RolloutStateReason field's value.
+func (s *Deployment) SetRolloutStateReason(v string) *Deployment {
+	s.RolloutStateReason = &v
 	return s
 }
 
@@ -5691,33 +11043,177 @@ func (s *Deployment) SetUpdatedAt(v time.Time) *Deployment {
 	return s
 }
 
-// Optional deployment parameters that control how many tasks run during the
-// deployment and the ordering of stopping and starting tasks.
+//
+// The deployment circuit breaker can only be used for services using the rolling
+// update (ECS) deployment type that are not behind a Classic Load Balancer.
+//
+// The deployment circuit breaker determines whether a service deployment will
+// fail if the service can't reach a steady state. If enabled, a service deployment
+// will transition to a failed state and stop launching new tasks. You can also
+// enable Amazon ECS to roll back your service to the last completed deployment
+// after a failure. For more information, see Rolling update (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-ecs.html)
+// in the Amazon Elastic Container Service Developer Guide.
+type DeploymentCircuitBreaker struct {
+	_ struct{} `type:"structure"`
+
+	// Whether to enable the deployment circuit breaker logic for the service.
+	//
+	// Enable is a required field
+	Enable *bool `locationName:"enable" type:"boolean" required:"true"`
+
+	// Whether to enable Amazon ECS to roll back the service if a service deployment
+	// fails. If rollback is enabled, when a service deployment fails, the service
+	// is rolled back to the last deployment that completed successfully.
+	//
+	// Rollback is a required field
+	Rollback *bool `locationName:"rollback" type:"boolean" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeploymentCircuitBreaker) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeploymentCircuitBreaker) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeploymentCircuitBreaker) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeploymentCircuitBreaker"}
+	if s.Enable == nil {
+		invalidParams.Add(request.NewErrParamRequired("Enable"))
+	}
+	if s.Rollback == nil {
+		invalidParams.Add(request.NewErrParamRequired("Rollback"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetEnable sets the Enable field's value.
+func (s *DeploymentCircuitBreaker) SetEnable(v bool) *DeploymentCircuitBreaker {
+	s.Enable = &v
+	return s
+}
+
+// SetRollback sets the Rollback field's value.
+func (s *DeploymentCircuitBreaker) SetRollback(v bool) *DeploymentCircuitBreaker {
+	s.Rollback = &v
+	return s
+}
+
+// Optional deployment parameters that control how many tasks run during a deployment
+// and the ordering of stopping and starting tasks.
 type DeploymentConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// The upper limit (as a percentage of the service's desiredCount) of the number
-	// of tasks that are allowed in the RUNNING or PENDING state in a service during
-	// a deployment. The maximum number of tasks during a deployment is the desiredCount
-	// multiplied by maximumPercent/100, rounded down to the nearest integer value.
+	//
+	// The deployment circuit breaker can only be used for services using the rolling
+	// update (ECS) deployment type.
+	//
+	// The deployment circuit breaker determines whether a service deployment will
+	// fail if the service can't reach a steady state. If deployment circuit breaker
+	// is enabled, a service deployment will transition to a failed state and stop
+	// launching new tasks. If rollback is enabled, when a service deployment fails,
+	// the service is rolled back to the last deployment that completed successfully.
+	DeploymentCircuitBreaker *DeploymentCircuitBreaker `locationName:"deploymentCircuitBreaker" type:"structure"`
+
+	// If a service is using the rolling update (ECS) deployment type, the maximum
+	// percent parameter represents an upper limit on the number of tasks in a service
+	// that are allowed in the RUNNING or PENDING state during a deployment, as
+	// a percentage of the desired number of tasks (rounded down to the nearest
+	// integer), and while any container instances are in the DRAINING state if
+	// the service contains tasks using the EC2 launch type. This parameter enables
+	// you to define the deployment batch size. For example, if your service has
+	// a desired number of four tasks and a maximum percent value of 200%, the scheduler
+	// may start four new tasks before stopping the four older tasks (provided that
+	// the cluster resources required to do this are available). The default value
+	// for maximum percent is 200%.
+	//
+	// If a service is using the blue/green (CODE_DEPLOY) or EXTERNAL deployment
+	// types and tasks that use the EC2 launch type, the maximum percent value is
+	// set to the default value and is used to define the upper limit on the number
+	// of the tasks in the service that remain in the RUNNING state while the container
+	// instances are in the DRAINING state. If the tasks in the service use the
+	// Fargate launch type, the maximum percent value is not used, although it is
+	// returned when describing your service.
 	MaximumPercent *int64 `locationName:"maximumPercent" type:"integer"`
 
-	// The lower limit (as a percentage of the service's desiredCount) of the number
-	// of running tasks that must remain in the RUNNING state in a service during
-	// a deployment. The minimum number of healthy tasks during a deployment is
-	// the desiredCount multiplied by minimumHealthyPercent/100, rounded up to the
-	// nearest integer value.
+	// If a service is using the rolling update (ECS) deployment type, the minimum
+	// healthy percent represents a lower limit on the number of tasks in a service
+	// that must remain in the RUNNING state during a deployment, as a percentage
+	// of the desired number of tasks (rounded up to the nearest integer), and while
+	// any container instances are in the DRAINING state if the service contains
+	// tasks using the EC2 launch type. This parameter enables you to deploy without
+	// using additional cluster capacity. For example, if your service has a desired
+	// number of four tasks and a minimum healthy percent of 50%, the scheduler
+	// may stop two existing tasks to free up cluster capacity before starting two
+	// new tasks. Tasks for services that do not use a load balancer are considered
+	// healthy if they are in the RUNNING state; tasks for services that do use
+	// a load balancer are considered healthy if they are in the RUNNING state and
+	// they are reported as healthy by the load balancer. The default value for
+	// minimum healthy percent is 100%.
+	//
+	// If a service is using the blue/green (CODE_DEPLOY) or EXTERNAL deployment
+	// types and tasks that use the EC2 launch type, the minimum healthy percent
+	// value is set to the default value and is used to define the lower limit on
+	// the number of the tasks in the service that remain in the RUNNING state while
+	// the container instances are in the DRAINING state. If the tasks in the service
+	// use the Fargate launch type, the minimum healthy percent value is not used,
+	// although it is returned when describing your service.
 	MinimumHealthyPercent *int64 `locationName:"minimumHealthyPercent" type:"integer"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeploymentConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeploymentConfiguration) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeploymentConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeploymentConfiguration"}
+	if s.DeploymentCircuitBreaker != nil {
+		if err := s.DeploymentCircuitBreaker.Validate(); err != nil {
+			invalidParams.AddNested("DeploymentCircuitBreaker", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetDeploymentCircuitBreaker sets the DeploymentCircuitBreaker field's value.
+func (s *DeploymentConfiguration) SetDeploymentCircuitBreaker(v *DeploymentCircuitBreaker) *DeploymentConfiguration {
+	s.DeploymentCircuitBreaker = v
+	return s
 }
 
 // SetMaximumPercent sets the MaximumPercent field's value.
@@ -5732,6 +11228,77 @@ func (s *DeploymentConfiguration) SetMinimumHealthyPercent(v int64) *DeploymentC
 	return s
 }
 
+// The deployment controller to use for the service. For more information, see
+// Amazon ECS Deployment Types (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-types.html)
+// in the Amazon Elastic Container Service Developer Guide.
+type DeploymentController struct {
+	_ struct{} `type:"structure"`
+
+	// The deployment controller type to use.
+	//
+	// There are three deployment controller types available:
+	//
+	// ECS
+	//
+	// The rolling update (ECS) deployment type involves replacing the current running
+	// version of the container with the latest version. The number of containers
+	// Amazon ECS adds or removes from the service during a rolling update is controlled
+	// by adjusting the minimum and maximum number of healthy tasks allowed during
+	// a service deployment, as specified in the DeploymentConfiguration.
+	//
+	// CODE_DEPLOY
+	//
+	// The blue/green (CODE_DEPLOY) deployment type uses the blue/green deployment
+	// model powered by CodeDeploy, which allows you to verify a new deployment
+	// of a service before sending production traffic to it.
+	//
+	// EXTERNAL
+	//
+	// The external (EXTERNAL) deployment type enables you to use any third-party
+	// deployment controller for full control over the deployment process for an
+	// Amazon ECS service.
+	//
+	// Type is a required field
+	Type *string `locationName:"type" type:"string" required:"true" enum:"DeploymentControllerType"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeploymentController) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DeploymentController) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeploymentController) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeploymentController"}
+	if s.Type == nil {
+		invalidParams.Add(request.NewErrParamRequired("Type"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetType sets the Type field's value.
+func (s *DeploymentController) SetType(v string) *DeploymentController {
+	s.Type = &v
+	return s
+}
+
 type DeregisterContainerInstanceInput struct {
 	_ struct{} `type:"structure"`
 
@@ -5742,9 +11309,9 @@ type DeregisterContainerInstanceInput struct {
 
 	// The container instance ID or full ARN of the container instance to deregister.
 	// The ARN contains the arn:aws:ecs namespace, followed by the Region of the
-	// container instance, the AWS account ID of the container instance owner, the
-	// container-instance namespace, and then the container instance ID. For example,
-	// arn:aws:ecs:region:aws_account_id:container-instance/container_instance_ID.
+	// container instance, the Amazon Web Services account ID of the container instance
+	// owner, the container-instance namespace, and then the container instance
+	// ID. For example, arn:aws:ecs:region:aws_account_id:container-instance/container_instance_ID.
 	//
 	// ContainerInstance is a required field
 	ContainerInstance *string `locationName:"containerInstance" type:"string" required:"true"`
@@ -5764,12 +11331,20 @@ type DeregisterContainerInstanceInput struct {
 	Force *bool `locationName:"force" type:"boolean"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeregisterContainerInstanceInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeregisterContainerInstanceInput) GoString() string {
 	return s.String()
 }
@@ -5812,12 +11387,20 @@ type DeregisterContainerInstanceOutput struct {
 	ContainerInstance *ContainerInstance `locationName:"containerInstance" type:"structure"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeregisterContainerInstanceOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeregisterContainerInstanceOutput) GoString() string {
 	return s.String()
 }
@@ -5838,12 +11421,20 @@ type DeregisterTaskDefinitionInput struct {
 	TaskDefinition *string `locationName:"taskDefinition" type:"string" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeregisterTaskDefinitionInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeregisterTaskDefinitionInput) GoString() string {
 	return s.String()
 }
@@ -5874,12 +11465,20 @@ type DeregisterTaskDefinitionOutput struct {
 	TaskDefinition *TaskDefinition `locationName:"taskDefinition" type:"structure"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeregisterTaskDefinitionOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DeregisterTaskDefinitionOutput) GoString() string {
 	return s.String()
 }
@@ -5890,6 +11489,131 @@ func (s *DeregisterTaskDefinitionOutput) SetTaskDefinition(v *TaskDefinition) *D
 	return s
 }
 
+type DescribeCapacityProvidersInput struct {
+	_ struct{} `type:"structure"`
+
+	// The short name or full Amazon Resource Name (ARN) of one or more capacity
+	// providers. Up to 100 capacity providers can be described in an action.
+	CapacityProviders []*string `locationName:"capacityProviders" type:"list"`
+
+	// Specifies whether or not you want to see the resource tags for the capacity
+	// provider. If TAGS is specified, the tags are included in the response. If
+	// this field is omitted, tags are not included in the response.
+	Include []*string `locationName:"include" type:"list"`
+
+	// The maximum number of account setting results returned by DescribeCapacityProviders
+	// in paginated output. When this parameter is used, DescribeCapacityProviders
+	// only returns maxResults results in a single page along with a nextToken response
+	// element. The remaining results of the initial request can be seen by sending
+	// another DescribeCapacityProviders request with the returned nextToken value.
+	// This value can be between 1 and 10. If this parameter is not used, then DescribeCapacityProviders
+	// returns up to 10 results and a nextToken value if applicable.
+	MaxResults *int64 `locationName:"maxResults" type:"integer"`
+
+	// The nextToken value returned from a previous paginated DescribeCapacityProviders
+	// request where maxResults was used and the results exceeded the value of that
+	// parameter. Pagination continues from the end of the previous results that
+	// returned the nextToken value.
+	//
+	// This token should be treated as an opaque identifier that is only used to
+	// retrieve the next items in a list and not for other programmatic purposes.
+	NextToken *string `locationName:"nextToken" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DescribeCapacityProvidersInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DescribeCapacityProvidersInput) GoString() string {
+	return s.String()
+}
+
+// SetCapacityProviders sets the CapacityProviders field's value.
+func (s *DescribeCapacityProvidersInput) SetCapacityProviders(v []*string) *DescribeCapacityProvidersInput {
+	s.CapacityProviders = v
+	return s
+}
+
+// SetInclude sets the Include field's value.
+func (s *DescribeCapacityProvidersInput) SetInclude(v []*string) *DescribeCapacityProvidersInput {
+	s.Include = v
+	return s
+}
+
+// SetMaxResults sets the MaxResults field's value.
+func (s *DescribeCapacityProvidersInput) SetMaxResults(v int64) *DescribeCapacityProvidersInput {
+	s.MaxResults = &v
+	return s
+}
+
+// SetNextToken sets the NextToken field's value.
+func (s *DescribeCapacityProvidersInput) SetNextToken(v string) *DescribeCapacityProvidersInput {
+	s.NextToken = &v
+	return s
+}
+
+type DescribeCapacityProvidersOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The list of capacity providers.
+	CapacityProviders []*CapacityProvider `locationName:"capacityProviders" type:"list"`
+
+	// Any failures associated with the call.
+	Failures []*Failure `locationName:"failures" type:"list"`
+
+	// The nextToken value to include in a future DescribeCapacityProviders request.
+	// When the results of a DescribeCapacityProviders request exceed maxResults,
+	// this value can be used to retrieve the next page of results. This value is
+	// null when there are no more results to return.
+	NextToken *string `locationName:"nextToken" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DescribeCapacityProvidersOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DescribeCapacityProvidersOutput) GoString() string {
+	return s.String()
+}
+
+// SetCapacityProviders sets the CapacityProviders field's value.
+func (s *DescribeCapacityProvidersOutput) SetCapacityProviders(v []*CapacityProvider) *DescribeCapacityProvidersOutput {
+	s.CapacityProviders = v
+	return s
+}
+
+// SetFailures sets the Failures field's value.
+func (s *DescribeCapacityProvidersOutput) SetFailures(v []*Failure) *DescribeCapacityProvidersOutput {
+	s.Failures = v
+	return s
+}
+
+// SetNextToken sets the NextToken field's value.
+func (s *DescribeCapacityProvidersOutput) SetNextToken(v string) *DescribeCapacityProvidersOutput {
+	s.NextToken = &v
+	return s
+}
+
 type DescribeClustersInput struct {
 	_ struct{} `type:"structure"`
 
@@ -5897,33 +11621,37 @@ type DescribeClustersInput struct {
 	// entries. If you do not specify a cluster, the default cluster is assumed.
 	Clusters []*string `locationName:"clusters" type:"list"`
 
-	// Additional information about your clusters to be separated by launch type,
-	// including:
+	// Whether to include additional information about the clusters in the response.
+	// If this field is omitted, this information isn't included.
 	//
-	//    * runningEC2TasksCount
+	// If ATTACHMENTS is specified, the attachments for the container instances
+	// or tasks within the cluster are included.
 	//
-	//    * runningFargateTasksCount
+	// If SETTINGS is specified, the settings for the cluster are included.
 	//
-	//    * pendingEC2TasksCount
+	// If CONFIGURATIONS is specified, the configuration for the cluster is included.
 	//
-	//    * pendingFargateTasksCount
+	// If STATISTICS is specified, the task and service count is included, separated
+	// by launch type.
 	//
-	//    * activeEC2ServiceCount
-	//
-	//    * activeFargateServiceCount
-	//
-	//    * drainingEC2ServiceCount
-	//
-	//    * drainingFargateServiceCount
+	// If TAGS is specified, the metadata tags associated with the cluster are included.
 	Include []*string `locationName:"include" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeClustersInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeClustersInput) GoString() string {
 	return s.String()
 }
@@ -5950,12 +11678,20 @@ type DescribeClustersOutput struct {
 	Failures []*Failure `locationName:"failures" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeClustersOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeClustersOutput) GoString() string {
 	return s.String()
 }
@@ -5977,7 +11713,9 @@ type DescribeContainerInstancesInput struct {
 
 	// The short name or full Amazon Resource Name (ARN) of the cluster that hosts
 	// the container instances to describe. If you do not specify a cluster, the
-	// default cluster is assumed.
+	// default cluster is assumed. This parameter is required if the container instance
+	// or container instances you are describing were launched in any cluster other
+	// than the default cluster.
 	Cluster *string `locationName:"cluster" type:"string"`
 
 	// A list of up to 100 container instance IDs or full Amazon Resource Name (ARN)
@@ -5985,14 +11723,27 @@ type DescribeContainerInstancesInput struct {
 	//
 	// ContainerInstances is a required field
 	ContainerInstances []*string `locationName:"containerInstances" type:"list" required:"true"`
+
+	// Specifies whether you want to see the resource tags for the container instance.
+	// If TAGS is specified, the tags are included in the response. If this field
+	// is omitted, tags are not included in the response.
+	Include []*string `locationName:"include" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeContainerInstancesInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeContainerInstancesInput) GoString() string {
 	return s.String()
 }
@@ -6022,6 +11773,12 @@ func (s *DescribeContainerInstancesInput) SetContainerInstances(v []*string) *De
 	return s
 }
 
+// SetInclude sets the Include field's value.
+func (s *DescribeContainerInstancesInput) SetInclude(v []*string) *DescribeContainerInstancesInput {
+	s.Include = v
+	return s
+}
+
 type DescribeContainerInstancesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -6032,12 +11789,20 @@ type DescribeContainerInstancesOutput struct {
 	Failures []*Failure `locationName:"failures" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeContainerInstancesOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeContainerInstancesOutput) GoString() string {
 	return s.String()
 }
@@ -6059,8 +11824,14 @@ type DescribeServicesInput struct {
 
 	// The short name or full Amazon Resource Name (ARN)the cluster that hosts the
 	// service to describe. If you do not specify a cluster, the default cluster
-	// is assumed.
+	// is assumed. This parameter is required if the service or services you are
+	// describing were launched in any cluster other than the default cluster.
 	Cluster *string `locationName:"cluster" type:"string"`
+
+	// Specifies whether you want to see the resource tags for the service. If TAGS
+	// is specified, the tags are included in the response. If this field is omitted,
+	// tags are not included in the response.
+	Include []*string `locationName:"include" type:"list"`
 
 	// A list of services to describe. You may specify up to 10 services to describe
 	// in a single operation.
@@ -6069,12 +11840,20 @@ type DescribeServicesInput struct {
 	Services []*string `locationName:"services" type:"list" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeServicesInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeServicesInput) GoString() string {
 	return s.String()
 }
@@ -6098,6 +11877,12 @@ func (s *DescribeServicesInput) SetCluster(v string) *DescribeServicesInput {
 	return s
 }
 
+// SetInclude sets the Include field's value.
+func (s *DescribeServicesInput) SetInclude(v []*string) *DescribeServicesInput {
+	s.Include = v
+	return s
+}
+
 // SetServices sets the Services field's value.
 func (s *DescribeServicesInput) SetServices(v []*string) *DescribeServicesInput {
 	s.Services = v
@@ -6114,12 +11899,20 @@ type DescribeServicesOutput struct {
 	Services []*Service `locationName:"services" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeServicesOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeServicesOutput) GoString() string {
 	return s.String()
 }
@@ -6139,6 +11932,11 @@ func (s *DescribeServicesOutput) SetServices(v []*Service) *DescribeServicesOutp
 type DescribeTaskDefinitionInput struct {
 	_ struct{} `type:"structure"`
 
+	// Specifies whether to see the resource tags for the task definition. If TAGS
+	// is specified, the tags are included in the response. If this field is omitted,
+	// tags are not included in the response.
+	Include []*string `locationName:"include" type:"list"`
+
 	// The family for the latest ACTIVE revision, family and revision (family:revision)
 	// for a specific revision in the family, or full Amazon Resource Name (ARN)
 	// of the task definition to describe.
@@ -6147,12 +11945,20 @@ type DescribeTaskDefinitionInput struct {
 	TaskDefinition *string `locationName:"taskDefinition" type:"string" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeTaskDefinitionInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeTaskDefinitionInput) GoString() string {
 	return s.String()
 }
@@ -6170,6 +11976,12 @@ func (s *DescribeTaskDefinitionInput) Validate() error {
 	return nil
 }
 
+// SetInclude sets the Include field's value.
+func (s *DescribeTaskDefinitionInput) SetInclude(v []*string) *DescribeTaskDefinitionInput {
+	s.Include = v
+	return s
+}
+
 // SetTaskDefinition sets the TaskDefinition field's value.
 func (s *DescribeTaskDefinitionInput) SetTaskDefinition(v string) *DescribeTaskDefinitionInput {
 	s.TaskDefinition = &v
@@ -6179,18 +11991,60 @@ func (s *DescribeTaskDefinitionInput) SetTaskDefinition(v string) *DescribeTaskD
 type DescribeTaskDefinitionOutput struct {
 	_ struct{} `type:"structure"`
 
+	// The metadata that is applied to the task definition to help you categorize
+	// and organize them. Each tag consists of a key and an optional value, both
+	// of which you define.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	Tags []*Tag `locationName:"tags" type:"list"`
+
 	// The full task definition description.
 	TaskDefinition *TaskDefinition `locationName:"taskDefinition" type:"structure"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeTaskDefinitionOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeTaskDefinitionOutput) GoString() string {
 	return s.String()
+}
+
+// SetTags sets the Tags field's value.
+func (s *DescribeTaskDefinitionOutput) SetTags(v []*Tag) *DescribeTaskDefinitionOutput {
+	s.Tags = v
+	return s
 }
 
 // SetTaskDefinition sets the TaskDefinition field's value.
@@ -6199,13 +12053,141 @@ func (s *DescribeTaskDefinitionOutput) SetTaskDefinition(v *TaskDefinition) *Des
 	return s
 }
 
+type DescribeTaskSetsInput struct {
+	_ struct{} `type:"structure"`
+
+	// The short name or full Amazon Resource Name (ARN) of the cluster that hosts
+	// the service that the task sets exist in.
+	//
+	// Cluster is a required field
+	Cluster *string `locationName:"cluster" type:"string" required:"true"`
+
+	// Specifies whether to see the resource tags for the task set. If TAGS is specified,
+	// the tags are included in the response. If this field is omitted, tags are
+	// not included in the response.
+	Include []*string `locationName:"include" type:"list"`
+
+	// The short name or full Amazon Resource Name (ARN) of the service that the
+	// task sets exist in.
+	//
+	// Service is a required field
+	Service *string `locationName:"service" type:"string" required:"true"`
+
+	// The ID or full Amazon Resource Name (ARN) of task sets to describe.
+	TaskSets []*string `locationName:"taskSets" type:"list"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DescribeTaskSetsInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DescribeTaskSetsInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeTaskSetsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeTaskSetsInput"}
+	if s.Cluster == nil {
+		invalidParams.Add(request.NewErrParamRequired("Cluster"))
+	}
+	if s.Service == nil {
+		invalidParams.Add(request.NewErrParamRequired("Service"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetCluster sets the Cluster field's value.
+func (s *DescribeTaskSetsInput) SetCluster(v string) *DescribeTaskSetsInput {
+	s.Cluster = &v
+	return s
+}
+
+// SetInclude sets the Include field's value.
+func (s *DescribeTaskSetsInput) SetInclude(v []*string) *DescribeTaskSetsInput {
+	s.Include = v
+	return s
+}
+
+// SetService sets the Service field's value.
+func (s *DescribeTaskSetsInput) SetService(v string) *DescribeTaskSetsInput {
+	s.Service = &v
+	return s
+}
+
+// SetTaskSets sets the TaskSets field's value.
+func (s *DescribeTaskSetsInput) SetTaskSets(v []*string) *DescribeTaskSetsInput {
+	s.TaskSets = v
+	return s
+}
+
+type DescribeTaskSetsOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Any failures associated with the call.
+	Failures []*Failure `locationName:"failures" type:"list"`
+
+	// The list of task sets described.
+	TaskSets []*TaskSet `locationName:"taskSets" type:"list"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DescribeTaskSetsOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DescribeTaskSetsOutput) GoString() string {
+	return s.String()
+}
+
+// SetFailures sets the Failures field's value.
+func (s *DescribeTaskSetsOutput) SetFailures(v []*Failure) *DescribeTaskSetsOutput {
+	s.Failures = v
+	return s
+}
+
+// SetTaskSets sets the TaskSets field's value.
+func (s *DescribeTaskSetsOutput) SetTaskSets(v []*TaskSet) *DescribeTaskSetsOutput {
+	s.TaskSets = v
+	return s
+}
+
 type DescribeTasksInput struct {
 	_ struct{} `type:"structure"`
 
 	// The short name or full Amazon Resource Name (ARN) of the cluster that hosts
-	// the task to describe. If you do not specify a cluster, the default cluster
-	// is assumed.
+	// the task or tasks to describe. If you do not specify a cluster, the default
+	// cluster is assumed. This parameter is required if the task or tasks you are
+	// describing were launched in any cluster other than the default cluster.
 	Cluster *string `locationName:"cluster" type:"string"`
+
+	// Specifies whether you want to see the resource tags for the task. If TAGS
+	// is specified, the tags are included in the response. If this field is omitted,
+	// tags are not included in the response.
+	Include []*string `locationName:"include" type:"list"`
 
 	// A list of up to 100 task IDs or full ARN entries.
 	//
@@ -6213,12 +12195,20 @@ type DescribeTasksInput struct {
 	Tasks []*string `locationName:"tasks" type:"list" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeTasksInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeTasksInput) GoString() string {
 	return s.String()
 }
@@ -6242,6 +12232,12 @@ func (s *DescribeTasksInput) SetCluster(v string) *DescribeTasksInput {
 	return s
 }
 
+// SetInclude sets the Include field's value.
+func (s *DescribeTasksInput) SetInclude(v []*string) *DescribeTasksInput {
+	s.Include = v
+	return s
+}
+
 // SetTasks sets the Tasks field's value.
 func (s *DescribeTasksInput) SetTasks(v []*string) *DescribeTasksInput {
 	s.Tasks = v
@@ -6258,12 +12254,20 @@ type DescribeTasksOutput struct {
 	Tasks []*Task `locationName:"tasks" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeTasksOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DescribeTasksOutput) GoString() string {
 	return s.String()
 }
@@ -6297,12 +12301,20 @@ type Device struct {
 	Permissions []*string `locationName:"permissions" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Device) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Device) GoString() string {
 	return s.String()
 }
@@ -6341,23 +12353,32 @@ func (s *Device) SetPermissions(v []*string) *Device {
 type DiscoverPollEndpointInput struct {
 	_ struct{} `type:"structure"`
 
-	// The short name or full Amazon Resource Name (ARN) of the cluster that the
-	// container instance belongs to.
+	// The short name or full Amazon Resource Name (ARN) of the cluster to which
+	// the container instance belongs.
 	Cluster *string `locationName:"cluster" type:"string"`
 
 	// The container instance ID or full ARN of the container instance. The ARN
 	// contains the arn:aws:ecs namespace, followed by the Region of the container
-	// instance, the AWS account ID of the container instance owner, the container-instance
-	// namespace, and then the container instance ID. For example, arn:aws:ecs:region:aws_account_id:container-instance/container_instance_ID.
+	// instance, the Amazon Web Services account ID of the container instance owner,
+	// the container-instance namespace, and then the container instance ID. For
+	// example, arn:aws:ecs:region:aws_account_id:container-instance/container_instance_ID.
 	ContainerInstance *string `locationName:"containerInstance" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DiscoverPollEndpointInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DiscoverPollEndpointInput) GoString() string {
 	return s.String()
 }
@@ -6384,12 +12405,20 @@ type DiscoverPollEndpointOutput struct {
 	TelemetryEndpoint *string `locationName:"telemetryEndpoint" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DiscoverPollEndpointOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s DiscoverPollEndpointOutput) GoString() string {
 	return s.String()
 }
@@ -6406,23 +12435,890 @@ func (s *DiscoverPollEndpointOutput) SetTelemetryEndpoint(v string) *DiscoverPol
 	return s
 }
 
-// A failed resource.
+// This parameter is specified when you are using Docker volumes. Docker volumes
+// are only supported when you are using the EC2 launch type. Windows containers
+// only support the use of the local driver. To use bind mounts, specify a host
+// instead.
+type DockerVolumeConfiguration struct {
+	_ struct{} `type:"structure"`
+
+	// If this value is true, the Docker volume is created if it does not already
+	// exist.
+	//
+	// This field is only used if the scope is shared.
+	Autoprovision *bool `locationName:"autoprovision" type:"boolean"`
+
+	// The Docker volume driver to use. The driver value must match the driver name
+	// provided by Docker because it is used for task placement. If the driver was
+	// installed using the Docker plugin CLI, use docker plugin ls to retrieve the
+	// driver name from your container instance. If the driver was installed using
+	// another method, use Docker plugin discovery to retrieve the driver name.
+	// For more information, see Docker plugin discovery (https://docs.docker.com/engine/extend/plugin_api/#plugin-discovery).
+	// This parameter maps to Driver in the Create a volume (https://docs.docker.com/engine/api/v1.35/#operation/VolumeCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the xxdriver option to docker volume create (https://docs.docker.com/engine/reference/commandline/volume_create/).
+	Driver *string `locationName:"driver" type:"string"`
+
+	// A map of Docker driver-specific options passed through. This parameter maps
+	// to DriverOpts in the Create a volume (https://docs.docker.com/engine/api/v1.35/#operation/VolumeCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the xxopt option to docker volume create (https://docs.docker.com/engine/reference/commandline/volume_create/).
+	DriverOpts map[string]*string `locationName:"driverOpts" type:"map"`
+
+	// Custom metadata to add to your Docker volume. This parameter maps to Labels
+	// in the Create a volume (https://docs.docker.com/engine/api/v1.35/#operation/VolumeCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the xxlabel option to docker volume create (https://docs.docker.com/engine/reference/commandline/volume_create/).
+	Labels map[string]*string `locationName:"labels" type:"map"`
+
+	// The scope for the Docker volume that determines its lifecycle. Docker volumes
+	// that are scoped to a task are automatically provisioned when the task starts
+	// and destroyed when the task stops. Docker volumes that are scoped as shared
+	// persist after the task stops.
+	Scope *string `locationName:"scope" type:"string" enum:"Scope"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DockerVolumeConfiguration) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s DockerVolumeConfiguration) GoString() string {
+	return s.String()
+}
+
+// SetAutoprovision sets the Autoprovision field's value.
+func (s *DockerVolumeConfiguration) SetAutoprovision(v bool) *DockerVolumeConfiguration {
+	s.Autoprovision = &v
+	return s
+}
+
+// SetDriver sets the Driver field's value.
+func (s *DockerVolumeConfiguration) SetDriver(v string) *DockerVolumeConfiguration {
+	s.Driver = &v
+	return s
+}
+
+// SetDriverOpts sets the DriverOpts field's value.
+func (s *DockerVolumeConfiguration) SetDriverOpts(v map[string]*string) *DockerVolumeConfiguration {
+	s.DriverOpts = v
+	return s
+}
+
+// SetLabels sets the Labels field's value.
+func (s *DockerVolumeConfiguration) SetLabels(v map[string]*string) *DockerVolumeConfiguration {
+	s.Labels = v
+	return s
+}
+
+// SetScope sets the Scope field's value.
+func (s *DockerVolumeConfiguration) SetScope(v string) *DockerVolumeConfiguration {
+	s.Scope = &v
+	return s
+}
+
+// The authorization configuration details for the Amazon EFS file system.
+type EFSAuthorizationConfig struct {
+	_ struct{} `type:"structure"`
+
+	// The Amazon EFS access point ID to use. If an access point is specified, the
+	// root directory value specified in the EFSVolumeConfiguration must either
+	// be omitted or set to / which will enforce the path set on the EFS access
+	// point. If an access point is used, transit encryption must be enabled in
+	// the EFSVolumeConfiguration. For more information, see Working with Amazon
+	// EFS Access Points (https://docs.aws.amazon.com/efs/latest/ug/efs-access-points.html)
+	// in the Amazon Elastic File System User Guide.
+	AccessPointId *string `locationName:"accessPointId" type:"string"`
+
+	// Whether or not to use the Amazon ECS task IAM role defined in a task definition
+	// when mounting the Amazon EFS file system. If enabled, transit encryption
+	// must be enabled in the EFSVolumeConfiguration. If this parameter is omitted,
+	// the default value of DISABLED is used. For more information, see Using Amazon
+	// EFS Access Points (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/efs-volumes.html#efs-volume-accesspoints)
+	// in the Amazon Elastic Container Service Developer Guide.
+	Iam *string `locationName:"iam" type:"string" enum:"EFSAuthorizationConfigIAM"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s EFSAuthorizationConfig) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s EFSAuthorizationConfig) GoString() string {
+	return s.String()
+}
+
+// SetAccessPointId sets the AccessPointId field's value.
+func (s *EFSAuthorizationConfig) SetAccessPointId(v string) *EFSAuthorizationConfig {
+	s.AccessPointId = &v
+	return s
+}
+
+// SetIam sets the Iam field's value.
+func (s *EFSAuthorizationConfig) SetIam(v string) *EFSAuthorizationConfig {
+	s.Iam = &v
+	return s
+}
+
+// This parameter is specified when you are using an Amazon Elastic File System
+// file system for task storage. For more information, see Amazon EFS Volumes
+// (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/efs-volumes.html)
+// in the Amazon Elastic Container Service Developer Guide.
+type EFSVolumeConfiguration struct {
+	_ struct{} `type:"structure"`
+
+	// The authorization configuration details for the Amazon EFS file system.
+	AuthorizationConfig *EFSAuthorizationConfig `locationName:"authorizationConfig" type:"structure"`
+
+	// The Amazon EFS file system ID to use.
+	//
+	// FileSystemId is a required field
+	FileSystemId *string `locationName:"fileSystemId" type:"string" required:"true"`
+
+	// The directory within the Amazon EFS file system to mount as the root directory
+	// inside the host. If this parameter is omitted, the root of the Amazon EFS
+	// volume will be used. Specifying / will have the same effect as omitting this
+	// parameter.
+	//
+	// If an EFS access point is specified in the authorizationConfig, the root
+	// directory parameter must either be omitted or set to / which will enforce
+	// the path set on the EFS access point.
+	RootDirectory *string `locationName:"rootDirectory" type:"string"`
+
+	// Whether or not to enable encryption for Amazon EFS data in transit between
+	// the Amazon ECS host and the Amazon EFS server. Transit encryption must be
+	// enabled if Amazon EFS IAM authorization is used. If this parameter is omitted,
+	// the default value of DISABLED is used. For more information, see Encrypting
+	// Data in Transit (https://docs.aws.amazon.com/efs/latest/ug/encryption-in-transit.html)
+	// in the Amazon Elastic File System User Guide.
+	TransitEncryption *string `locationName:"transitEncryption" type:"string" enum:"EFSTransitEncryption"`
+
+	// The port to use when sending encrypted data between the Amazon ECS host and
+	// the Amazon EFS server. If you do not specify a transit encryption port, it
+	// will use the port selection strategy that the Amazon EFS mount helper uses.
+	// For more information, see EFS Mount Helper (https://docs.aws.amazon.com/efs/latest/ug/efs-mount-helper.html)
+	// in the Amazon Elastic File System User Guide.
+	TransitEncryptionPort *int64 `locationName:"transitEncryptionPort" type:"integer"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s EFSVolumeConfiguration) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s EFSVolumeConfiguration) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *EFSVolumeConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "EFSVolumeConfiguration"}
+	if s.FileSystemId == nil {
+		invalidParams.Add(request.NewErrParamRequired("FileSystemId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetAuthorizationConfig sets the AuthorizationConfig field's value.
+func (s *EFSVolumeConfiguration) SetAuthorizationConfig(v *EFSAuthorizationConfig) *EFSVolumeConfiguration {
+	s.AuthorizationConfig = v
+	return s
+}
+
+// SetFileSystemId sets the FileSystemId field's value.
+func (s *EFSVolumeConfiguration) SetFileSystemId(v string) *EFSVolumeConfiguration {
+	s.FileSystemId = &v
+	return s
+}
+
+// SetRootDirectory sets the RootDirectory field's value.
+func (s *EFSVolumeConfiguration) SetRootDirectory(v string) *EFSVolumeConfiguration {
+	s.RootDirectory = &v
+	return s
+}
+
+// SetTransitEncryption sets the TransitEncryption field's value.
+func (s *EFSVolumeConfiguration) SetTransitEncryption(v string) *EFSVolumeConfiguration {
+	s.TransitEncryption = &v
+	return s
+}
+
+// SetTransitEncryptionPort sets the TransitEncryptionPort field's value.
+func (s *EFSVolumeConfiguration) SetTransitEncryptionPort(v int64) *EFSVolumeConfiguration {
+	s.TransitEncryptionPort = &v
+	return s
+}
+
+// A list of files containing the environment variables to pass to a container.
+// You can specify up to ten environment files. The file must have a .env file
+// extension. Each line in an environment file should contain an environment
+// variable in VARIABLE=VALUE format. Lines beginning with # are treated as
+// comments and are ignored. For more information on the environment variable
+// file syntax, see Declare default environment variables in file (https://docs.docker.com/compose/env-file/).
+//
+// If there are environment variables specified using the environment parameter
+// in a container definition, they take precedence over the variables contained
+// within an environment file. If multiple environment files are specified that
+// contain the same variable, they are processed from the top down. It is recommended
+// to use unique variable names. For more information, see Specifying environment
+// variables (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/taskdef-envfiles.html)
+// in the Amazon Elastic Container Service Developer Guide.
+//
+// This parameter is only supported for tasks hosted on Fargate using the following
+// platform versions:
+//
+//    * Linux platform version 1.4.0 or later.
+//
+//    * Windows platform version 1.0.0 or later.
+type EnvironmentFile struct {
+	_ struct{} `type:"structure"`
+
+	// The file type to use. The only supported value is s3.
+	//
+	// Type is a required field
+	Type *string `locationName:"type" type:"string" required:"true" enum:"EnvironmentFileType"`
+
+	// The Amazon Resource Name (ARN) of the Amazon S3 object containing the environment
+	// variable file.
+	//
+	// Value is a required field
+	Value *string `locationName:"value" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s EnvironmentFile) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s EnvironmentFile) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *EnvironmentFile) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "EnvironmentFile"}
+	if s.Type == nil {
+		invalidParams.Add(request.NewErrParamRequired("Type"))
+	}
+	if s.Value == nil {
+		invalidParams.Add(request.NewErrParamRequired("Value"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetType sets the Type field's value.
+func (s *EnvironmentFile) SetType(v string) *EnvironmentFile {
+	s.Type = &v
+	return s
+}
+
+// SetValue sets the Value field's value.
+func (s *EnvironmentFile) SetValue(v string) *EnvironmentFile {
+	s.Value = &v
+	return s
+}
+
+// The amount of ephemeral storage to allocate for the task. This parameter
+// is used to expand the total amount of ephemeral storage available, beyond
+// the default amount, for tasks hosted on Fargate. For more information, see
+// Fargate task storage (https://docs.aws.amazon.com/AmazonECS/latest/userguide/using_data_volumes.html)
+// in the Amazon ECS User Guide for Fargate.
+//
+// This parameter is only supported for tasks hosted on Fargate using the following
+// platform versions:
+//
+//    * Linux platform version 1.4.0 or later.
+//
+//    * Windows platform version 1.0.0 or later.
+type EphemeralStorage struct {
+	_ struct{} `type:"structure"`
+
+	// The total amount, in GiB, of ephemeral storage to set for the task. The minimum
+	// supported value is 21 GiB and the maximum supported value is 200 GiB.
+	//
+	// SizeInGiB is a required field
+	SizeInGiB *int64 `locationName:"sizeInGiB" type:"integer" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s EphemeralStorage) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s EphemeralStorage) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *EphemeralStorage) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "EphemeralStorage"}
+	if s.SizeInGiB == nil {
+		invalidParams.Add(request.NewErrParamRequired("SizeInGiB"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetSizeInGiB sets the SizeInGiB field's value.
+func (s *EphemeralStorage) SetSizeInGiB(v int64) *EphemeralStorage {
+	s.SizeInGiB = &v
+	return s
+}
+
+// The details of the execute command configuration.
+type ExecuteCommandConfiguration struct {
+	_ struct{} `type:"structure"`
+
+	// Specify an Key Management Service key ID to encrypt the data between the
+	// local client and the container.
+	KmsKeyId *string `locationName:"kmsKeyId" type:"string"`
+
+	// The log configuration for the results of the execute command actions. The
+	// logs can be sent to CloudWatch Logs or an Amazon S3 bucket. When logging=OVERRIDE
+	// is specified, a logConfiguration must be provided.
+	LogConfiguration *ExecuteCommandLogConfiguration `locationName:"logConfiguration" type:"structure"`
+
+	// The log setting to use for redirecting logs for your execute command results.
+	// The following log settings are available.
+	//
+	//    * NONE: The execute command session is not logged.
+	//
+	//    * DEFAULT: The awslogs configuration in the task definition is used. If
+	//    no logging parameter is specified, it defaults to this value. If no awslogs
+	//    log driver is configured in the task definition, the output won't be logged.
+	//
+	//    * OVERRIDE: Specify the logging details as a part of logConfiguration.
+	//    If the OVERRIDE logging option is specified, the logConfiguration is required.
+	Logging *string `locationName:"logging" type:"string" enum:"ExecuteCommandLogging"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ExecuteCommandConfiguration) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ExecuteCommandConfiguration) GoString() string {
+	return s.String()
+}
+
+// SetKmsKeyId sets the KmsKeyId field's value.
+func (s *ExecuteCommandConfiguration) SetKmsKeyId(v string) *ExecuteCommandConfiguration {
+	s.KmsKeyId = &v
+	return s
+}
+
+// SetLogConfiguration sets the LogConfiguration field's value.
+func (s *ExecuteCommandConfiguration) SetLogConfiguration(v *ExecuteCommandLogConfiguration) *ExecuteCommandConfiguration {
+	s.LogConfiguration = v
+	return s
+}
+
+// SetLogging sets the Logging field's value.
+func (s *ExecuteCommandConfiguration) SetLogging(v string) *ExecuteCommandConfiguration {
+	s.Logging = &v
+	return s
+}
+
+type ExecuteCommandInput struct {
+	_ struct{} `type:"structure"`
+
+	// The Amazon Resource Name (ARN) or short name of the cluster the task is running
+	// in. If you do not specify a cluster, the default cluster is assumed.
+	Cluster *string `locationName:"cluster" type:"string"`
+
+	// The command to run on the container.
+	//
+	// Command is a required field
+	Command *string `locationName:"command" type:"string" required:"true"`
+
+	// The name of the container to execute the command on. A container name only
+	// needs to be specified for tasks containing multiple containers.
+	Container *string `locationName:"container" type:"string"`
+
+	// Use this flag to run your command in interactive mode.
+	//
+	// Interactive is a required field
+	Interactive *bool `locationName:"interactive" type:"boolean" required:"true"`
+
+	// The Amazon Resource Name (ARN) or ID of the task the container is part of.
+	//
+	// Task is a required field
+	Task *string `locationName:"task" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ExecuteCommandInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ExecuteCommandInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ExecuteCommandInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ExecuteCommandInput"}
+	if s.Command == nil {
+		invalidParams.Add(request.NewErrParamRequired("Command"))
+	}
+	if s.Interactive == nil {
+		invalidParams.Add(request.NewErrParamRequired("Interactive"))
+	}
+	if s.Task == nil {
+		invalidParams.Add(request.NewErrParamRequired("Task"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetCluster sets the Cluster field's value.
+func (s *ExecuteCommandInput) SetCluster(v string) *ExecuteCommandInput {
+	s.Cluster = &v
+	return s
+}
+
+// SetCommand sets the Command field's value.
+func (s *ExecuteCommandInput) SetCommand(v string) *ExecuteCommandInput {
+	s.Command = &v
+	return s
+}
+
+// SetContainer sets the Container field's value.
+func (s *ExecuteCommandInput) SetContainer(v string) *ExecuteCommandInput {
+	s.Container = &v
+	return s
+}
+
+// SetInteractive sets the Interactive field's value.
+func (s *ExecuteCommandInput) SetInteractive(v bool) *ExecuteCommandInput {
+	s.Interactive = &v
+	return s
+}
+
+// SetTask sets the Task field's value.
+func (s *ExecuteCommandInput) SetTask(v string) *ExecuteCommandInput {
+	s.Task = &v
+	return s
+}
+
+// The log configuration for the results of the execute command actions. The
+// logs can be sent to CloudWatch Logs or an Amazon S3 bucket.
+type ExecuteCommandLogConfiguration struct {
+	_ struct{} `type:"structure"`
+
+	// Whether or not to enable encryption on the CloudWatch logs. If not specified,
+	// encryption will be disabled.
+	CloudWatchEncryptionEnabled *bool `locationName:"cloudWatchEncryptionEnabled" type:"boolean"`
+
+	// The name of the CloudWatch log group to send logs to.
+	//
+	// The CloudWatch log group must already be created.
+	CloudWatchLogGroupName *string `locationName:"cloudWatchLogGroupName" type:"string"`
+
+	// The name of the S3 bucket to send logs to.
+	//
+	// The S3 bucket must already be created.
+	S3BucketName *string `locationName:"s3BucketName" type:"string"`
+
+	// Whether or not to use encryption on the S3 logs. If not specified, encryption
+	// is not used.
+	S3EncryptionEnabled *bool `locationName:"s3EncryptionEnabled" type:"boolean"`
+
+	// An optional folder in the S3 bucket to place logs in.
+	S3KeyPrefix *string `locationName:"s3KeyPrefix" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ExecuteCommandLogConfiguration) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ExecuteCommandLogConfiguration) GoString() string {
+	return s.String()
+}
+
+// SetCloudWatchEncryptionEnabled sets the CloudWatchEncryptionEnabled field's value.
+func (s *ExecuteCommandLogConfiguration) SetCloudWatchEncryptionEnabled(v bool) *ExecuteCommandLogConfiguration {
+	s.CloudWatchEncryptionEnabled = &v
+	return s
+}
+
+// SetCloudWatchLogGroupName sets the CloudWatchLogGroupName field's value.
+func (s *ExecuteCommandLogConfiguration) SetCloudWatchLogGroupName(v string) *ExecuteCommandLogConfiguration {
+	s.CloudWatchLogGroupName = &v
+	return s
+}
+
+// SetS3BucketName sets the S3BucketName field's value.
+func (s *ExecuteCommandLogConfiguration) SetS3BucketName(v string) *ExecuteCommandLogConfiguration {
+	s.S3BucketName = &v
+	return s
+}
+
+// SetS3EncryptionEnabled sets the S3EncryptionEnabled field's value.
+func (s *ExecuteCommandLogConfiguration) SetS3EncryptionEnabled(v bool) *ExecuteCommandLogConfiguration {
+	s.S3EncryptionEnabled = &v
+	return s
+}
+
+// SetS3KeyPrefix sets the S3KeyPrefix field's value.
+func (s *ExecuteCommandLogConfiguration) SetS3KeyPrefix(v string) *ExecuteCommandLogConfiguration {
+	s.S3KeyPrefix = &v
+	return s
+}
+
+type ExecuteCommandOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The Amazon Resource Name (ARN) of the cluster.
+	ClusterArn *string `locationName:"clusterArn" type:"string"`
+
+	// The Amazon Resource Name (ARN) of the container.
+	ContainerArn *string `locationName:"containerArn" type:"string"`
+
+	// The name of the container.
+	ContainerName *string `locationName:"containerName" type:"string"`
+
+	// Whether or not the execute command session is running in interactive mode.
+	// Amazon ECS only supports initiating interactive sessions, so you must specify
+	// true for this value.
+	Interactive *bool `locationName:"interactive" type:"boolean"`
+
+	// The details of the SSM session that was created for this instance of execute-command.
+	Session *Session `locationName:"session" type:"structure"`
+
+	// The Amazon Resource Name (ARN) of the task.
+	TaskArn *string `locationName:"taskArn" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ExecuteCommandOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ExecuteCommandOutput) GoString() string {
+	return s.String()
+}
+
+// SetClusterArn sets the ClusterArn field's value.
+func (s *ExecuteCommandOutput) SetClusterArn(v string) *ExecuteCommandOutput {
+	s.ClusterArn = &v
+	return s
+}
+
+// SetContainerArn sets the ContainerArn field's value.
+func (s *ExecuteCommandOutput) SetContainerArn(v string) *ExecuteCommandOutput {
+	s.ContainerArn = &v
+	return s
+}
+
+// SetContainerName sets the ContainerName field's value.
+func (s *ExecuteCommandOutput) SetContainerName(v string) *ExecuteCommandOutput {
+	s.ContainerName = &v
+	return s
+}
+
+// SetInteractive sets the Interactive field's value.
+func (s *ExecuteCommandOutput) SetInteractive(v bool) *ExecuteCommandOutput {
+	s.Interactive = &v
+	return s
+}
+
+// SetSession sets the Session field's value.
+func (s *ExecuteCommandOutput) SetSession(v *Session) *ExecuteCommandOutput {
+	s.Session = v
+	return s
+}
+
+// SetTaskArn sets the TaskArn field's value.
+func (s *ExecuteCommandOutput) SetTaskArn(v string) *ExecuteCommandOutput {
+	s.TaskArn = &v
+	return s
+}
+
+// The authorization configuration details for Amazon FSx for Windows File Server
+// file system. See FSxWindowsFileServerVolumeConfiguration (https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_FSxWindowsFileServerVolumeConfiguration.html)
+// in the Amazon Elastic Container Service API Reference.
+//
+// For more information and the input format, see Amazon FSx for Windows File
+// Server Volumes (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/wfsx-volumes.html)
+// in the Amazon Elastic Container Service Developer Guide.
+type FSxWindowsFileServerAuthorizationConfig struct {
+	_ struct{} `type:"structure"`
+
+	// The authorization credential option to use. The authorization credential
+	// options can be provided using either the Amazon Resource Name (ARN) of an
+	// Secrets Manager secret or SSM Parameter Store parameter. The ARNs refer to
+	// the stored credentials.
+	//
+	// CredentialsParameter is a required field
+	CredentialsParameter *string `locationName:"credentialsParameter" type:"string" required:"true"`
+
+	// A fully qualified domain name hosted by an Directory Service (https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_microsoft_ad.html)
+	// Managed Microsoft AD (Active Directory) or self-hosted AD on Amazon EC2.
+	//
+	// Domain is a required field
+	Domain *string `locationName:"domain" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s FSxWindowsFileServerAuthorizationConfig) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s FSxWindowsFileServerAuthorizationConfig) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *FSxWindowsFileServerAuthorizationConfig) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "FSxWindowsFileServerAuthorizationConfig"}
+	if s.CredentialsParameter == nil {
+		invalidParams.Add(request.NewErrParamRequired("CredentialsParameter"))
+	}
+	if s.Domain == nil {
+		invalidParams.Add(request.NewErrParamRequired("Domain"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetCredentialsParameter sets the CredentialsParameter field's value.
+func (s *FSxWindowsFileServerAuthorizationConfig) SetCredentialsParameter(v string) *FSxWindowsFileServerAuthorizationConfig {
+	s.CredentialsParameter = &v
+	return s
+}
+
+// SetDomain sets the Domain field's value.
+func (s *FSxWindowsFileServerAuthorizationConfig) SetDomain(v string) *FSxWindowsFileServerAuthorizationConfig {
+	s.Domain = &v
+	return s
+}
+
+// This parameter is specified when you are using Amazon FSx for Windows File
+// Server (https://docs.aws.amazon.com/fsx/latest/WindowsGuide/what-is.html)
+// file system for task storage.
+//
+// For more information and the input format, see Amazon FSx for Windows File
+// Server Volumes (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/wfsx-volumes.html)
+// in the Amazon Elastic Container Service Developer Guide.
+type FSxWindowsFileServerVolumeConfiguration struct {
+	_ struct{} `type:"structure"`
+
+	// The authorization configuration details for the Amazon FSx for Windows File
+	// Server file system.
+	//
+	// AuthorizationConfig is a required field
+	AuthorizationConfig *FSxWindowsFileServerAuthorizationConfig `locationName:"authorizationConfig" type:"structure" required:"true"`
+
+	// The Amazon FSx for Windows File Server file system ID to use.
+	//
+	// FileSystemId is a required field
+	FileSystemId *string `locationName:"fileSystemId" type:"string" required:"true"`
+
+	// The directory within the Amazon FSx for Windows File Server file system to
+	// mount as the root directory inside the host.
+	//
+	// RootDirectory is a required field
+	RootDirectory *string `locationName:"rootDirectory" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s FSxWindowsFileServerVolumeConfiguration) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s FSxWindowsFileServerVolumeConfiguration) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *FSxWindowsFileServerVolumeConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "FSxWindowsFileServerVolumeConfiguration"}
+	if s.AuthorizationConfig == nil {
+		invalidParams.Add(request.NewErrParamRequired("AuthorizationConfig"))
+	}
+	if s.FileSystemId == nil {
+		invalidParams.Add(request.NewErrParamRequired("FileSystemId"))
+	}
+	if s.RootDirectory == nil {
+		invalidParams.Add(request.NewErrParamRequired("RootDirectory"))
+	}
+	if s.AuthorizationConfig != nil {
+		if err := s.AuthorizationConfig.Validate(); err != nil {
+			invalidParams.AddNested("AuthorizationConfig", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetAuthorizationConfig sets the AuthorizationConfig field's value.
+func (s *FSxWindowsFileServerVolumeConfiguration) SetAuthorizationConfig(v *FSxWindowsFileServerAuthorizationConfig) *FSxWindowsFileServerVolumeConfiguration {
+	s.AuthorizationConfig = v
+	return s
+}
+
+// SetFileSystemId sets the FileSystemId field's value.
+func (s *FSxWindowsFileServerVolumeConfiguration) SetFileSystemId(v string) *FSxWindowsFileServerVolumeConfiguration {
+	s.FileSystemId = &v
+	return s
+}
+
+// SetRootDirectory sets the RootDirectory field's value.
+func (s *FSxWindowsFileServerVolumeConfiguration) SetRootDirectory(v string) *FSxWindowsFileServerVolumeConfiguration {
+	s.RootDirectory = &v
+	return s
+}
+
+// A failed resource. For a list of common causes, see API failure reasons (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/api_failures_messages.html)
+// in the Amazon Elastic Container Service Developer Guide.
 type Failure struct {
 	_ struct{} `type:"structure"`
 
 	// The Amazon Resource Name (ARN) of the failed resource.
 	Arn *string `locationName:"arn" type:"string"`
 
+	// The details of the failure.
+	Detail *string `locationName:"detail" type:"string"`
+
 	// The reason for the failure.
 	Reason *string `locationName:"reason" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Failure) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Failure) GoString() string {
 	return s.String()
 }
@@ -6433,9 +13329,82 @@ func (s *Failure) SetArn(v string) *Failure {
 	return s
 }
 
+// SetDetail sets the Detail field's value.
+func (s *Failure) SetDetail(v string) *Failure {
+	s.Detail = &v
+	return s
+}
+
 // SetReason sets the Reason field's value.
 func (s *Failure) SetReason(v string) *Failure {
 	s.Reason = &v
+	return s
+}
+
+// The FireLens configuration for the container. This is used to specify and
+// configure a log router for container logs. For more information, see Custom
+// Log Routing (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_firelens.html)
+// in the Amazon Elastic Container Service Developer Guide.
+type FirelensConfiguration struct {
+	_ struct{} `type:"structure"`
+
+	// The options to use when configuring the log router. This field is optional
+	// and can be used to specify a custom configuration file or to add additional
+	// metadata, such as the task, task definition, cluster, and container instance
+	// details to the log event. If specified, the syntax to use is "options":{"enable-ecs-log-metadata":"true|false","config-file-type:"s3|file","config-file-value":"arn:aws:s3:::mybucket/fluent.conf|filepath"}.
+	// For more information, see Creating a Task Definition that Uses a FireLens
+	// Configuration (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_firelens.html#firelens-taskdef)
+	// in the Amazon Elastic Container Service Developer Guide.
+	//
+	// Tasks hosted on Fargate only support the file configuration file type.
+	Options map[string]*string `locationName:"options" type:"map"`
+
+	// The log router to use. The valid values are fluentd or fluentbit.
+	//
+	// Type is a required field
+	Type *string `locationName:"type" type:"string" required:"true" enum:"FirelensConfigurationType"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s FirelensConfiguration) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s FirelensConfiguration) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *FirelensConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "FirelensConfiguration"}
+	if s.Type == nil {
+		invalidParams.Add(request.NewErrParamRequired("Type"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetOptions sets the Options field's value.
+func (s *FirelensConfiguration) SetOptions(v map[string]*string) *FirelensConfiguration {
+	s.Options = v
+	return s
+}
+
+// SetType sets the Type field's value.
+func (s *FirelensConfiguration) SetType(v string) *FirelensConfiguration {
+	s.Type = &v
 	return s
 }
 
@@ -6443,19 +13412,71 @@ func (s *Failure) SetReason(v string) *Failure {
 // that are specified in a container definition override any Docker health checks
 // that exist in the container image (such as those specified in a parent image
 // or from the image's Dockerfile).
+//
+// You can view the health status of both individual containers and a task with
+// the DescribeTasks API operation or when viewing the task details in the console.
+//
+// The following describes the possible healthStatus values for a container:
+//
+//    * HEALTHY-The container health check has passed successfully.
+//
+//    * UNHEALTHY-The container health check has failed.
+//
+//    * UNKNOWN-The container health check is being evaluated or there is no
+//    container health check defined.
+//
+// The following describes the possible healthStatus values for a task. The
+// container health check status of nonessential containers do not have an effect
+// on the health status of a task.
+//
+//    * HEALTHY-All essential containers within the task have passed their health
+//    checks.
+//
+//    * UNHEALTHY-One or more essential containers have failed their health
+//    check.
+//
+//    * UNKNOWN-The essential containers within the task are still having their
+//    health checks evaluated or there are no container health checks defined.
+//
+// If a task is run manually, and not as part of a service, the task will continue
+// its lifecycle regardless of its health status. For tasks that are part of
+// a service, if the task reports as unhealthy then the task will be stopped
+// and the service scheduler will replace it.
+//
+// The following are notes about container health check support:
+//
+//    * Container health checks require version 1.17.0 or greater of the Amazon
+//    ECS container agent. For more information, see Updating the Amazon ECS
+//    Container Agent (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-update.html).
+//
+//    * Container health checks are supported for Fargate tasks if you are using
+//    platform version 1.1.0 or greater. For more information, see Fargate Platform
+//    Versions (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html).
+//
+//    * Container health checks are not supported for tasks that are part of
+//    a service that is configured to use a Classic Load Balancer.
 type HealthCheck struct {
 	_ struct{} `type:"structure"`
 
 	// A string array representing the command that the container runs to determine
 	// if it is healthy. The string array must start with CMD to execute the command
 	// arguments directly, or CMD-SHELL to run the command with the container's
-	// default shell. For example:
+	// default shell.
+	//
+	// When you use the Amazon Web Services Management Console JSON panel, the Command
+	// Line Interface, or the APIs, you should enclose the list of commands in brackets,
+	// as shown below.
 	//
 	// [ "CMD-SHELL", "curl -f http://localhost/ || exit 1" ]
 	//
+	// You do not need to include the brackets when you use the Amazon Web Services
+	// Management Consoleas shown below.
+	//
+	// "CMD-SHELL", "curl -f http://localhost/ || exit 1"
+	//
 	// An exit code of 0 indicates success, and non-zero exit code indicates failure.
-	// For more information, see HealthCheck in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/).
+	// For more information, see HealthCheck in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/).
 	//
 	// Command is a required field
 	Command []*string `locationName:"command" type:"list" required:"true"`
@@ -6485,12 +13506,20 @@ type HealthCheck struct {
 	Timeout *int64 `locationName:"timeout" type:"integer"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s HealthCheck) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s HealthCheck) GoString() string {
 	return s.String()
 }
@@ -6554,12 +13583,20 @@ type HostEntry struct {
 	IpAddress *string `locationName:"ipAddress" type:"string" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s HostEntry) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s HostEntry) GoString() string {
 	return s.String()
 }
@@ -6592,29 +13629,38 @@ func (s *HostEntry) SetIpAddress(v string) *HostEntry {
 	return s
 }
 
-// Details on a container instance host volume.
+// Details on a container instance bind mount host volume.
 type HostVolumeProperties struct {
 	_ struct{} `type:"structure"`
 
-	// The path on the host container instance that is presented to the container.
-	// If this parameter is empty, then the Docker daemon has assigned a host path
-	// for you. If the host parameter contains a sourcePath file location, then
-	// the data volume persists at the specified location on the host container
-	// instance until you delete it manually. If the sourcePath value does not exist
-	// on the host container instance, the Docker daemon creates it. If the location
-	// does exist, the contents of the source path folder are exported.
+	// When the host parameter is used, specify a sourcePath to declare the path
+	// on the host container instance that is presented to the container. If this
+	// parameter is empty, then the Docker daemon has assigned a host path for you.
+	// If the host parameter contains a sourcePath file location, then the data
+	// volume persists at the specified location on the host container instance
+	// until you delete it manually. If the sourcePath value does not exist on the
+	// host container instance, the Docker daemon creates it. If the location does
+	// exist, the contents of the source path folder are exported.
 	//
 	// If you are using the Fargate launch type, the sourcePath parameter is not
 	// supported.
 	SourcePath *string `locationName:"sourcePath" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s HostVolumeProperties) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s HostVolumeProperties) GoString() string {
 	return s.String()
 }
@@ -6623,6 +13669,181 @@ func (s HostVolumeProperties) GoString() string {
 func (s *HostVolumeProperties) SetSourcePath(v string) *HostVolumeProperties {
 	s.SourcePath = &v
 	return s
+}
+
+// Details on a Elastic Inference accelerator. For more information, see Working
+// with Amazon Elastic Inference on Amazon ECS (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-inference.html)
+// in the Amazon Elastic Container Service Developer Guide.
+type InferenceAccelerator struct {
+	_ struct{} `type:"structure"`
+
+	// The Elastic Inference accelerator device name. The deviceName must also be
+	// referenced in a container definition as a ResourceRequirement.
+	//
+	// DeviceName is a required field
+	DeviceName *string `locationName:"deviceName" type:"string" required:"true"`
+
+	// The Elastic Inference accelerator type to use.
+	//
+	// DeviceType is a required field
+	DeviceType *string `locationName:"deviceType" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s InferenceAccelerator) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s InferenceAccelerator) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *InferenceAccelerator) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "InferenceAccelerator"}
+	if s.DeviceName == nil {
+		invalidParams.Add(request.NewErrParamRequired("DeviceName"))
+	}
+	if s.DeviceType == nil {
+		invalidParams.Add(request.NewErrParamRequired("DeviceType"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetDeviceName sets the DeviceName field's value.
+func (s *InferenceAccelerator) SetDeviceName(v string) *InferenceAccelerator {
+	s.DeviceName = &v
+	return s
+}
+
+// SetDeviceType sets the DeviceType field's value.
+func (s *InferenceAccelerator) SetDeviceType(v string) *InferenceAccelerator {
+	s.DeviceType = &v
+	return s
+}
+
+// Details on an Elastic Inference accelerator task override. This parameter
+// is used to override the Elastic Inference accelerator specified in the task
+// definition. For more information, see Working with Amazon Elastic Inference
+// on Amazon ECS (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-inference.html)
+// in the Amazon Elastic Container Service Developer Guide.
+type InferenceAcceleratorOverride struct {
+	_ struct{} `type:"structure"`
+
+	// The Elastic Inference accelerator device name to override for the task. This
+	// parameter must match a deviceName specified in the task definition.
+	DeviceName *string `locationName:"deviceName" type:"string"`
+
+	// The Elastic Inference accelerator type to use.
+	DeviceType *string `locationName:"deviceType" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s InferenceAcceleratorOverride) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s InferenceAcceleratorOverride) GoString() string {
+	return s.String()
+}
+
+// SetDeviceName sets the DeviceName field's value.
+func (s *InferenceAcceleratorOverride) SetDeviceName(v string) *InferenceAcceleratorOverride {
+	s.DeviceName = &v
+	return s
+}
+
+// SetDeviceType sets the DeviceType field's value.
+func (s *InferenceAcceleratorOverride) SetDeviceType(v string) *InferenceAcceleratorOverride {
+	s.DeviceType = &v
+	return s
+}
+
+// The specified parameter is invalid. Review the available parameters for the
+// API request.
+type InvalidParameterException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s InvalidParameterException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s InvalidParameterException) GoString() string {
+	return s.String()
+}
+
+func newErrorInvalidParameterException(v protocol.ResponseMetadata) error {
+	return &InvalidParameterException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *InvalidParameterException) Code() string {
+	return "InvalidParameterException"
+}
+
+// Message returns the exception's message.
+func (s *InvalidParameterException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *InvalidParameterException) OrigErr() error {
+	return nil
+}
+
+func (s *InvalidParameterException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *InvalidParameterException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *InvalidParameterException) RequestID() string {
+	return s.RespMetadata.RequestID
 }
 
 // The Linux capabilities for the container that are added to or dropped from
@@ -6637,12 +13858,11 @@ type KernelCapabilities struct {
 
 	// The Linux capabilities for the container that have been added to the default
 	// configuration provided by Docker. This parameter maps to CapAdd in the Create
-	// a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --cap-add option to docker run (https://docs.docker.com/engine/reference/run/).
+	// a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --cap-add option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
-	// If you are using tasks that use the Fargate launch type, the add parameter
-	// is not supported.
+	// Tasks launched on Fargate only support adding the SYS_PTRACE kernel capability.
 	//
 	// Valid values: "ALL" | "AUDIT_CONTROL" | "AUDIT_WRITE" | "BLOCK_SUSPEND" |
 	// "CHOWN" | "DAC_OVERRIDE" | "DAC_READ_SEARCH" | "FOWNER" | "FSETID" | "IPC_LOCK"
@@ -6656,9 +13876,9 @@ type KernelCapabilities struct {
 
 	// The Linux capabilities for the container that have been removed from the
 	// default configuration provided by Docker. This parameter maps to CapDrop
-	// in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --cap-drop option to docker run (https://docs.docker.com/engine/reference/run/).
+	// in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --cap-drop option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
 	// Valid values: "ALL" | "AUDIT_CONTROL" | "AUDIT_WRITE" | "BLOCK_SUSPEND" |
 	// "CHOWN" | "DAC_OVERRIDE" | "DAC_READ_SEARCH" | "FOWNER" | "FSETID" | "IPC_LOCK"
@@ -6671,12 +13891,20 @@ type KernelCapabilities struct {
 	Drop []*string `locationName:"drop" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s KernelCapabilities) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s KernelCapabilities) GoString() string {
 	return s.String()
 }
@@ -6693,25 +13921,33 @@ func (s *KernelCapabilities) SetDrop(v []*string) *KernelCapabilities {
 	return s
 }
 
-// A key and value pair object.
+// A key-value pair object.
 type KeyValuePair struct {
 	_ struct{} `type:"structure"`
 
-	// The name of the key value pair. For environment variables, this is the name
+	// The name of the key-value pair. For environment variables, this is the name
 	// of the environment variable.
 	Name *string `locationName:"name" type:"string"`
 
-	// The value of the key value pair. For environment variables, this is the value
+	// The value of the key-value pair. For environment variables, this is the value
 	// of the environment variable.
 	Value *string `locationName:"value" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s KeyValuePair) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s KeyValuePair) GoString() string {
 	return s.String()
 }
@@ -6728,6 +13964,70 @@ func (s *KeyValuePair) SetValue(v string) *KeyValuePair {
 	return s
 }
 
+// The limit for the resource has been exceeded.
+type LimitExceededException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s LimitExceededException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s LimitExceededException) GoString() string {
+	return s.String()
+}
+
+func newErrorLimitExceededException(v protocol.ResponseMetadata) error {
+	return &LimitExceededException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *LimitExceededException) Code() string {
+	return "LimitExceededException"
+}
+
+// Message returns the exception's message.
+func (s *LimitExceededException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *LimitExceededException) OrigErr() error {
+	return nil
+}
+
+func (s *LimitExceededException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *LimitExceededException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *LimitExceededException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
 // Linux-specific options that are applied to the container, such as Linux KernelCapabilities.
 type LinuxParameters struct {
 	_ struct{} `type:"structure"`
@@ -6735,48 +14035,84 @@ type LinuxParameters struct {
 	// The Linux capabilities for the container that are added to or dropped from
 	// the default configuration provided by Docker.
 	//
-	// If you are using tasks that use the Fargate launch type, capabilities is
-	// supported but the add parameter is not supported.
+	// For tasks that use the Fargate launch type, capabilities is supported for
+	// all platform versions but the add parameter is only supported if using platform
+	// version 1.4.0 or later.
 	Capabilities *KernelCapabilities `locationName:"capabilities" type:"structure"`
 
 	// Any host devices to expose to the container. This parameter maps to Devices
-	// in the Create a container (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/#create-a-container)
-	// section of the Docker Remote API (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.27/)
-	// and the --device option to docker run (https://docs.docker.com/engine/reference/run/).
+	// in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+	// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+	// and the --device option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
 	// If you are using tasks that use the Fargate launch type, the devices parameter
 	// is not supported.
 	Devices []*Device `locationName:"devices" type:"list"`
 
 	// Run an init process inside the container that forwards signals and reaps
-	// processes. This parameter maps to the --init option to docker run (https://docs.docker.com/engine/reference/run/).
+	// processes. This parameter maps to the --init option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	// This parameter requires version 1.25 of the Docker Remote API or greater
 	// on your container instance. To check the Docker Remote API version on your
 	// container instance, log in to your container instance and run the following
-	// command: sudo docker version | grep "Server API version"
+	// command: sudo docker version --format '{{.Server.APIVersion}}'
 	InitProcessEnabled *bool `locationName:"initProcessEnabled" type:"boolean"`
 
+	// The total amount of swap memory (in MiB) a container can use. This parameter
+	// will be translated to the --memory-swap option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration)
+	// where the value would be the sum of the container memory plus the maxSwap
+	// value.
+	//
+	// If a maxSwap value of 0 is specified, the container will not use swap. Accepted
+	// values are 0 or any positive integer. If the maxSwap parameter is omitted,
+	// the container will use the swap configuration for the container instance
+	// it is running on. A maxSwap value must be set for the swappiness parameter
+	// to be used.
+	//
+	// If you are using tasks that use the Fargate launch type, the maxSwap parameter
+	// is not supported.
+	MaxSwap *int64 `locationName:"maxSwap" type:"integer"`
+
 	// The value for the size (in MiB) of the /dev/shm volume. This parameter maps
-	// to the --shm-size option to docker run (https://docs.docker.com/engine/reference/run/).
+	// to the --shm-size option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
 	// If you are using tasks that use the Fargate launch type, the sharedMemorySize
 	// parameter is not supported.
 	SharedMemorySize *int64 `locationName:"sharedMemorySize" type:"integer"`
 
+	// This allows you to tune a container's memory swappiness behavior. A swappiness
+	// value of 0 will cause swapping to not happen unless absolutely necessary.
+	// A swappiness value of 100 will cause pages to be swapped very aggressively.
+	// Accepted values are whole numbers between 0 and 100. If the swappiness parameter
+	// is not specified, a default value of 60 is used. If a value is not specified
+	// for maxSwap then this parameter is ignored. This parameter maps to the --memory-swappiness
+	// option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
+	//
+	// If you are using tasks that use the Fargate launch type, the swappiness parameter
+	// is not supported.
+	Swappiness *int64 `locationName:"swappiness" type:"integer"`
+
 	// The container path, mount options, and size (in MiB) of the tmpfs mount.
-	// This parameter maps to the --tmpfs option to docker run (https://docs.docker.com/engine/reference/run/).
+	// This parameter maps to the --tmpfs option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
 	//
 	// If you are using tasks that use the Fargate launch type, the tmpfs parameter
 	// is not supported.
 	Tmpfs []*Tmpfs `locationName:"tmpfs" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s LinuxParameters) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s LinuxParameters) GoString() string {
 	return s.String()
 }
@@ -6829,15 +14165,167 @@ func (s *LinuxParameters) SetInitProcessEnabled(v bool) *LinuxParameters {
 	return s
 }
 
+// SetMaxSwap sets the MaxSwap field's value.
+func (s *LinuxParameters) SetMaxSwap(v int64) *LinuxParameters {
+	s.MaxSwap = &v
+	return s
+}
+
 // SetSharedMemorySize sets the SharedMemorySize field's value.
 func (s *LinuxParameters) SetSharedMemorySize(v int64) *LinuxParameters {
 	s.SharedMemorySize = &v
 	return s
 }
 
+// SetSwappiness sets the Swappiness field's value.
+func (s *LinuxParameters) SetSwappiness(v int64) *LinuxParameters {
+	s.Swappiness = &v
+	return s
+}
+
 // SetTmpfs sets the Tmpfs field's value.
 func (s *LinuxParameters) SetTmpfs(v []*Tmpfs) *LinuxParameters {
 	s.Tmpfs = v
+	return s
+}
+
+type ListAccountSettingsInput struct {
+	_ struct{} `type:"structure"`
+
+	// Specifies whether to return the effective settings. If true, the account
+	// settings for the root user or the default setting for the principalArn are
+	// returned. If false, the account settings for the principalArn are returned
+	// if they are set. Otherwise, no account settings are returned.
+	EffectiveSettings *bool `locationName:"effectiveSettings" type:"boolean"`
+
+	// The maximum number of account setting results returned by ListAccountSettings
+	// in paginated output. When this parameter is used, ListAccountSettings only
+	// returns maxResults results in a single page along with a nextToken response
+	// element. The remaining results of the initial request can be seen by sending
+	// another ListAccountSettings request with the returned nextToken value. This
+	// value can be between 1 and 10. If this parameter is not used, then ListAccountSettings
+	// returns up to 10 results and a nextToken value if applicable.
+	MaxResults *int64 `locationName:"maxResults" type:"integer"`
+
+	// The name of the account setting you want to list the settings for.
+	Name *string `locationName:"name" type:"string" enum:"SettingName"`
+
+	// The nextToken value returned from a ListAccountSettings request indicating
+	// that more results are available to fulfill the request and further calls
+	// will be needed. If maxResults was provided, it is possible the number of
+	// results to be fewer than maxResults.
+	//
+	// This token should be treated as an opaque identifier that is only used to
+	// retrieve the next items in a list and not for other programmatic purposes.
+	NextToken *string `locationName:"nextToken" type:"string"`
+
+	// The ARN of the principal, which can be an IAM user, IAM role, or the root
+	// user. If this field is omitted, the account settings are listed only for
+	// the authenticated user.
+	//
+	// Federated users assume the account setting of the root user and can't have
+	// explicit account settings set for them.
+	PrincipalArn *string `locationName:"principalArn" type:"string"`
+
+	// The value of the account settings with which to filter results. You must
+	// also specify an account setting name to use this parameter.
+	Value *string `locationName:"value" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ListAccountSettingsInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ListAccountSettingsInput) GoString() string {
+	return s.String()
+}
+
+// SetEffectiveSettings sets the EffectiveSettings field's value.
+func (s *ListAccountSettingsInput) SetEffectiveSettings(v bool) *ListAccountSettingsInput {
+	s.EffectiveSettings = &v
+	return s
+}
+
+// SetMaxResults sets the MaxResults field's value.
+func (s *ListAccountSettingsInput) SetMaxResults(v int64) *ListAccountSettingsInput {
+	s.MaxResults = &v
+	return s
+}
+
+// SetName sets the Name field's value.
+func (s *ListAccountSettingsInput) SetName(v string) *ListAccountSettingsInput {
+	s.Name = &v
+	return s
+}
+
+// SetNextToken sets the NextToken field's value.
+func (s *ListAccountSettingsInput) SetNextToken(v string) *ListAccountSettingsInput {
+	s.NextToken = &v
+	return s
+}
+
+// SetPrincipalArn sets the PrincipalArn field's value.
+func (s *ListAccountSettingsInput) SetPrincipalArn(v string) *ListAccountSettingsInput {
+	s.PrincipalArn = &v
+	return s
+}
+
+// SetValue sets the Value field's value.
+func (s *ListAccountSettingsInput) SetValue(v string) *ListAccountSettingsInput {
+	s.Value = &v
+	return s
+}
+
+type ListAccountSettingsOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The nextToken value to include in a future ListAccountSettings request. When
+	// the results of a ListAccountSettings request exceed maxResults, this value
+	// can be used to retrieve the next page of results. This value is null when
+	// there are no more results to return.
+	NextToken *string `locationName:"nextToken" type:"string"`
+
+	// The account settings for the resource.
+	Settings []*Setting `locationName:"settings" type:"list"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ListAccountSettingsOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ListAccountSettingsOutput) GoString() string {
+	return s.String()
+}
+
+// SetNextToken sets the NextToken field's value.
+func (s *ListAccountSettingsOutput) SetNextToken(v string) *ListAccountSettingsOutput {
+	s.NextToken = &v
+	return s
+}
+
+// SetSettings sets the Settings field's value.
+func (s *ListAccountSettingsOutput) SetSettings(v []*Setting) *ListAccountSettingsOutput {
+	s.Settings = v
 	return s
 }
 
@@ -6864,10 +14352,10 @@ type ListAttributesInput struct {
 	// results and a nextToken value if applicable.
 	MaxResults *int64 `locationName:"maxResults" type:"integer"`
 
-	// The nextToken value returned from a previous paginated ListAttributes request
-	// where maxResults was used and the results exceeded the value of that parameter.
-	// Pagination continues from the end of the previous results that returned the
-	// nextToken value.
+	// The nextToken value returned from a ListAttributes request indicating that
+	// more results are available to fulfill the request and further calls will
+	// be needed. If maxResults was provided, it is possible the number of results
+	// to be fewer than maxResults.
 	//
 	// This token should be treated as an opaque identifier that is only used to
 	// retrieve the next items in a list and not for other programmatic purposes.
@@ -6879,12 +14367,20 @@ type ListAttributesInput struct {
 	TargetType *string `locationName:"targetType" type:"string" required:"true" enum:"TargetType"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListAttributesInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListAttributesInput) GoString() string {
 	return s.String()
 }
@@ -6951,12 +14447,20 @@ type ListAttributesOutput struct {
 	NextToken *string `locationName:"nextToken" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListAttributesOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListAttributesOutput) GoString() string {
 	return s.String()
 }
@@ -6985,22 +14489,30 @@ type ListClustersInput struct {
 	// and a nextToken value if applicable.
 	MaxResults *int64 `locationName:"maxResults" type:"integer"`
 
-	// The nextToken value returned from a previous paginated ListClusters request
-	// where maxResults was used and the results exceeded the value of that parameter.
-	// Pagination continues from the end of the previous results that returned the
-	// nextToken value.
+	// The nextToken value returned from a ListClusters request indicating that
+	// more results are available to fulfill the request and further calls will
+	// be needed. If maxResults was provided, it is possible the number of results
+	// to be fewer than maxResults.
 	//
 	// This token should be treated as an opaque identifier that is only used to
 	// retrieve the next items in a list and not for other programmatic purposes.
 	NextToken *string `locationName:"nextToken" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListClustersInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListClustersInput) GoString() string {
 	return s.String()
 }
@@ -7031,12 +14543,20 @@ type ListClustersOutput struct {
 	NextToken *string `locationName:"nextToken" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListClustersOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListClustersOutput) GoString() string {
 	return s.String()
 }
@@ -7063,7 +14583,7 @@ type ListContainerInstancesInput struct {
 
 	// You can filter the results of a ListContainerInstances operation with cluster
 	// query language statements. For more information, see Cluster Query Language
-	// (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/cluster-query-language.html)
+	// (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cluster-query-language.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	Filter *string `locationName:"filter" type:"string"`
 
@@ -7077,10 +14597,10 @@ type ListContainerInstancesInput struct {
 	// applicable.
 	MaxResults *int64 `locationName:"maxResults" type:"integer"`
 
-	// The nextToken value returned from a previous paginated ListContainerInstances
-	// request where maxResults was used and the results exceeded the value of that
-	// parameter. Pagination continues from the end of the previous results that
-	// returned the nextToken value.
+	// The nextToken value returned from a ListContainerInstances request indicating
+	// that more results are available to fulfill the request and further calls
+	// will be needed. If maxResults was provided, it is possible the number of
+	// results to be fewer than maxResults.
 	//
 	// This token should be treated as an opaque identifier that is only used to
 	// retrieve the next items in a list and not for other programmatic purposes.
@@ -7089,17 +14609,25 @@ type ListContainerInstancesInput struct {
 	// Filters the container instances by status. For example, if you specify the
 	// DRAINING status, the results include only container instances that have been
 	// set to DRAINING using UpdateContainerInstancesState. If you do not specify
-	// this parameter, the default is to include container instances set to ACTIVE
-	// and DRAINING.
+	// this parameter, the default is to include container instances set to all
+	// states other than INACTIVE.
 	Status *string `locationName:"status" type:"string" enum:"ContainerInstanceStatus"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListContainerInstancesInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListContainerInstancesInput) GoString() string {
 	return s.String()
 }
@@ -7148,12 +14676,20 @@ type ListContainerInstancesOutput struct {
 	NextToken *string `locationName:"nextToken" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListContainerInstancesOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListContainerInstancesOutput) GoString() string {
 	return s.String()
 }
@@ -7173,12 +14709,12 @@ func (s *ListContainerInstancesOutput) SetNextToken(v string) *ListContainerInst
 type ListServicesInput struct {
 	_ struct{} `type:"structure"`
 
-	// The short name or full Amazon Resource Name (ARN) of the cluster that hosts
-	// the services to list. If you do not specify a cluster, the default cluster
-	// is assumed.
+	// The short name or full Amazon Resource Name (ARN) of the cluster to use when
+	// filtering the ListServices results. If you do not specify a cluster, the
+	// default cluster is assumed.
 	Cluster *string `locationName:"cluster" type:"string"`
 
-	// The launch type for the services to list.
+	// The launch type to use when filtering the ListServices results.
 	LaunchType *string `locationName:"launchType" type:"string" enum:"LaunchType"`
 
 	// The maximum number of service results returned by ListServices in paginated
@@ -7186,29 +14722,37 @@ type ListServicesInput struct {
 	// results in a single page along with a nextToken response element. The remaining
 	// results of the initial request can be seen by sending another ListServices
 	// request with the returned nextToken value. This value can be between 1 and
-	// 10. If this parameter is not used, then ListServices returns up to 10 results
+	// 100. If this parameter is not used, then ListServices returns up to 10 results
 	// and a nextToken value if applicable.
 	MaxResults *int64 `locationName:"maxResults" type:"integer"`
 
-	// The nextToken value returned from a previous paginated ListServices request
-	// where maxResults was used and the results exceeded the value of that parameter.
-	// Pagination continues from the end of the previous results that returned the
-	// nextToken value.
+	// The nextToken value returned from a ListServices request indicating that
+	// more results are available to fulfill the request and further calls will
+	// be needed. If maxResults was provided, it is possible the number of results
+	// to be fewer than maxResults.
 	//
 	// This token should be treated as an opaque identifier that is only used to
 	// retrieve the next items in a list and not for other programmatic purposes.
 	NextToken *string `locationName:"nextToken" type:"string"`
 
-	// The scheduling strategy for services to list.
+	// The scheduling strategy to use when filtering the ListServices results.
 	SchedulingStrategy *string `locationName:"schedulingStrategy" type:"string" enum:"SchedulingStrategy"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListServicesInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListServicesInput) GoString() string {
 	return s.String()
 }
@@ -7257,12 +14801,20 @@ type ListServicesOutput struct {
 	ServiceArns []*string `locationName:"serviceArns" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListServicesOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListServicesOutput) GoString() string {
 	return s.String()
 }
@@ -7276,6 +14828,85 @@ func (s *ListServicesOutput) SetNextToken(v string) *ListServicesOutput {
 // SetServiceArns sets the ServiceArns field's value.
 func (s *ListServicesOutput) SetServiceArns(v []*string) *ListServicesOutput {
 	s.ServiceArns = v
+	return s
+}
+
+type ListTagsForResourceInput struct {
+	_ struct{} `type:"structure"`
+
+	// The Amazon Resource Name (ARN) that identifies the resource for which to
+	// list the tags. Currently, the supported resources are Amazon ECS tasks, services,
+	// task definitions, clusters, and container instances.
+	//
+	// ResourceArn is a required field
+	ResourceArn *string `locationName:"resourceArn" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ListTagsForResourceInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ListTagsForResourceInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ListTagsForResourceInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ListTagsForResourceInput"}
+	if s.ResourceArn == nil {
+		invalidParams.Add(request.NewErrParamRequired("ResourceArn"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetResourceArn sets the ResourceArn field's value.
+func (s *ListTagsForResourceInput) SetResourceArn(v string) *ListTagsForResourceInput {
+	s.ResourceArn = &v
+	return s
+}
+
+type ListTagsForResourceOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The tags for the resource.
+	Tags []*Tag `locationName:"tags" type:"list"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ListTagsForResourceOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ListTagsForResourceOutput) GoString() string {
+	return s.String()
+}
+
+// SetTags sets the Tags field's value.
+func (s *ListTagsForResourceOutput) SetTags(v []*Tag) *ListTagsForResourceOutput {
+	s.Tags = v
 	return s
 }
 
@@ -7297,10 +14928,10 @@ type ListTaskDefinitionFamiliesInput struct {
 	// if applicable.
 	MaxResults *int64 `locationName:"maxResults" type:"integer"`
 
-	// The nextToken value returned from a previous paginated ListTaskDefinitionFamilies
-	// request where maxResults was used and the results exceeded the value of that
-	// parameter. Pagination continues from the end of the previous results that
-	// returned the nextToken value.
+	// The nextToken value returned from a ListTaskDefinitionFamilies request indicating
+	// that more results are available to fulfill the request and further calls
+	// will be needed. If maxResults was provided, it is possible the number of
+	// results to be fewer than maxResults.
 	//
 	// This token should be treated as an opaque identifier that is only used to
 	// retrieve the next items in a list and not for other programmatic purposes.
@@ -7316,12 +14947,20 @@ type ListTaskDefinitionFamiliesInput struct {
 	Status *string `locationName:"status" type:"string" enum:"TaskDefinitionFamilyStatus"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListTaskDefinitionFamiliesInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListTaskDefinitionFamiliesInput) GoString() string {
 	return s.String()
 }
@@ -7364,12 +15003,20 @@ type ListTaskDefinitionFamiliesOutput struct {
 	NextToken *string `locationName:"nextToken" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListTaskDefinitionFamiliesOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListTaskDefinitionFamiliesOutput) GoString() string {
 	return s.String()
 }
@@ -7403,10 +15050,10 @@ type ListTaskDefinitionsInput struct {
 	// returns up to 100 results and a nextToken value if applicable.
 	MaxResults *int64 `locationName:"maxResults" type:"integer"`
 
-	// The nextToken value returned from a previous paginated ListTaskDefinitions
-	// request where maxResults was used and the results exceeded the value of that
-	// parameter. Pagination continues from the end of the previous results that
-	// returned the nextToken value.
+	// The nextToken value returned from a ListTaskDefinitions request indicating
+	// that more results are available to fulfill the request and further calls
+	// will be needed. If maxResults was provided, it is possible the number of
+	// results to be fewer than maxResults.
 	//
 	// This token should be treated as an opaque identifier that is only used to
 	// retrieve the next items in a list and not for other programmatic purposes.
@@ -7428,12 +15075,20 @@ type ListTaskDefinitionsInput struct {
 	Status *string `locationName:"status" type:"string" enum:"TaskDefinitionStatus"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListTaskDefinitionsInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListTaskDefinitionsInput) GoString() string {
 	return s.String()
 }
@@ -7482,12 +15137,20 @@ type ListTaskDefinitionsOutput struct {
 	TaskDefinitionArns []*string `locationName:"taskDefinitionArns" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListTaskDefinitionsOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListTaskDefinitionsOutput) GoString() string {
 	return s.String()
 }
@@ -7507,33 +15170,34 @@ func (s *ListTaskDefinitionsOutput) SetTaskDefinitionArns(v []*string) *ListTask
 type ListTasksInput struct {
 	_ struct{} `type:"structure"`
 
-	// The short name or full Amazon Resource Name (ARN) of the cluster that hosts
-	// the tasks to list. If you do not specify a cluster, the default cluster is
-	// assumed.
+	// The short name or full Amazon Resource Name (ARN) of the cluster to use when
+	// filtering the ListTasks results. If you do not specify a cluster, the default
+	// cluster is assumed.
 	Cluster *string `locationName:"cluster" type:"string"`
 
-	// The container instance ID or full ARN of the container instance with which
-	// to filter the ListTasks results. Specifying a containerInstance limits the
+	// The container instance ID or full ARN of the container instance to use when
+	// filtering the ListTasks results. Specifying a containerInstance limits the
 	// results to tasks that belong to that container instance.
 	ContainerInstance *string `locationName:"containerInstance" type:"string"`
 
-	// The task desired status with which to filter the ListTasks results. Specifying
+	// The task desired status to use when filtering the ListTasks results. Specifying
 	// a desiredStatus of STOPPED limits the results to tasks that Amazon ECS has
-	// set the desired status to STOPPED, which can be useful for debugging tasks
+	// set the desired status to STOPPED. This can be useful for debugging tasks
 	// that are not starting properly or have died or finished. The default status
 	// filter is RUNNING, which shows tasks that Amazon ECS has set the desired
 	// status to RUNNING.
 	//
 	// Although you can filter results based on a desired status of PENDING, this
-	// does not return any results because Amazon ECS never sets the desired status
-	// of a task to that value (only a task's lastStatus may have a value of PENDING).
+	// does not return any results. Amazon ECS never sets the desired status of
+	// a task to that value (only a task's lastStatus may have a value of PENDING).
 	DesiredStatus *string `locationName:"desiredStatus" type:"string" enum:"DesiredStatus"`
 
-	// The name of the family with which to filter the ListTasks results. Specifying
-	// a family limits the results to tasks that belong to that family.
+	// The name of the task definition family to use when filtering the ListTasks
+	// results. Specifying a family limits the results to tasks that belong to that
+	// family.
 	Family *string `locationName:"family" type:"string"`
 
-	// The launch type for services to list.
+	// The launch type to use when filtering the ListTasks results.
 	LaunchType *string `locationName:"launchType" type:"string" enum:"LaunchType"`
 
 	// The maximum number of task results returned by ListTasks in paginated output.
@@ -7545,16 +15209,16 @@ type ListTasksInput struct {
 	// value if applicable.
 	MaxResults *int64 `locationName:"maxResults" type:"integer"`
 
-	// The nextToken value returned from a previous paginated ListTasks request
-	// where maxResults was used and the results exceeded the value of that parameter.
-	// Pagination continues from the end of the previous results that returned the
-	// nextToken value.
+	// The nextToken value returned from a ListTasks request indicating that more
+	// results are available to fulfill the request and further calls will be needed.
+	// If maxResults was provided, it is possible the number of results to be fewer
+	// than maxResults.
 	//
 	// This token should be treated as an opaque identifier that is only used to
 	// retrieve the next items in a list and not for other programmatic purposes.
 	NextToken *string `locationName:"nextToken" type:"string"`
 
-	// The name of the service with which to filter the ListTasks results. Specifying
+	// The name of the service to use when filtering the ListTasks results. Specifying
 	// a serviceName limits the results to tasks that belong to that service.
 	ServiceName *string `locationName:"serviceName" type:"string"`
 
@@ -7563,12 +15227,20 @@ type ListTasksInput struct {
 	StartedBy *string `locationName:"startedBy" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListTasksInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListTasksInput) GoString() string {
 	return s.String()
 }
@@ -7640,12 +15312,20 @@ type ListTasksOutput struct {
 	TaskArns []*string `locationName:"taskArns" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListTasksOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ListTasksOutput) GoString() string {
 	return s.String()
 }
@@ -7662,14 +15342,10 @@ func (s *ListTasksOutput) SetTaskArns(v []*string) *ListTasksOutput {
 	return s
 }
 
-// Details on a load balancer that is used with a service.
+// The load balancer configuration to use with a service or task set.
 //
-// Services with tasks that use the awsvpc network mode (for example, those
-// with the Fargate launch type) only support Application Load Balancers and
-// Network Load Balancers; Classic Load Balancers are not supported. Also, when
-// you create any target groups for these services, you must choose ip as the
-// target type, not instance, because tasks that use the awsvpc network mode
-// are associated with an elastic network interface, not an Amazon EC2 instance.
+// For specific notes and restrictions regarding the use of load balancers with
+// services and task sets, see the CreateService and CreateTaskSet actions.
 type LoadBalancer struct {
 	_ struct{} `type:"structure"`
 
@@ -7678,30 +15354,59 @@ type LoadBalancer struct {
 	ContainerName *string `locationName:"containerName" type:"string"`
 
 	// The port on the container to associate with the load balancer. This port
-	// must correspond to a containerPort in the service's task definition. Your
-	// container instances must allow ingress traffic on the hostPort of the port
-	// mapping.
+	// must correspond to a containerPort in the task definition the tasks in the
+	// service are using. For tasks that use the EC2 launch type, the container
+	// instance they are launched on must allow ingress traffic on the hostPort
+	// of the port mapping.
 	ContainerPort *int64 `locationName:"containerPort" type:"integer"`
 
-	// The name of a load balancer.
+	// The name of the load balancer to associate with the Amazon ECS service or
+	// task set.
+	//
+	// A load balancer name is only specified when using a Classic Load Balancer.
+	// If you are using an Application Load Balancer or a Network Load Balancer
+	// the load balancer name parameter should be omitted.
 	LoadBalancerName *string `locationName:"loadBalancerName" type:"string"`
 
 	// The full Amazon Resource Name (ARN) of the Elastic Load Balancing target
-	// group associated with a service.
+	// group or groups associated with a service or task set.
+	//
+	// A target group ARN is only specified when using an Application Load Balancer
+	// or Network Load Balancer. If you are using a Classic Load Balancer the target
+	// group ARN should be omitted.
+	//
+	// For services using the ECS deployment controller, you can specify one or
+	// multiple target groups. For more information, see Registering Multiple Target
+	// Groups with a Service (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/register-multiple-targetgroups.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	//
+	// For services using the CODE_DEPLOY deployment controller, you are required
+	// to define two target groups for the load balancer. For more information,
+	// see Blue/Green Deployment with CodeDeploy (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-bluegreen.html)
+	// in the Amazon Elastic Container Service Developer Guide.
 	//
 	// If your service's task definition uses the awsvpc network mode (which is
 	// required for the Fargate launch type), you must choose ip as the target type,
-	// not instance, because tasks that use the awsvpc network mode are associated
-	// with an elastic network interface, not an Amazon EC2 instance.
+	// not instance, when creating your target groups because tasks that use the
+	// awsvpc network mode are associated with an elastic network interface, not
+	// an Amazon EC2 instance.
 	TargetGroupArn *string `locationName:"targetGroupArn" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s LoadBalancer) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s LoadBalancer) GoString() string {
 	return s.String()
 }
@@ -7730,28 +15435,65 @@ func (s *LoadBalancer) SetTargetGroupArn(v string) *LoadBalancer {
 	return s
 }
 
-// Log configuration options to send to a custom log driver for the container.
+// The log configuration for the container. This parameter maps to LogConfig
+// in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+// and the --log-driver option to docker run (https://docs.docker.com/engine/reference/commandline/run/).
+//
+// By default, containers use the same logging driver that the Docker daemon
+// uses; however the container may use a different logging driver than the Docker
+// daemon by specifying a log driver configuration in the container definition.
+// For more information on the options for different supported log drivers,
+// see Configure logging drivers (https://docs.docker.com/engine/admin/logging/overview/)
+// in the Docker documentation.
+//
+// The following should be noted when specifying a log configuration for your
+// containers:
+//
+//    * Amazon ECS currently supports a subset of the logging drivers available
+//    to the Docker daemon (shown in the valid values below). Additional log
+//    drivers may be available in future releases of the Amazon ECS container
+//    agent.
+//
+//    * This parameter requires version 1.18 of the Docker Remote API or greater
+//    on your container instance.
+//
+//    * For tasks hosted on Amazon EC2 instances, the Amazon ECS container agent
+//    must register the available logging drivers with the ECS_AVAILABLE_LOGGING_DRIVERS
+//    environment variable before containers placed on that instance can use
+//    these log configuration options. For more information, see Amazon ECS
+//    container agent configuration (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-config.html)
+//    in the Amazon Elastic Container Service Developer Guide.
+//
+//    * For tasks on Fargate, because you do not have access to the underlying
+//    infrastructure your tasks are hosted on, any additional software needed
+//    will have to be installed outside of the task. For example, the Fluentd
+//    output aggregators or a remote host running Logstash to send Gelf logs
+//    to.
 type LogConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// The log driver to use for the container. The valid values listed for this
-	// parameter are log drivers that the Amazon ECS container agent can communicate
-	// with by default. If using the Fargate launch type, the only supported value
-	// is awslogs. For more information about using the awslogs driver, see Using
-	// the awslogs Log Driver (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html)
+	// The log driver to use for the container.
+	//
+	// For tasks on Fargate, the supported log drivers are awslogs, splunk, and
+	// awsfirelens.
+	//
+	// For tasks hosted on Amazon EC2 instances, the supported log drivers are awslogs,
+	// fluentd, gelf, json-file, journald, logentries,syslog, splunk, and awsfirelens.
+	//
+	// For more information about using the awslogs log driver, see Using the awslogs
+	// log driver (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	//
-	// If you have a custom driver that is not listed above that you would like
-	// to work with the Amazon ECS container agent, you can fork the Amazon ECS
+	// For more information about using the awsfirelens log driver, see Custom log
+	// routing (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_firelens.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	//
+	// If you have a custom driver that is not listed, you can fork the Amazon ECS
 	// container agent project that is available on GitHub (https://github.com/aws/amazon-ecs-agent)
 	// and customize it to work with that driver. We encourage you to submit pull
-	// requests for changes that you would like to have included. However, Amazon
-	// Web Services does not currently support running modified copies of this software.
-	//
-	// This parameter requires version 1.18 of the Docker Remote API or greater
-	// on your container instance. To check the Docker Remote API version on your
-	// container instance, log in to your container instance and run the following
-	// command: sudo docker version | grep "Server API version"
+	// requests for changes that you would like to have included. However, we do
+	// not currently provide support for running modified copies of this software.
 	//
 	// LogDriver is a required field
 	LogDriver *string `locationName:"logDriver" type:"string" required:"true" enum:"LogDriver"`
@@ -7760,16 +15502,29 @@ type LogConfiguration struct {
 	// version 1.19 of the Docker Remote API or greater on your container instance.
 	// To check the Docker Remote API version on your container instance, log in
 	// to your container instance and run the following command: sudo docker version
-	// | grep "Server API version"
+	// --format '{{.Server.APIVersion}}'
 	Options map[string]*string `locationName:"options" type:"map"`
+
+	// The secrets to pass to the log configuration. For more information, see Specifying
+	// Sensitive Data (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	SecretOptions []*Secret `locationName:"secretOptions" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s LogConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s LogConfiguration) GoString() string {
 	return s.String()
 }
@@ -7779,6 +15534,16 @@ func (s *LogConfiguration) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "LogConfiguration"}
 	if s.LogDriver == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogDriver"))
+	}
+	if s.SecretOptions != nil {
+		for i, v := range s.SecretOptions {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "SecretOptions", i), err.(request.ErrInvalidParams))
+			}
+		}
 	}
 
 	if invalidParams.Len() > 0 {
@@ -7799,6 +15564,329 @@ func (s *LogConfiguration) SetOptions(v map[string]*string) *LogConfiguration {
 	return s
 }
 
+// SetSecretOptions sets the SecretOptions field's value.
+func (s *LogConfiguration) SetSecretOptions(v []*Secret) *LogConfiguration {
+	s.SecretOptions = v
+	return s
+}
+
+// Details about the managed agent status for the container.
+type ManagedAgent struct {
+	_ struct{} `type:"structure"`
+
+	// The Unix timestamp for when the managed agent was last started.
+	LastStartedAt *time.Time `locationName:"lastStartedAt" type:"timestamp"`
+
+	// The last known status of the managed agent.
+	LastStatus *string `locationName:"lastStatus" type:"string"`
+
+	// The name of the managed agent. When the execute command feature is enabled,
+	// the managed agent name is ExecuteCommandAgent.
+	Name *string `locationName:"name" type:"string" enum:"ManagedAgentName"`
+
+	// The reason for why the managed agent is in the state it is in.
+	Reason *string `locationName:"reason" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ManagedAgent) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ManagedAgent) GoString() string {
+	return s.String()
+}
+
+// SetLastStartedAt sets the LastStartedAt field's value.
+func (s *ManagedAgent) SetLastStartedAt(v time.Time) *ManagedAgent {
+	s.LastStartedAt = &v
+	return s
+}
+
+// SetLastStatus sets the LastStatus field's value.
+func (s *ManagedAgent) SetLastStatus(v string) *ManagedAgent {
+	s.LastStatus = &v
+	return s
+}
+
+// SetName sets the Name field's value.
+func (s *ManagedAgent) SetName(v string) *ManagedAgent {
+	s.Name = &v
+	return s
+}
+
+// SetReason sets the Reason field's value.
+func (s *ManagedAgent) SetReason(v string) *ManagedAgent {
+	s.Reason = &v
+	return s
+}
+
+// An object representing a change in state for a managed agent.
+type ManagedAgentStateChange struct {
+	_ struct{} `type:"structure"`
+
+	// The name of the container associated with the managed agent.
+	//
+	// ContainerName is a required field
+	ContainerName *string `locationName:"containerName" type:"string" required:"true"`
+
+	// The name of the managed agent.
+	//
+	// ManagedAgentName is a required field
+	ManagedAgentName *string `locationName:"managedAgentName" type:"string" required:"true" enum:"ManagedAgentName"`
+
+	// The reason for the status of the managed agent.
+	Reason *string `locationName:"reason" type:"string"`
+
+	// The status of the managed agent.
+	//
+	// Status is a required field
+	Status *string `locationName:"status" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ManagedAgentStateChange) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ManagedAgentStateChange) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ManagedAgentStateChange) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ManagedAgentStateChange"}
+	if s.ContainerName == nil {
+		invalidParams.Add(request.NewErrParamRequired("ContainerName"))
+	}
+	if s.ManagedAgentName == nil {
+		invalidParams.Add(request.NewErrParamRequired("ManagedAgentName"))
+	}
+	if s.Status == nil {
+		invalidParams.Add(request.NewErrParamRequired("Status"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetContainerName sets the ContainerName field's value.
+func (s *ManagedAgentStateChange) SetContainerName(v string) *ManagedAgentStateChange {
+	s.ContainerName = &v
+	return s
+}
+
+// SetManagedAgentName sets the ManagedAgentName field's value.
+func (s *ManagedAgentStateChange) SetManagedAgentName(v string) *ManagedAgentStateChange {
+	s.ManagedAgentName = &v
+	return s
+}
+
+// SetReason sets the Reason field's value.
+func (s *ManagedAgentStateChange) SetReason(v string) *ManagedAgentStateChange {
+	s.Reason = &v
+	return s
+}
+
+// SetStatus sets the Status field's value.
+func (s *ManagedAgentStateChange) SetStatus(v string) *ManagedAgentStateChange {
+	s.Status = &v
+	return s
+}
+
+// The managed scaling settings for the Auto Scaling group capacity provider.
+//
+// When managed scaling is enabled, Amazon ECS manages the scale-in and scale-out
+// actions of the Auto Scaling group. Amazon ECS manages a target tracking scaling
+// policy using an Amazon ECS-managed CloudWatch metric with the specified targetCapacity
+// value as the target value for the metric. For more information, see Using
+// Managed Scaling (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/asg-capacity-providers.html#asg-capacity-providers-managed-scaling)
+// in the Amazon Elastic Container Service Developer Guide.
+//
+// If managed scaling is disabled, the user must manage the scaling of the Auto
+// Scaling group.
+type ManagedScaling struct {
+	_ struct{} `type:"structure"`
+
+	// The period of time, in seconds, after a newly launched Amazon EC2 instance
+	// can contribute to CloudWatch metrics for Auto Scaling group. If this parameter
+	// is omitted, the default value of 300 seconds is used.
+	InstanceWarmupPeriod *int64 `locationName:"instanceWarmupPeriod" type:"integer"`
+
+	// The maximum number of container instances that Amazon ECS will scale in or
+	// scale out at one time. If this parameter is omitted, the default value of
+	// 10000 is used.
+	MaximumScalingStepSize *int64 `locationName:"maximumScalingStepSize" min:"1" type:"integer"`
+
+	// The minimum number of container instances that Amazon ECS will scale in or
+	// scale out at one time. If this parameter is omitted, the default value of
+	// 1 is used.
+	MinimumScalingStepSize *int64 `locationName:"minimumScalingStepSize" min:"1" type:"integer"`
+
+	// Whether or not to enable managed scaling for the capacity provider.
+	Status *string `locationName:"status" type:"string" enum:"ManagedScalingStatus"`
+
+	// The target capacity value for the capacity provider. The specified value
+	// must be greater than 0 and less than or equal to 100. A value of 100 will
+	// result in the Amazon EC2 instances in your Auto Scaling group being completely
+	// utilized.
+	TargetCapacity *int64 `locationName:"targetCapacity" min:"1" type:"integer"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ManagedScaling) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ManagedScaling) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ManagedScaling) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ManagedScaling"}
+	if s.MaximumScalingStepSize != nil && *s.MaximumScalingStepSize < 1 {
+		invalidParams.Add(request.NewErrParamMinValue("MaximumScalingStepSize", 1))
+	}
+	if s.MinimumScalingStepSize != nil && *s.MinimumScalingStepSize < 1 {
+		invalidParams.Add(request.NewErrParamMinValue("MinimumScalingStepSize", 1))
+	}
+	if s.TargetCapacity != nil && *s.TargetCapacity < 1 {
+		invalidParams.Add(request.NewErrParamMinValue("TargetCapacity", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetInstanceWarmupPeriod sets the InstanceWarmupPeriod field's value.
+func (s *ManagedScaling) SetInstanceWarmupPeriod(v int64) *ManagedScaling {
+	s.InstanceWarmupPeriod = &v
+	return s
+}
+
+// SetMaximumScalingStepSize sets the MaximumScalingStepSize field's value.
+func (s *ManagedScaling) SetMaximumScalingStepSize(v int64) *ManagedScaling {
+	s.MaximumScalingStepSize = &v
+	return s
+}
+
+// SetMinimumScalingStepSize sets the MinimumScalingStepSize field's value.
+func (s *ManagedScaling) SetMinimumScalingStepSize(v int64) *ManagedScaling {
+	s.MinimumScalingStepSize = &v
+	return s
+}
+
+// SetStatus sets the Status field's value.
+func (s *ManagedScaling) SetStatus(v string) *ManagedScaling {
+	s.Status = &v
+	return s
+}
+
+// SetTargetCapacity sets the TargetCapacity field's value.
+func (s *ManagedScaling) SetTargetCapacity(v int64) *ManagedScaling {
+	s.TargetCapacity = &v
+	return s
+}
+
+// Amazon ECS is unable to determine the current version of the Amazon ECS container
+// agent on the container instance and does not have enough information to proceed
+// with an update. This could be because the agent running on the container
+// instance is an older or custom version that does not use our version information.
+type MissingVersionException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s MissingVersionException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s MissingVersionException) GoString() string {
+	return s.String()
+}
+
+func newErrorMissingVersionException(v protocol.ResponseMetadata) error {
+	return &MissingVersionException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *MissingVersionException) Code() string {
+	return "MissingVersionException"
+}
+
+// Message returns the exception's message.
+func (s *MissingVersionException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *MissingVersionException) OrigErr() error {
+	return nil
+}
+
+func (s *MissingVersionException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *MissingVersionException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *MissingVersionException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
 // Details on a volume mount point that is used in a container definition.
 type MountPoint struct {
 	_ struct{} `type:"structure"`
@@ -7811,16 +15899,25 @@ type MountPoint struct {
 	// value is false.
 	ReadOnly *bool `locationName:"readOnly" type:"boolean"`
 
-	// The name of the volume to mount.
+	// The name of the volume to mount. Must be a volume name referenced in the
+	// name parameter of task definition volume.
 	SourceVolume *string `locationName:"sourceVolume" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s MountPoint) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s MountPoint) GoString() string {
 	return s.String()
 }
@@ -7863,12 +15960,20 @@ type NetworkBinding struct {
 	Protocol *string `locationName:"protocol" type:"string" enum:"TransportProtocol"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s NetworkBinding) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s NetworkBinding) GoString() string {
 	return s.String()
 }
@@ -7907,12 +16012,20 @@ type NetworkConfiguration struct {
 	AwsvpcConfiguration *AwsVpcConfiguration `locationName:"awsvpcConfiguration" type:"structure"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s NetworkConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s NetworkConfiguration) GoString() string {
 	return s.String()
 }
@@ -7953,12 +16066,20 @@ type NetworkInterface struct {
 	PrivateIpv4Address *string `locationName:"privateIpv4Address" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s NetworkInterface) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s NetworkInterface) GoString() string {
 	return s.String()
 }
@@ -7981,31 +16102,108 @@ func (s *NetworkInterface) SetPrivateIpv4Address(v string) *NetworkInterface {
 	return s
 }
 
+// There is no update available for this Amazon ECS container agent. This could
+// be because the agent is already running the latest version, or it is so old
+// that there is no update path to the current version.
+type NoUpdateAvailableException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s NoUpdateAvailableException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s NoUpdateAvailableException) GoString() string {
+	return s.String()
+}
+
+func newErrorNoUpdateAvailableException(v protocol.ResponseMetadata) error {
+	return &NoUpdateAvailableException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *NoUpdateAvailableException) Code() string {
+	return "NoUpdateAvailableException"
+}
+
+// Message returns the exception's message.
+func (s *NoUpdateAvailableException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *NoUpdateAvailableException) OrigErr() error {
+	return nil
+}
+
+func (s *NoUpdateAvailableException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *NoUpdateAvailableException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *NoUpdateAvailableException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
 // An object representing a constraint on task placement. For more information,
-// see Task Placement Constraints (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html)
+// see Task Placement Constraints (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html)
 // in the Amazon Elastic Container Service Developer Guide.
+//
+// If you are using the Fargate launch type, task placement constraints are
+// not supported.
 type PlacementConstraint struct {
 	_ struct{} `type:"structure"`
 
-	// A cluster query language expression to apply to the constraint. You cannot
-	// specify an expression if the constraint type is distinctInstance. For more
-	// information, see Cluster Query Language (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/cluster-query-language.html)
+	// A cluster query language expression to apply to the constraint. The expression
+	// can have a maximum length of 2000 characters. You can't specify an expression
+	// if the constraint type is distinctInstance. For more information, see Cluster
+	// query language (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cluster-query-language.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	Expression *string `locationName:"expression" type:"string"`
 
 	// The type of constraint. Use distinctInstance to ensure that each task in
 	// a particular group is running on a different container instance. Use memberOf
-	// to restrict the selection to a group of valid candidates. The value distinctInstance
-	// is not supported in task definitions.
+	// to restrict the selection to a group of valid candidates.
 	Type *string `locationName:"type" type:"string" enum:"PlacementConstraintType"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s PlacementConstraint) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s PlacementConstraint) GoString() string {
 	return s.String()
 }
@@ -8023,7 +16221,7 @@ func (s *PlacementConstraint) SetType(v string) *PlacementConstraint {
 }
 
 // The task placement strategy for a task or service. For more information,
-// see Task Placement Strategies (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-strategies.html)
+// see Task Placement Strategies (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-strategies.html)
 // in the Amazon Elastic Container Service Developer Guide.
 type PlacementStrategy struct {
 	_ struct{} `type:"structure"`
@@ -8046,12 +16244,20 @@ type PlacementStrategy struct {
 	Type *string `locationName:"type" type:"string" enum:"PlacementStrategyType"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s PlacementStrategy) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s PlacementStrategy) GoString() string {
 	return s.String()
 }
@@ -8068,13 +16274,210 @@ func (s *PlacementStrategy) SetType(v string) *PlacementStrategy {
 	return s
 }
 
+// The devices that are available on the container instance. The only supported
+// device type is a GPU.
+type PlatformDevice struct {
+	_ struct{} `type:"structure"`
+
+	// The ID for the GPU(s) on the container instance. The available GPU IDs can
+	// also be obtained on the container instance in the /var/lib/ecs/gpu/nvidia_gpu_info.json
+	// file.
+	//
+	// Id is a required field
+	Id *string `locationName:"id" type:"string" required:"true"`
+
+	// The type of device that is available on the container instance. The only
+	// supported value is GPU.
+	//
+	// Type is a required field
+	Type *string `locationName:"type" type:"string" required:"true" enum:"PlatformDeviceType"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PlatformDevice) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PlatformDevice) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PlatformDevice) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PlatformDevice"}
+	if s.Id == nil {
+		invalidParams.Add(request.NewErrParamRequired("Id"))
+	}
+	if s.Type == nil {
+		invalidParams.Add(request.NewErrParamRequired("Type"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetId sets the Id field's value.
+func (s *PlatformDevice) SetId(v string) *PlatformDevice {
+	s.Id = &v
+	return s
+}
+
+// SetType sets the Type field's value.
+func (s *PlatformDevice) SetType(v string) *PlatformDevice {
+	s.Type = &v
+	return s
+}
+
+// The specified platform version does not satisfy the task definition's required
+// capabilities.
+type PlatformTaskDefinitionIncompatibilityException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PlatformTaskDefinitionIncompatibilityException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PlatformTaskDefinitionIncompatibilityException) GoString() string {
+	return s.String()
+}
+
+func newErrorPlatformTaskDefinitionIncompatibilityException(v protocol.ResponseMetadata) error {
+	return &PlatformTaskDefinitionIncompatibilityException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *PlatformTaskDefinitionIncompatibilityException) Code() string {
+	return "PlatformTaskDefinitionIncompatibilityException"
+}
+
+// Message returns the exception's message.
+func (s *PlatformTaskDefinitionIncompatibilityException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *PlatformTaskDefinitionIncompatibilityException) OrigErr() error {
+	return nil
+}
+
+func (s *PlatformTaskDefinitionIncompatibilityException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *PlatformTaskDefinitionIncompatibilityException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *PlatformTaskDefinitionIncompatibilityException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
+// The specified platform version does not exist.
+type PlatformUnknownException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PlatformUnknownException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PlatformUnknownException) GoString() string {
+	return s.String()
+}
+
+func newErrorPlatformUnknownException(v protocol.ResponseMetadata) error {
+	return &PlatformUnknownException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *PlatformUnknownException) Code() string {
+	return "PlatformUnknownException"
+}
+
+// Message returns the exception's message.
+func (s *PlatformUnknownException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *PlatformUnknownException) OrigErr() error {
+	return nil
+}
+
+func (s *PlatformUnknownException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *PlatformUnknownException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *PlatformUnknownException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
 // Port mappings allow containers to access ports on the host container instance
 // to send or receive traffic. Port mappings are specified as part of the container
 // definition.
 //
-// If using containers in a task with the awsvpc or host network mode, exposed
-// ports should be specified using containerPort. The hostPort can be left blank
-// or it must be the same value as the containerPort.
+// If you are using containers in a task with the awsvpc or host network mode,
+// exposed ports should be specified using containerPort. The hostPort can be
+// left blank or it must be the same value as the containerPort.
+//
+// You cannot expose the same container port for multiple protocols. An error
+// will be returned if this is attempted
 //
 // After a task reaches the RUNNING status, manual and automatic host and container
 // port assignments are visible in the networkBindings section of DescribeTasks
@@ -8085,45 +16488,45 @@ type PortMapping struct {
 	// The port number on the container that is bound to the user-specified or automatically
 	// assigned host port.
 	//
-	// If using containers in a task with the awsvpc or host network mode, exposed
-	// ports should be specified using containerPort.
+	// If you are using containers in a task with the awsvpc or host network mode,
+	// exposed ports should be specified using containerPort.
 	//
-	// If using containers in a task with the bridge network mode and you specify
-	// a container port and not a host port, your container automatically receives
-	// a host port in the ephemeral port range (for more information, see hostPort).
-	// Port mappings that are automatically assigned in this way do not count toward
-	// the 100 reserved ports limit of a container instance.
+	// If you are using containers in a task with the bridge network mode and you
+	// specify a container port and not a host port, your container automatically
+	// receives a host port in the ephemeral port range. For more information, see
+	// hostPort. Port mappings that are automatically assigned in this way do not
+	// count toward the 100 reserved ports limit of a container instance.
 	ContainerPort *int64 `locationName:"containerPort" type:"integer"`
 
 	// The port number on the container instance to reserve for your container.
 	//
-	// If using containers in a task with the awsvpc or host network mode, the hostPort
-	// can either be left blank or set to the same value as the containerPort.
+	// If you are using containers in a task with the awsvpc or host network mode,
+	// the hostPort can either be left blank or set to the same value as the containerPort.
 	//
-	// If using containers in a task with the bridge network mode, you can specify
-	// a non-reserved host port for your container port mapping, or you can omit
-	// the hostPort (or set it to 0) while specifying a containerPort and your container
-	// automatically receives a port in the ephemeral port range for your container
-	// instance operating system and Docker version.
+	// If you are using containers in a task with the bridge network mode, you can
+	// specify a non-reserved host port for your container port mapping, or you
+	// can omit the hostPort (or set it to 0) while specifying a containerPort and
+	// your container automatically receives a port in the ephemeral port range
+	// for your container instance operating system and Docker version.
 	//
 	// The default ephemeral port range for Docker version 1.6.0 and later is listed
-	// on the instance under /proc/sys/net/ipv4/ip_local_port_range; if this kernel
+	// on the instance under /proc/sys/net/ipv4/ip_local_port_range. If this kernel
 	// parameter is unavailable, the default ephemeral port range from 49153 through
-	// 65535 is used. You should not attempt to specify a host port in the ephemeral
-	// port range as these are reserved for automatic assignment. In general, ports
-	// below 32768 are outside of the ephemeral port range.
+	// 65535 is used. Do not attempt to specify a host port in the ephemeral port
+	// range as these are reserved for automatic assignment. In general, ports below
+	// 32768 are outside of the ephemeral port range.
 	//
 	// The default ephemeral port range from 49153 through 65535 is always used
 	// for Docker versions before 1.6.0.
 	//
 	// The default reserved ports are 22 for SSH, the Docker ports 2375 and 2376,
-	// and the Amazon ECS container agent ports 51678 and 51679. Any host port that
+	// and the Amazon ECS container agent ports 51678-51680. Any host port that
 	// was previously specified in a running task is also reserved while the task
 	// is running (after a task stops, the host port is released). The current reserved
 	// ports are displayed in the remainingResources of DescribeContainerInstances
-	// output, and a container instance may have up to 100 reserved ports at a time,
-	// including the default reserved ports (automatically assigned ports do not
-	// count toward the 100 reserved ports limit).
+	// output. A container instance can have up to 100 reserved ports at a time,
+	// including the default reserved ports. Automatically assigned ports don't
+	// count toward the 100 reserved ports limit.
 	HostPort *int64 `locationName:"hostPort" type:"integer"`
 
 	// The protocol used for the port mapping. Valid values are tcp and udp. The
@@ -8131,12 +16534,20 @@ type PortMapping struct {
 	Protocol *string `locationName:"protocol" type:"string" enum:"TransportProtocol"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s PortMapping) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s PortMapping) GoString() string {
 	return s.String()
 }
@@ -8159,6 +16570,321 @@ func (s *PortMapping) SetProtocol(v string) *PortMapping {
 	return s
 }
 
+// The configuration details for the App Mesh proxy.
+//
+// For tasks using the EC2 launch type, the container instances require at least
+// version 1.26.0 of the container agent and at least version 1.26.0-1 of the
+// ecs-init package to enable a proxy configuration. If your container instances
+// are launched from the Amazon ECS-optimized AMI version 20190301 or later,
+// then they contain the required versions of the container agent and ecs-init.
+// For more information, see Amazon ECS-optimized Linux AMI (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html)
+type ProxyConfiguration struct {
+	_ struct{} `type:"structure"`
+
+	// The name of the container that will serve as the App Mesh proxy.
+	//
+	// ContainerName is a required field
+	ContainerName *string `locationName:"containerName" type:"string" required:"true"`
+
+	// The set of network configuration parameters to provide the Container Network
+	// Interface (CNI) plugin, specified as key-value pairs.
+	//
+	//    * IgnoredUID - (Required) The user ID (UID) of the proxy container as
+	//    defined by the user parameter in a container definition. This is used
+	//    to ensure the proxy ignores its own traffic. If IgnoredGID is specified,
+	//    this field can be empty.
+	//
+	//    * IgnoredGID - (Required) The group ID (GID) of the proxy container as
+	//    defined by the user parameter in a container definition. This is used
+	//    to ensure the proxy ignores its own traffic. If IgnoredUID is specified,
+	//    this field can be empty.
+	//
+	//    * AppPorts - (Required) The list of ports that the application uses. Network
+	//    traffic to these ports is forwarded to the ProxyIngressPort and ProxyEgressPort.
+	//
+	//    * ProxyIngressPort - (Required) Specifies the port that incoming traffic
+	//    to the AppPorts is directed to.
+	//
+	//    * ProxyEgressPort - (Required) Specifies the port that outgoing traffic
+	//    from the AppPorts is directed to.
+	//
+	//    * EgressIgnoredPorts - (Required) The egress traffic going to the specified
+	//    ports is ignored and not redirected to the ProxyEgressPort. It can be
+	//    an empty list.
+	//
+	//    * EgressIgnoredIPs - (Required) The egress traffic going to the specified
+	//    IP addresses is ignored and not redirected to the ProxyEgressPort. It
+	//    can be an empty list.
+	Properties []*KeyValuePair `locationName:"properties" type:"list"`
+
+	// The proxy type. The only supported value is APPMESH.
+	Type *string `locationName:"type" type:"string" enum:"ProxyConfigurationType"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ProxyConfiguration) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ProxyConfiguration) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ProxyConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ProxyConfiguration"}
+	if s.ContainerName == nil {
+		invalidParams.Add(request.NewErrParamRequired("ContainerName"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetContainerName sets the ContainerName field's value.
+func (s *ProxyConfiguration) SetContainerName(v string) *ProxyConfiguration {
+	s.ContainerName = &v
+	return s
+}
+
+// SetProperties sets the Properties field's value.
+func (s *ProxyConfiguration) SetProperties(v []*KeyValuePair) *ProxyConfiguration {
+	s.Properties = v
+	return s
+}
+
+// SetType sets the Type field's value.
+func (s *ProxyConfiguration) SetType(v string) *ProxyConfiguration {
+	s.Type = &v
+	return s
+}
+
+type PutAccountSettingDefaultInput struct {
+	_ struct{} `type:"structure"`
+
+	// The resource name for which to modify the account setting. If serviceLongArnFormat
+	// is specified, the ARN for your Amazon ECS services is affected. If taskLongArnFormat
+	// is specified, the ARN and resource ID for your Amazon ECS tasks is affected.
+	// If containerInstanceLongArnFormat is specified, the ARN and resource ID for
+	// your Amazon ECS container instances is affected. If awsvpcTrunking is specified,
+	// the ENI limit for your Amazon ECS container instances is affected. If containerInsights
+	// is specified, the default setting for CloudWatch Container Insights for your
+	// clusters is affected.
+	//
+	// Name is a required field
+	Name *string `locationName:"name" type:"string" required:"true" enum:"SettingName"`
+
+	// The account setting value for the specified principal ARN. Accepted values
+	// are enabled and disabled.
+	//
+	// Value is a required field
+	Value *string `locationName:"value" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PutAccountSettingDefaultInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PutAccountSettingDefaultInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutAccountSettingDefaultInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutAccountSettingDefaultInput"}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+	if s.Value == nil {
+		invalidParams.Add(request.NewErrParamRequired("Value"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetName sets the Name field's value.
+func (s *PutAccountSettingDefaultInput) SetName(v string) *PutAccountSettingDefaultInput {
+	s.Name = &v
+	return s
+}
+
+// SetValue sets the Value field's value.
+func (s *PutAccountSettingDefaultInput) SetValue(v string) *PutAccountSettingDefaultInput {
+	s.Value = &v
+	return s
+}
+
+type PutAccountSettingDefaultOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The current setting for a resource.
+	Setting *Setting `locationName:"setting" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PutAccountSettingDefaultOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PutAccountSettingDefaultOutput) GoString() string {
+	return s.String()
+}
+
+// SetSetting sets the Setting field's value.
+func (s *PutAccountSettingDefaultOutput) SetSetting(v *Setting) *PutAccountSettingDefaultOutput {
+	s.Setting = v
+	return s
+}
+
+type PutAccountSettingInput struct {
+	_ struct{} `type:"structure"`
+
+	// The Amazon ECS resource name for which to modify the account setting. If
+	// serviceLongArnFormat is specified, the ARN for your Amazon ECS services is
+	// affected. If taskLongArnFormat is specified, the ARN and resource ID for
+	// your Amazon ECS tasks is affected. If containerInstanceLongArnFormat is specified,
+	// the ARN and resource ID for your Amazon ECS container instances is affected.
+	// If awsvpcTrunking is specified, the elastic network interface (ENI) limit
+	// for your Amazon ECS container instances is affected. If containerInsights
+	// is specified, the default setting for CloudWatch Container Insights for your
+	// clusters is affected.
+	//
+	// Name is a required field
+	Name *string `locationName:"name" type:"string" required:"true" enum:"SettingName"`
+
+	// The ARN of the principal, which can be an IAM user, IAM role, or the root
+	// user. If you specify the root user, it modifies the account setting for all
+	// IAM users, IAM roles, and the root user of the account unless an IAM user
+	// or role explicitly overrides these settings. If this field is omitted, the
+	// setting is changed only for the authenticated user.
+	//
+	// Federated users assume the account setting of the root user and can't have
+	// explicit account settings set for them.
+	PrincipalArn *string `locationName:"principalArn" type:"string"`
+
+	// The account setting value for the specified principal ARN. Accepted values
+	// are enabled and disabled.
+	//
+	// Value is a required field
+	Value *string `locationName:"value" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PutAccountSettingInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PutAccountSettingInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutAccountSettingInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutAccountSettingInput"}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+	if s.Value == nil {
+		invalidParams.Add(request.NewErrParamRequired("Value"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetName sets the Name field's value.
+func (s *PutAccountSettingInput) SetName(v string) *PutAccountSettingInput {
+	s.Name = &v
+	return s
+}
+
+// SetPrincipalArn sets the PrincipalArn field's value.
+func (s *PutAccountSettingInput) SetPrincipalArn(v string) *PutAccountSettingInput {
+	s.PrincipalArn = &v
+	return s
+}
+
+// SetValue sets the Value field's value.
+func (s *PutAccountSettingInput) SetValue(v string) *PutAccountSettingInput {
+	s.Value = &v
+	return s
+}
+
+type PutAccountSettingOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The current account setting for a resource.
+	Setting *Setting `locationName:"setting" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PutAccountSettingOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PutAccountSettingOutput) GoString() string {
+	return s.String()
+}
+
+// SetSetting sets the Setting field's value.
+func (s *PutAccountSettingOutput) SetSetting(v *Setting) *PutAccountSettingOutput {
+	s.Setting = v
+	return s
+}
+
 type PutAttributesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8175,12 +16901,20 @@ type PutAttributesInput struct {
 	Cluster *string `locationName:"cluster" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s PutAttributesInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s PutAttributesInput) GoString() string {
 	return s.String()
 }
@@ -8227,12 +16961,20 @@ type PutAttributesOutput struct {
 	Attributes []*Attribute `locationName:"attributes" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s PutAttributesOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s PutAttributesOutput) GoString() string {
 	return s.String()
 }
@@ -8240,6 +16982,149 @@ func (s PutAttributesOutput) GoString() string {
 // SetAttributes sets the Attributes field's value.
 func (s *PutAttributesOutput) SetAttributes(v []*Attribute) *PutAttributesOutput {
 	s.Attributes = v
+	return s
+}
+
+type PutClusterCapacityProvidersInput struct {
+	_ struct{} `type:"structure"`
+
+	// The name of one or more capacity providers to associate with the cluster.
+	//
+	// If specifying a capacity provider that uses an Auto Scaling group, the capacity
+	// provider must already be created. New capacity providers can be created with
+	// the CreateCapacityProvider API operation.
+	//
+	// To use a Fargate capacity provider, specify either the FARGATE or FARGATE_SPOT
+	// capacity providers. The Fargate capacity providers are available to all accounts
+	// and only need to be associated with a cluster to be used.
+	//
+	// CapacityProviders is a required field
+	CapacityProviders []*string `locationName:"capacityProviders" type:"list" required:"true"`
+
+	// The short name or full Amazon Resource Name (ARN) of the cluster to modify
+	// the capacity provider settings for. If you do not specify a cluster, the
+	// default cluster is assumed.
+	//
+	// Cluster is a required field
+	Cluster *string `locationName:"cluster" type:"string" required:"true"`
+
+	// The capacity provider strategy to use by default for the cluster.
+	//
+	// When creating a service or running a task on a cluster, if no capacity provider
+	// or launch type is specified then the default capacity provider strategy for
+	// the cluster is used.
+	//
+	// A capacity provider strategy consists of one or more capacity providers along
+	// with the base and weight to assign to them. A capacity provider must be associated
+	// with the cluster to be used in a capacity provider strategy. The PutClusterCapacityProviders
+	// API is used to associate a capacity provider with a cluster. Only capacity
+	// providers with an ACTIVE or UPDATING status can be used.
+	//
+	// If specifying a capacity provider that uses an Auto Scaling group, the capacity
+	// provider must already be created. New capacity providers can be created with
+	// the CreateCapacityProvider API operation.
+	//
+	// To use a Fargate capacity provider, specify either the FARGATE or FARGATE_SPOT
+	// capacity providers. The Fargate capacity providers are available to all accounts
+	// and only need to be associated with a cluster to be used.
+	//
+	// DefaultCapacityProviderStrategy is a required field
+	DefaultCapacityProviderStrategy []*CapacityProviderStrategyItem `locationName:"defaultCapacityProviderStrategy" type:"list" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PutClusterCapacityProvidersInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PutClusterCapacityProvidersInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutClusterCapacityProvidersInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutClusterCapacityProvidersInput"}
+	if s.CapacityProviders == nil {
+		invalidParams.Add(request.NewErrParamRequired("CapacityProviders"))
+	}
+	if s.Cluster == nil {
+		invalidParams.Add(request.NewErrParamRequired("Cluster"))
+	}
+	if s.DefaultCapacityProviderStrategy == nil {
+		invalidParams.Add(request.NewErrParamRequired("DefaultCapacityProviderStrategy"))
+	}
+	if s.DefaultCapacityProviderStrategy != nil {
+		for i, v := range s.DefaultCapacityProviderStrategy {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "DefaultCapacityProviderStrategy", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetCapacityProviders sets the CapacityProviders field's value.
+func (s *PutClusterCapacityProvidersInput) SetCapacityProviders(v []*string) *PutClusterCapacityProvidersInput {
+	s.CapacityProviders = v
+	return s
+}
+
+// SetCluster sets the Cluster field's value.
+func (s *PutClusterCapacityProvidersInput) SetCluster(v string) *PutClusterCapacityProvidersInput {
+	s.Cluster = &v
+	return s
+}
+
+// SetDefaultCapacityProviderStrategy sets the DefaultCapacityProviderStrategy field's value.
+func (s *PutClusterCapacityProvidersInput) SetDefaultCapacityProviderStrategy(v []*CapacityProviderStrategyItem) *PutClusterCapacityProvidersInput {
+	s.DefaultCapacityProviderStrategy = v
+	return s
+}
+
+type PutClusterCapacityProvidersOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Details about the cluster.
+	Cluster *Cluster `locationName:"cluster" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PutClusterCapacityProvidersOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s PutClusterCapacityProvidersOutput) GoString() string {
+	return s.String()
+}
+
+// SetCluster sets the Cluster field's value.
+func (s *PutClusterCapacityProvidersOutput) SetCluster(v *Cluster) *PutClusterCapacityProvidersOutput {
+	s.Cluster = v
 	return s
 }
 
@@ -8266,6 +17151,38 @@ type RegisterContainerInstanceInput struct {
 	// curl http://169.254.169.254/latest/dynamic/instance-identity/signature/
 	InstanceIdentityDocumentSignature *string `locationName:"instanceIdentityDocumentSignature" type:"string"`
 
+	// The devices that are available on the container instance. The only supported
+	// device type is a GPU.
+	PlatformDevices []*PlatformDevice `locationName:"platformDevices" type:"list"`
+
+	// The metadata that you apply to the container instance to help you categorize
+	// and organize them. Each tag consists of a key and an optional value, both
+	// of which you define.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	Tags []*Tag `locationName:"tags" type:"list"`
+
 	// The resources available on the instance.
 	TotalResources []*Resource `locationName:"totalResources" type:"list"`
 
@@ -8274,12 +17191,20 @@ type RegisterContainerInstanceInput struct {
 	VersionInfo *VersionInfo `locationName:"versionInfo" type:"structure"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s RegisterContainerInstanceInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s RegisterContainerInstanceInput) GoString() string {
 	return s.String()
 }
@@ -8294,6 +17219,26 @@ func (s *RegisterContainerInstanceInput) Validate() error {
 			}
 			if err := v.Validate(); err != nil {
 				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Attributes", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+	if s.PlatformDevices != nil {
+		for i, v := range s.PlatformDevices {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "PlatformDevices", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+	if s.Tags != nil {
+		for i, v := range s.Tags {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Tags", i), err.(request.ErrInvalidParams))
 			}
 		}
 	}
@@ -8334,6 +17279,18 @@ func (s *RegisterContainerInstanceInput) SetInstanceIdentityDocumentSignature(v 
 	return s
 }
 
+// SetPlatformDevices sets the PlatformDevices field's value.
+func (s *RegisterContainerInstanceInput) SetPlatformDevices(v []*PlatformDevice) *RegisterContainerInstanceInput {
+	s.PlatformDevices = v
+	return s
+}
+
+// SetTags sets the Tags field's value.
+func (s *RegisterContainerInstanceInput) SetTags(v []*Tag) *RegisterContainerInstanceInput {
+	s.Tags = v
+	return s
+}
+
 // SetTotalResources sets the TotalResources field's value.
 func (s *RegisterContainerInstanceInput) SetTotalResources(v []*Resource) *RegisterContainerInstanceInput {
 	s.TotalResources = v
@@ -8353,12 +17310,20 @@ type RegisterContainerInstanceOutput struct {
 	ContainerInstance *ContainerInstance `locationName:"containerInstance" type:"structure"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s RegisterContainerInstanceOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s RegisterContainerInstanceOutput) GoString() string {
 	return s.String()
 }
@@ -8386,12 +17351,12 @@ type RegisterTaskDefinitionInput struct {
 	// Task-level CPU and memory parameters are ignored for Windows containers.
 	// We recommend specifying container-level resources for Windows containers.
 	//
-	// If using the EC2 launch type, this field is optional. Supported values are
-	// between 128 CPU units (0.125 vCPUs) and 10240 CPU units (10 vCPUs).
+	// If you are using the EC2 launch type, this field is optional. Supported values
+	// are between 128 CPU units (0.125 vCPUs) and 10240 CPU units (10 vCPUs).
 	//
-	// If using the Fargate launch type, this field is required and you must use
-	// one of the following values, which determines your range of supported values
-	// for the memory parameter:
+	// If you are using the Fargate launch type, this field is required and you
+	// must use one of the following values, which determines your range of supported
+	// values for the memory parameter:
 	//
 	//    * 256 (.25 vCPU) - Available memory values: 512 (0.5 GB), 1024 (1 GB),
 	//    2048 (2 GB)
@@ -8409,17 +17374,68 @@ type RegisterTaskDefinitionInput struct {
 	//    (30 GB) in increments of 1024 (1 GB)
 	Cpu *string `locationName:"cpu" type:"string"`
 
-	// The Amazon Resource Name (ARN) of the task execution role that the Amazon
-	// ECS container agent and the Docker daemon can assume.
+	// The amount of ephemeral storage to allocate for the task. This parameter
+	// is used to expand the total amount of ephemeral storage available, beyond
+	// the default amount, for tasks hosted on Fargate. For more information, see
+	// Fargate task storage (https://docs.aws.amazon.com/AmazonECS/latest/userguide/using_data_volumes.html)
+	// in the Amazon ECS User Guide for Fargate.
+	//
+	// This parameter is only supported for tasks hosted on Fargate using the following
+	// platform versions:
+	//
+	//    * Linux platform version 1.4.0 or later.
+	//
+	//    * Windows platform version 1.0.0 or later.
+	EphemeralStorage *EphemeralStorage `locationName:"ephemeralStorage" type:"structure"`
+
+	// The Amazon Resource Name (ARN) of the task execution role that grants the
+	// Amazon ECS container agent permission to make Amazon Web Services API calls
+	// on your behalf. The task execution IAM role is required depending on the
+	// requirements of your task. For more information, see Amazon ECS task execution
+	// IAM role (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html)
+	// in the Amazon Elastic Container Service Developer Guide.
 	ExecutionRoleArn *string `locationName:"executionRoleArn" type:"string"`
 
 	// You must specify a family for a task definition, which allows you to track
 	// multiple versions of the same task definition. The family is used as a name
 	// for your task definition. Up to 255 letters (uppercase and lowercase), numbers,
-	// hyphens, and underscores are allowed.
+	// underscores, and hyphens are allowed.
 	//
 	// Family is a required field
 	Family *string `locationName:"family" type:"string" required:"true"`
+
+	// The Elastic Inference accelerators to use for the containers in the task.
+	InferenceAccelerators []*InferenceAccelerator `locationName:"inferenceAccelerators" type:"list"`
+
+	// The IPC resource namespace to use for the containers in the task. The valid
+	// values are host, task, or none. If host is specified, then all containers
+	// within the tasks that specified the host IPC mode on the same container instance
+	// share the same IPC resources with the host Amazon EC2 instance. If task is
+	// specified, all containers within the specified task share the same IPC resources.
+	// If none is specified, then IPC resources within the containers of a task
+	// are private and not shared with other containers in a task or on the container
+	// instance. If no value is specified, then the IPC resource namespace sharing
+	// depends on the Docker daemon setting on the container instance. For more
+	// information, see IPC settings (https://docs.docker.com/engine/reference/run/#ipc-settings---ipc)
+	// in the Docker run reference.
+	//
+	// If the host IPC mode is used, be aware that there is a heightened risk of
+	// undesired IPC namespace expose. For more information, see Docker security
+	// (https://docs.docker.com/engine/security/security/).
+	//
+	// If you are setting namespaced kernel parameters using systemControls for
+	// the containers in the task, the following will apply to your IPC resource
+	// namespace. For more information, see System Controls (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	//
+	//    * For tasks that use the host IPC mode, IPC namespace related systemControls
+	//    are not supported.
+	//
+	//    * For tasks that use the task IPC mode, IPC namespace related systemControls
+	//    will apply to all containers within a task.
+	//
+	// This parameter is not supported for Windows containers or tasks run on Fargate.
+	IpcMode *string `locationName:"ipcMode" type:"string" enum:"IpcMode"`
 
 	// The amount of memory (in MiB) used by the task. It can be expressed as an
 	// integer using MiB, for example 1024, or as a string using GB, for example
@@ -8452,50 +17468,117 @@ type RegisterTaskDefinitionInput struct {
 	Memory *string `locationName:"memory" type:"string"`
 
 	// The Docker networking mode to use for the containers in the task. The valid
-	// values are none, bridge, awsvpc, and host. The default Docker network mode
-	// is bridge. If using the Fargate launch type, the awsvpc network mode is required.
-	// If using the EC2 launch type, any network mode can be used. If the network
-	// mode is set to none, you can't specify port mappings in your container definitions,
-	// and the task's containers do not have external connectivity. The host and
-	// awsvpc network modes offer the highest networking performance for containers
-	// because they use the EC2 network stack instead of the virtualized network
-	// stack provided by the bridge mode.
+	// values are none, bridge, awsvpc, and host. If no network mode is specified,
+	// the default is bridge.
+	//
+	// For Amazon ECS tasks on Fargate, the awsvpc network mode is required. For
+	// Amazon ECS tasks on Amazon EC2 Linux instances, any network mode can be used.
+	// For Amazon ECS tasks on Amazon EC2 Windows instances, <default> or awsvpc
+	// can be used. If the network mode is set to none, you cannot specify port
+	// mappings in your container definitions, and the tasks containers do not have
+	// external connectivity. The host and awsvpc network modes offer the highest
+	// networking performance for containers because they use the EC2 network stack
+	// instead of the virtualized network stack provided by the bridge mode.
 	//
 	// With the host and awsvpc network modes, exposed container ports are mapped
 	// directly to the corresponding host port (for the host network mode) or the
 	// attached elastic network interface port (for the awsvpc network mode), so
 	// you cannot take advantage of dynamic host port mappings.
 	//
-	// If the network mode is awsvpc, the task is allocated an Elastic Network Interface,
-	// and you must specify a NetworkConfiguration when you create a service or
-	// run a task with the task definition. For more information, see Task Networking
-	// (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html)
+	// When using the host network mode, you should not run containers using the
+	// root user (UID 0). It is considered best practice to use a non-root user.
+	//
+	// If the network mode is awsvpc, the task is allocated an elastic network interface,
+	// and you must specify a NetworkConfiguration value when you create a service
+	// or run a task with the task definition. For more information, see Task Networking
+	// (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	//
-	// If the network mode is host, you can't run multiple instantiations of the
+	// If the network mode is host, you cannot run multiple instantiations of the
 	// same task on a single container instance when port mappings are used.
-	//
-	// Docker for Windows uses different network modes than Docker for Linux. When
-	// you register a task definition with Windows containers, you must not specify
-	// a network mode.
 	//
 	// For more information, see Network settings (https://docs.docker.com/engine/reference/run/#network-settings)
 	// in the Docker run reference.
 	NetworkMode *string `locationName:"networkMode" type:"string" enum:"NetworkMode"`
 
+	// The process namespace to use for the containers in the task. The valid values
+	// are host or task. If host is specified, then all containers within the tasks
+	// that specified the host PID mode on the same container instance share the
+	// same process namespace with the host Amazon EC2 instance. If task is specified,
+	// all containers within the specified task share the same process namespace.
+	// If no value is specified, the default is a private namespace. For more information,
+	// see PID settings (https://docs.docker.com/engine/reference/run/#pid-settings---pid)
+	// in the Docker run reference.
+	//
+	// If the host PID mode is used, be aware that there is a heightened risk of
+	// undesired process namespace expose. For more information, see Docker security
+	// (https://docs.docker.com/engine/security/security/).
+	//
+	// This parameter is not supported for Windows containers or tasks run on Fargate.
+	PidMode *string `locationName:"pidMode" type:"string" enum:"PidMode"`
+
 	// An array of placement constraint objects to use for the task. You can specify
 	// a maximum of 10 constraints per task (this limit includes constraints in
-	// the task definition and those specified at run time).
+	// the task definition and those specified at runtime).
 	PlacementConstraints []*TaskDefinitionPlacementConstraint `locationName:"placementConstraints" type:"list"`
 
-	// The launch type required by the task. If no value is specified, it defaults
-	// to EC2.
+	// The configuration details for the App Mesh proxy.
+	//
+	// For tasks hosted on Amazon EC2 instances, the container instances require
+	// at least version 1.26.0 of the container agent and at least version 1.26.0-1
+	// of the ecs-init package to enable a proxy configuration. If your container
+	// instances are launched from the Amazon ECS-optimized AMI version 20190301
+	// or later, then they contain the required versions of the container agent
+	// and ecs-init. For more information, see Amazon ECS-optimized AMI versions
+	// (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-ami-versions.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	ProxyConfiguration *ProxyConfiguration `locationName:"proxyConfiguration" type:"structure"`
+
+	// The task launch type that Amazon ECS should validate the task definition
+	// against. A client exception is returned if the task definition doesn't validate
+	// against the compatibilities specified. If no value is specified, the parameter
+	// is omitted from the response.
 	RequiresCompatibilities []*string `locationName:"requiresCompatibilities" type:"list"`
+
+	// The operating system that your tasks definitions run on. A platform family
+	// is specified only for tasks using the Fargate launch type.
+	//
+	// When you specify a task definition in a service, this value must match the
+	// runtimePlatform value of the service.
+	RuntimePlatform *RuntimePlatform `locationName:"runtimePlatform" type:"structure"`
+
+	// The metadata that you apply to the task definition to help you categorize
+	// and organize them. Each tag consists of a key and an optional value, both
+	// of which you define.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	Tags []*Tag `locationName:"tags" type:"list"`
 
 	// The short name or full Amazon Resource Name (ARN) of the IAM role that containers
 	// in this task can assume. All containers in this task are granted the permissions
 	// that are specified in this role. For more information, see IAM Roles for
-	// Tasks (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html)
+	// Tasks (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	TaskRoleArn *string `locationName:"taskRoleArn" type:"string"`
 
@@ -8504,12 +17587,20 @@ type RegisterTaskDefinitionInput struct {
 	Volumes []*Volume `locationName:"volumes" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s RegisterTaskDefinitionInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s RegisterTaskDefinitionInput) GoString() string {
 	return s.String()
 }
@@ -8533,6 +17624,46 @@ func (s *RegisterTaskDefinitionInput) Validate() error {
 			}
 		}
 	}
+	if s.EphemeralStorage != nil {
+		if err := s.EphemeralStorage.Validate(); err != nil {
+			invalidParams.AddNested("EphemeralStorage", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.InferenceAccelerators != nil {
+		for i, v := range s.InferenceAccelerators {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "InferenceAccelerators", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+	if s.ProxyConfiguration != nil {
+		if err := s.ProxyConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("ProxyConfiguration", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.Tags != nil {
+		for i, v := range s.Tags {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Tags", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+	if s.Volumes != nil {
+		for i, v := range s.Volumes {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Volumes", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
 
 	if invalidParams.Len() > 0 {
 		return invalidParams
@@ -8552,6 +17683,12 @@ func (s *RegisterTaskDefinitionInput) SetCpu(v string) *RegisterTaskDefinitionIn
 	return s
 }
 
+// SetEphemeralStorage sets the EphemeralStorage field's value.
+func (s *RegisterTaskDefinitionInput) SetEphemeralStorage(v *EphemeralStorage) *RegisterTaskDefinitionInput {
+	s.EphemeralStorage = v
+	return s
+}
+
 // SetExecutionRoleArn sets the ExecutionRoleArn field's value.
 func (s *RegisterTaskDefinitionInput) SetExecutionRoleArn(v string) *RegisterTaskDefinitionInput {
 	s.ExecutionRoleArn = &v
@@ -8561,6 +17698,18 @@ func (s *RegisterTaskDefinitionInput) SetExecutionRoleArn(v string) *RegisterTas
 // SetFamily sets the Family field's value.
 func (s *RegisterTaskDefinitionInput) SetFamily(v string) *RegisterTaskDefinitionInput {
 	s.Family = &v
+	return s
+}
+
+// SetInferenceAccelerators sets the InferenceAccelerators field's value.
+func (s *RegisterTaskDefinitionInput) SetInferenceAccelerators(v []*InferenceAccelerator) *RegisterTaskDefinitionInput {
+	s.InferenceAccelerators = v
+	return s
+}
+
+// SetIpcMode sets the IpcMode field's value.
+func (s *RegisterTaskDefinitionInput) SetIpcMode(v string) *RegisterTaskDefinitionInput {
+	s.IpcMode = &v
 	return s
 }
 
@@ -8576,15 +17725,39 @@ func (s *RegisterTaskDefinitionInput) SetNetworkMode(v string) *RegisterTaskDefi
 	return s
 }
 
+// SetPidMode sets the PidMode field's value.
+func (s *RegisterTaskDefinitionInput) SetPidMode(v string) *RegisterTaskDefinitionInput {
+	s.PidMode = &v
+	return s
+}
+
 // SetPlacementConstraints sets the PlacementConstraints field's value.
 func (s *RegisterTaskDefinitionInput) SetPlacementConstraints(v []*TaskDefinitionPlacementConstraint) *RegisterTaskDefinitionInput {
 	s.PlacementConstraints = v
 	return s
 }
 
+// SetProxyConfiguration sets the ProxyConfiguration field's value.
+func (s *RegisterTaskDefinitionInput) SetProxyConfiguration(v *ProxyConfiguration) *RegisterTaskDefinitionInput {
+	s.ProxyConfiguration = v
+	return s
+}
+
 // SetRequiresCompatibilities sets the RequiresCompatibilities field's value.
 func (s *RegisterTaskDefinitionInput) SetRequiresCompatibilities(v []*string) *RegisterTaskDefinitionInput {
 	s.RequiresCompatibilities = v
+	return s
+}
+
+// SetRuntimePlatform sets the RuntimePlatform field's value.
+func (s *RegisterTaskDefinitionInput) SetRuntimePlatform(v *RuntimePlatform) *RegisterTaskDefinitionInput {
+	s.RuntimePlatform = v
+	return s
+}
+
+// SetTags sets the Tags field's value.
+func (s *RegisterTaskDefinitionInput) SetTags(v []*Tag) *RegisterTaskDefinitionInput {
+	s.Tags = v
 	return s
 }
 
@@ -8603,18 +17776,35 @@ func (s *RegisterTaskDefinitionInput) SetVolumes(v []*Volume) *RegisterTaskDefin
 type RegisterTaskDefinitionOutput struct {
 	_ struct{} `type:"structure"`
 
+	// The list of tags associated with the task definition.
+	Tags []*Tag `locationName:"tags" type:"list"`
+
 	// The full description of the registered task definition.
 	TaskDefinition *TaskDefinition `locationName:"taskDefinition" type:"structure"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s RegisterTaskDefinitionOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s RegisterTaskDefinitionOutput) GoString() string {
 	return s.String()
+}
+
+// SetTags sets the Tags field's value.
+func (s *RegisterTaskDefinitionOutput) SetTags(v []*Tag) *RegisterTaskDefinitionOutput {
+	s.Tags = v
+	return s
 }
 
 // SetTaskDefinition sets the TaskDefinition field's value.
@@ -8627,19 +17817,33 @@ func (s *RegisterTaskDefinitionOutput) SetTaskDefinition(v *TaskDefinition) *Reg
 type RepositoryCredentials struct {
 	_ struct{} `type:"structure"`
 
-	// The Amazon Resource Name (ARN) or name of the secret containing the private
-	// repository credentials.
+	// The Amazon Resource Name (ARN) of the secret containing the private repository
+	// credentials.
+	//
+	// When you are using the Amazon ECS API, CLI, or Amazon Web Services SDK, if
+	// the secret exists in the same Region as the task that you are launching then
+	// you can use either the full ARN or the name of the secret. When you are using
+	// the Amazon Web Services Management Console, you must specify the full ARN
+	// of the secret.
 	//
 	// CredentialsParameter is a required field
 	CredentialsParameter *string `locationName:"credentialsParameter" type:"string" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s RepositoryCredentials) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s RepositoryCredentials) GoString() string {
 	return s.String()
 }
@@ -8690,12 +17894,20 @@ type Resource struct {
 	Type *string `locationName:"type" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Resource) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Resource) GoString() string {
 	return s.String()
 }
@@ -8736,8 +17948,222 @@ func (s *Resource) SetType(v string) *Resource {
 	return s
 }
 
+// The specified resource is in-use and cannot be removed.
+type ResourceInUseException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ResourceInUseException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ResourceInUseException) GoString() string {
+	return s.String()
+}
+
+func newErrorResourceInUseException(v protocol.ResponseMetadata) error {
+	return &ResourceInUseException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *ResourceInUseException) Code() string {
+	return "ResourceInUseException"
+}
+
+// Message returns the exception's message.
+func (s *ResourceInUseException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *ResourceInUseException) OrigErr() error {
+	return nil
+}
+
+func (s *ResourceInUseException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *ResourceInUseException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *ResourceInUseException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
+// The specified resource could not be found.
+type ResourceNotFoundException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ResourceNotFoundException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ResourceNotFoundException) GoString() string {
+	return s.String()
+}
+
+func newErrorResourceNotFoundException(v protocol.ResponseMetadata) error {
+	return &ResourceNotFoundException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *ResourceNotFoundException) Code() string {
+	return "ResourceNotFoundException"
+}
+
+// Message returns the exception's message.
+func (s *ResourceNotFoundException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *ResourceNotFoundException) OrigErr() error {
+	return nil
+}
+
+func (s *ResourceNotFoundException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *ResourceNotFoundException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *ResourceNotFoundException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
+// The type and amount of a resource to assign to a container. The supported
+// resource types are GPUs and Elastic Inference accelerators. For more information,
+// see Working with GPUs on Amazon ECS (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-gpu.html)
+// or Working with Amazon Elastic Inference on Amazon ECS (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-inference.html)
+// in the Amazon Elastic Container Service Developer Guide
+type ResourceRequirement struct {
+	_ struct{} `type:"structure"`
+
+	// The type of resource to assign to a container. The supported values are GPU
+	// or InferenceAccelerator.
+	//
+	// Type is a required field
+	Type *string `locationName:"type" type:"string" required:"true" enum:"ResourceType"`
+
+	// The value for the specified resource type.
+	//
+	// If the GPU type is used, the value is the number of physical GPUs the Amazon
+	// ECS container agent will reserve for the container. The number of GPUs reserved
+	// for all containers in a task should not exceed the number of available GPUs
+	// on the container instance the task is launched on.
+	//
+	// If the InferenceAccelerator type is used, the value should match the deviceName
+	// for an InferenceAccelerator specified in a task definition.
+	//
+	// Value is a required field
+	Value *string `locationName:"value" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ResourceRequirement) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ResourceRequirement) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ResourceRequirement) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ResourceRequirement"}
+	if s.Type == nil {
+		invalidParams.Add(request.NewErrParamRequired("Type"))
+	}
+	if s.Value == nil {
+		invalidParams.Add(request.NewErrParamRequired("Value"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetType sets the Type field's value.
+func (s *ResourceRequirement) SetType(v string) *ResourceRequirement {
+	s.Type = &v
+	return s
+}
+
+// SetValue sets the Value field's value.
+func (s *ResourceRequirement) SetValue(v string) *ResourceRequirement {
+	s.Value = &v
+	return s
+}
+
 type RunTaskInput struct {
 	_ struct{} `type:"structure"`
+
+	// The capacity provider strategy to use for the task.
+	//
+	// If a capacityProviderStrategy is specified, the launchType parameter must
+	// be omitted. If no capacityProviderStrategy or launchType is specified, the
+	// defaultCapacityProviderStrategy for the cluster is used.
+	//
+	// When you use cluster auto scaling, you must specify capacityProviderStrategy
+	// and not launchType.
+	//
+	// A capacity provider strategy may contain a maximum of 6 capacity providers.
+	CapacityProviderStrategy []*CapacityProviderStrategyItem `locationName:"capacityProviderStrategy" type:"list"`
 
 	// The short name or full Amazon Resource Name (ARN) of the cluster on which
 	// to run your task. If you do not specify a cluster, the default cluster is
@@ -8748,17 +18174,48 @@ type RunTaskInput struct {
 	// You can specify up to 10 tasks per call.
 	Count *int64 `locationName:"count" type:"integer"`
 
+	// Specifies whether to enable Amazon ECS managed tags for the task. For more
+	// information, see Tagging Your Amazon ECS Resources (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-using-tags.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	EnableECSManagedTags *bool `locationName:"enableECSManagedTags" type:"boolean"`
+
+	// Whether or not to enable the execute command functionality for the containers
+	// in this task. If true, this enables execute command functionality on all
+	// containers in the task.
+	EnableExecuteCommand *bool `locationName:"enableExecuteCommand" type:"boolean"`
+
 	// The name of the task group to associate with the task. The default value
 	// is the family name of the task definition (for example, family:my-family-name).
 	Group *string `locationName:"group" type:"string"`
 
-	// The launch type on which to run your task.
+	// The infrastructure on which to run your standalone task. For more information,
+	// see Amazon ECS launch types (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	//
+	// The FARGATE launch type runs your tasks on Fargate On-Demand infrastructure.
+	//
+	// Fargate Spot infrastructure is available for use but a capacity provider
+	// strategy must be used. For more information, see Fargate capacity providers
+	// (https://docs.aws.amazon.com/AmazonECS/latest/userguide/fargate-capacity-providers.html)
+	// in the Amazon ECS User Guide for Fargate.
+	//
+	// The EC2 launch type runs your tasks on Amazon EC2 instances registered to
+	// your cluster.
+	//
+	// The EXTERNAL launch type runs your tasks on your on-premise server or virtual
+	// machine (VM) capacity registered to your cluster.
+	//
+	// A task can use either a launch type or a capacity provider strategy. If a
+	// launchType is specified, the capacityProviderStrategy parameter must be omitted.
+	//
+	// When you use cluster auto scaling, you must specify capacityProviderStrategy
+	// and not launchType.
 	LaunchType *string `locationName:"launchType" type:"string" enum:"LaunchType"`
 
 	// The network configuration for the task. This parameter is required for task
-	// definitions that use the awsvpc network mode to receive their own Elastic
-	// Network Interface, and it is not supported for other network modes. For more
-	// information, see Task Networking (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html)
+	// definitions that use the awsvpc network mode to receive their own elastic
+	// network interface, and it is not supported for other network modes. For more
+	// information, see Task networking (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	NetworkConfiguration *NetworkConfiguration `locationName:"networkConfiguration" type:"structure"`
 
@@ -8776,18 +18233,34 @@ type RunTaskInput struct {
 
 	// An array of placement constraint objects to use for the task. You can specify
 	// up to 10 constraints per task (including constraints in the task definition
-	// and those specified at run time).
+	// and those specified at runtime).
 	PlacementConstraints []*PlacementConstraint `locationName:"placementConstraints" type:"list"`
 
 	// The placement strategy objects to use for the task. You can specify a maximum
-	// of five strategy rules per task.
+	// of 5 strategy rules per task.
 	PlacementStrategy []*PlacementStrategy `locationName:"placementStrategy" type:"list"`
 
-	// The platform version on which to run your task. If one is not specified,
-	// the latest version is used by default.
+	// The platform version the task should use. A platform version is only specified
+	// for tasks hosted on Fargate. If one is not specified, the LATEST platform
+	// version is used by default. For more information, see Fargate platform versions
+	// (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html)
+	// in the Amazon Elastic Container Service Developer Guide.
 	PlatformVersion *string `locationName:"platformVersion" type:"string"`
 
-	// An optional tag specified when a task is started. For example if you automatically
+	// Specifies whether to propagate the tags from the task definition to the task.
+	// If no value is specified, the tags are not propagated. Tags can only be propagated
+	// to the task during task creation. To add tags to a task after task creation,
+	// use the TagResource API action.
+	//
+	// An error will be received if you specify the SERVICE option when running
+	// a task.
+	PropagateTags *string `locationName:"propagateTags" type:"string" enum:"PropagateTags"`
+
+	// The reference ID to use for the task. The reference ID can have a maximum
+	// length of 1024 characters.
+	ReferenceId *string `locationName:"referenceId" type:"string"`
+
+	// An optional tag specified when a task is started. For example, if you automatically
 	// trigger a task to run a batch process job, you could apply a unique identifier
 	// for that job to your task with the startedBy parameter. You can then identify
 	// which tasks belong to that job by filtering the results of a ListTasks call
@@ -8798,19 +18271,60 @@ type RunTaskInput struct {
 	// contains the deployment ID of the service that starts it.
 	StartedBy *string `locationName:"startedBy" type:"string"`
 
+	// The metadata that you apply to the task to help you categorize and organize
+	// them. Each tag consists of a key and an optional value, both of which you
+	// define.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	Tags []*Tag `locationName:"tags" type:"list"`
+
 	// The family and revision (family:revision) or full ARN of the task definition
 	// to run. If a revision is not specified, the latest ACTIVE revision is used.
+	//
+	// The full ARN value must match the value that you specified ias the Resource
+	// of the IAM principal's permissions policy. For example, if the Resource is
+	// arn:aws:ecs:us-east-1:111122223333:task-definition/TaskFamilyName:*, the
+	// taskDefinition ARN value must be arn:aws:ecs:us-east-1:111122223333:task-definition/TaskFamilyName.
 	//
 	// TaskDefinition is a required field
 	TaskDefinition *string `locationName:"taskDefinition" type:"string" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s RunTaskInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s RunTaskInput) GoString() string {
 	return s.String()
 }
@@ -8821,9 +18335,34 @@ func (s *RunTaskInput) Validate() error {
 	if s.TaskDefinition == nil {
 		invalidParams.Add(request.NewErrParamRequired("TaskDefinition"))
 	}
+	if s.CapacityProviderStrategy != nil {
+		for i, v := range s.CapacityProviderStrategy {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "CapacityProviderStrategy", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
 	if s.NetworkConfiguration != nil {
 		if err := s.NetworkConfiguration.Validate(); err != nil {
 			invalidParams.AddNested("NetworkConfiguration", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.Overrides != nil {
+		if err := s.Overrides.Validate(); err != nil {
+			invalidParams.AddNested("Overrides", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.Tags != nil {
+		for i, v := range s.Tags {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Tags", i), err.(request.ErrInvalidParams))
+			}
 		}
 	}
 
@@ -8831,6 +18370,12 @@ func (s *RunTaskInput) Validate() error {
 		return invalidParams
 	}
 	return nil
+}
+
+// SetCapacityProviderStrategy sets the CapacityProviderStrategy field's value.
+func (s *RunTaskInput) SetCapacityProviderStrategy(v []*CapacityProviderStrategyItem) *RunTaskInput {
+	s.CapacityProviderStrategy = v
+	return s
 }
 
 // SetCluster sets the Cluster field's value.
@@ -8842,6 +18387,18 @@ func (s *RunTaskInput) SetCluster(v string) *RunTaskInput {
 // SetCount sets the Count field's value.
 func (s *RunTaskInput) SetCount(v int64) *RunTaskInput {
 	s.Count = &v
+	return s
+}
+
+// SetEnableECSManagedTags sets the EnableECSManagedTags field's value.
+func (s *RunTaskInput) SetEnableECSManagedTags(v bool) *RunTaskInput {
+	s.EnableECSManagedTags = &v
+	return s
+}
+
+// SetEnableExecuteCommand sets the EnableExecuteCommand field's value.
+func (s *RunTaskInput) SetEnableExecuteCommand(v bool) *RunTaskInput {
+	s.EnableExecuteCommand = &v
 	return s
 }
 
@@ -8887,9 +18444,27 @@ func (s *RunTaskInput) SetPlatformVersion(v string) *RunTaskInput {
 	return s
 }
 
+// SetPropagateTags sets the PropagateTags field's value.
+func (s *RunTaskInput) SetPropagateTags(v string) *RunTaskInput {
+	s.PropagateTags = &v
+	return s
+}
+
+// SetReferenceId sets the ReferenceId field's value.
+func (s *RunTaskInput) SetReferenceId(v string) *RunTaskInput {
+	s.ReferenceId = &v
+	return s
+}
+
 // SetStartedBy sets the StartedBy field's value.
 func (s *RunTaskInput) SetStartedBy(v string) *RunTaskInput {
 	s.StartedBy = &v
+	return s
+}
+
+// SetTags sets the Tags field's value.
+func (s *RunTaskInput) SetTags(v []*Tag) *RunTaskInput {
+	s.Tags = v
 	return s
 }
 
@@ -8910,12 +18485,20 @@ type RunTaskOutput struct {
 	Tasks []*Task `locationName:"tasks" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s RunTaskOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s RunTaskOutput) GoString() string {
 	return s.String()
 }
@@ -8932,19 +18515,257 @@ func (s *RunTaskOutput) SetTasks(v []*Task) *RunTaskOutput {
 	return s
 }
 
+// Information about the platform for the Amazon ECS service or task.
+type RuntimePlatform struct {
+	_ struct{} `type:"structure"`
+
+	// The CPU architecture.
+	CpuArchitecture *string `locationName:"cpuArchitecture" type:"string" enum:"CPUArchitecture"`
+
+	// The operating system.
+	OperatingSystemFamily *string `locationName:"operatingSystemFamily" type:"string" enum:"OSFamily"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s RuntimePlatform) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s RuntimePlatform) GoString() string {
+	return s.String()
+}
+
+// SetCpuArchitecture sets the CpuArchitecture field's value.
+func (s *RuntimePlatform) SetCpuArchitecture(v string) *RuntimePlatform {
+	s.CpuArchitecture = &v
+	return s
+}
+
+// SetOperatingSystemFamily sets the OperatingSystemFamily field's value.
+func (s *RuntimePlatform) SetOperatingSystemFamily(v string) *RuntimePlatform {
+	s.OperatingSystemFamily = &v
+	return s
+}
+
+// A floating-point percentage of the desired number of tasks to place and keep
+// running in the task set.
+type Scale struct {
+	_ struct{} `type:"structure"`
+
+	// The unit of measure for the scale value.
+	Unit *string `locationName:"unit" type:"string" enum:"ScaleUnit"`
+
+	// The value, specified as a percent total of a service's desiredCount, to scale
+	// the task set. Accepted values are numbers between 0 and 100.
+	Value *float64 `locationName:"value" type:"double"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s Scale) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s Scale) GoString() string {
+	return s.String()
+}
+
+// SetUnit sets the Unit field's value.
+func (s *Scale) SetUnit(v string) *Scale {
+	s.Unit = &v
+	return s
+}
+
+// SetValue sets the Value field's value.
+func (s *Scale) SetValue(v float64) *Scale {
+	s.Value = &v
+	return s
+}
+
+// An object representing the secret to expose to your container. Secrets can
+// be exposed to a container in the following ways:
+//
+//    * To inject sensitive data into your containers as environment variables,
+//    use the secrets container definition parameter.
+//
+//    * To reference sensitive information in the log configuration of a container,
+//    use the secretOptions container definition parameter.
+//
+// For more information, see Specifying Sensitive Data (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data.html)
+// in the Amazon Elastic Container Service Developer Guide.
+type Secret struct {
+	_ struct{} `type:"structure"`
+
+	// The name of the secret.
+	//
+	// Name is a required field
+	Name *string `locationName:"name" type:"string" required:"true"`
+
+	// The secret to expose to the container. The supported values are either the
+	// full ARN of the Secrets Manager secret or the full ARN of the parameter in
+	// the SSM Parameter Store.
+	//
+	// If the SSM Parameter Store parameter exists in the same Region as the task
+	// you are launching, then you can use either the full ARN or name of the parameter.
+	// If the parameter exists in a different Region, then the full ARN must be
+	// specified.
+	//
+	// ValueFrom is a required field
+	ValueFrom *string `locationName:"valueFrom" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s Secret) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s Secret) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *Secret) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "Secret"}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+	if s.ValueFrom == nil {
+		invalidParams.Add(request.NewErrParamRequired("ValueFrom"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetName sets the Name field's value.
+func (s *Secret) SetName(v string) *Secret {
+	s.Name = &v
+	return s
+}
+
+// SetValueFrom sets the ValueFrom field's value.
+func (s *Secret) SetValueFrom(v string) *Secret {
+	s.ValueFrom = &v
+	return s
+}
+
+// These errors are usually caused by a server issue.
+type ServerException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ServerException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ServerException) GoString() string {
+	return s.String()
+}
+
+func newErrorServerException(v protocol.ResponseMetadata) error {
+	return &ServerException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *ServerException) Code() string {
+	return "ServerException"
+}
+
+// Message returns the exception's message.
+func (s *ServerException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *ServerException) OrigErr() error {
+	return nil
+}
+
+func (s *ServerException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *ServerException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *ServerException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
 // Details on a service within a cluster
 type Service struct {
 	_ struct{} `type:"structure"`
 
+	// The capacity provider strategy the service is using. When using the DescribeServices
+	// API, this field is omitted if the service was created using a launch type.
+	CapacityProviderStrategy []*CapacityProviderStrategyItem `locationName:"capacityProviderStrategy" type:"list"`
+
 	// The Amazon Resource Name (ARN) of the cluster that hosts the service.
 	ClusterArn *string `locationName:"clusterArn" type:"string"`
 
-	// The Unix time stamp for when the service was created.
+	// The Unix timestamp for when the service was created.
 	CreatedAt *time.Time `locationName:"createdAt" type:"timestamp"`
+
+	// The principal that created the service.
+	CreatedBy *string `locationName:"createdBy" type:"string"`
 
 	// Optional deployment parameters that control how many tasks run during the
 	// deployment and the ordering of stopping and starting tasks.
 	DeploymentConfiguration *DeploymentConfiguration `locationName:"deploymentConfiguration" type:"structure"`
+
+	// The deployment controller type the service is using. When using the DescribeServices
+	// API, this field is omitted if the service is using the ECS deployment controller
+	// type.
+	DeploymentController *DeploymentController `locationName:"deploymentController" type:"structure"`
 
 	// The current state of deployments for the service.
 	Deployments []*Deployment `locationName:"deployments" type:"list"`
@@ -8953,6 +18774,16 @@ type Service struct {
 	// on the service. This value is specified when the service is created with
 	// CreateService, and it can be modified with UpdateService.
 	DesiredCount *int64 `locationName:"desiredCount" type:"integer"`
+
+	// Specifies whether to enable Amazon ECS managed tags for the tasks in the
+	// service. For more information, see Tagging Your Amazon ECS Resources (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-using-tags.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	EnableECSManagedTags *bool `locationName:"enableECSManagedTags" type:"boolean"`
+
+	// Whether or not the execute command functionality is enabled for the service.
+	// If true, the execute command functionality is enabled for all containers
+	// in tasks as part of the service.
+	EnableExecuteCommand *bool `locationName:"enableExecuteCommand" type:"boolean"`
 
 	// The event stream for your service. A maximum of 100 of the latest events
 	// are displayed.
@@ -8963,19 +18794,14 @@ type Service struct {
 	// started.
 	HealthCheckGracePeriodSeconds *int64 `locationName:"healthCheckGracePeriodSeconds" type:"integer"`
 
-	// The launch type on which your service is running.
+	// The launch type the service is using. When using the DescribeServices API,
+	// this field is omitted if the service was created using a capacity provider
+	// strategy.
 	LaunchType *string `locationName:"launchType" type:"string" enum:"LaunchType"`
 
 	// A list of Elastic Load Balancing load balancer objects, containing the load
 	// balancer name, the container name (as it appears in a container definition),
 	// and the container port to access from the load balancer.
-	//
-	// Services with tasks that use the awsvpc network mode (for example, those
-	// with the Fargate launch type) only support Application Load Balancers and
-	// Network Load Balancers; Classic Load Balancers are not supported. Also, when
-	// you create any target groups for these services, you must choose ip as the
-	// target type, not instance, because tasks that use the awsvpc network mode
-	// are associated with an elastic network interface, not an Amazon EC2 instance.
 	LoadBalancers []*LoadBalancer `locationName:"loadBalancers" type:"list"`
 
 	// The VPC subnet and security group configuration for tasks that receive their
@@ -8991,10 +18817,23 @@ type Service struct {
 	// The placement strategy that determines how tasks for the service are placed.
 	PlacementStrategy []*PlacementStrategy `locationName:"placementStrategy" type:"list"`
 
-	// The platform version on which your task is running. For more information,
-	// see AWS Fargate Platform Versions (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html)
+	// The operating system that your tasks in the service are running on. A platform
+	// family is specified only for tasks using the Fargate launch type.
+	//
+	// All tasks that run as part of this service must use the same platformFamily
+	// value as the service, for example, LINUX.
+	PlatformFamily *string `locationName:"platformFamily" type:"string"`
+
+	// The platform version on which to run your service. A platform version is
+	// only specified for tasks hosted on Fargate. If one is not specified, the
+	// LATEST platform version is used by default. For more information, see Fargate
+	// Platform Versions (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	PlatformVersion *string `locationName:"platformVersion" type:"string"`
+
+	// Specifies whether to propagate the tags from the task definition or the service
+	// to the task. If no value is specified, the tags are not propagated.
+	PropagateTags *string `locationName:"propagateTags" type:"string" enum:"PropagateTags"`
 
 	// The ARN of the IAM role associated with the service that allows the Amazon
 	// ECS container agent to register container instances with an Elastic Load
@@ -9005,7 +18844,7 @@ type Service struct {
 	RunningCount *int64 `locationName:"runningCount" type:"integer"`
 
 	// The scheduling strategy to use for the service. For more information, see
-	// Services (http://docs.aws.amazon.com/AmazonECS/latest/developerguideecs_services.html).
+	// Services (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_services.html).
 	//
 	// There are two service scheduler strategies available:
 	//
@@ -9015,42 +18854,94 @@ type Service struct {
 	//    and constraints to customize task placement decisions.
 	//
 	//    * DAEMON-The daemon scheduling strategy deploys exactly one task on each
-	//    container instance in your cluster. When using this strategy, do not specify
-	//    a desired number of tasks or any task placement strategies.
-	//
-	// Fargate tasks do not support the DAEMON scheduling strategy.
+	//    active container instance that meets all of the task placement constraints
+	//    that you specify in your cluster. The service scheduler also evaluates
+	//    the task placement constraints for running tasks and will stop tasks that
+	//    do not meet the placement constraints. Fargate tasks do not support the
+	//    DAEMON scheduling strategy.
 	SchedulingStrategy *string `locationName:"schedulingStrategy" type:"string" enum:"SchedulingStrategy"`
 
 	// The ARN that identifies the service. The ARN contains the arn:aws:ecs namespace,
-	// followed by the Region of the service, the AWS account ID of the service
-	// owner, the service namespace, and then the service name. For example, arn:aws:ecs:region:012345678910:service/my-service.
+	// followed by the Region of the service, the Amazon Web Services account ID
+	// of the service owner, the service namespace, and then the service name. For
+	// example, arn:aws:ecs:region:012345678910:service/my-service.
 	ServiceArn *string `locationName:"serviceArn" type:"string"`
 
 	// The name of your service. Up to 255 letters (uppercase and lowercase), numbers,
-	// hyphens, and underscores are allowed. Service names must be unique within
+	// underscores, and hyphens are allowed. Service names must be unique within
 	// a cluster, but you can have similarly named services in multiple clusters
 	// within a Region or across multiple Regions.
 	ServiceName *string `locationName:"serviceName" type:"string"`
 
+	// The details of the service discovery registries to assign to this service.
+	// For more information, see Service Discovery (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-discovery.html).
 	ServiceRegistries []*ServiceRegistry `locationName:"serviceRegistries" type:"list"`
 
 	// The status of the service. The valid values are ACTIVE, DRAINING, or INACTIVE.
 	Status *string `locationName:"status" type:"string"`
 
+	// The metadata that you apply to the service to help you categorize and organize
+	// them. Each tag consists of a key and an optional value, both of which you
+	// define.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	Tags []*Tag `locationName:"tags" type:"list"`
+
 	// The task definition to use for tasks in the service. This value is specified
 	// when the service is created with CreateService, and it can be modified with
 	// UpdateService.
 	TaskDefinition *string `locationName:"taskDefinition" type:"string"`
+
+	// Information about a set of Amazon ECS tasks in either an CodeDeploy or an
+	// EXTERNAL deployment. An Amazon ECS task set includes details such as the
+	// desired number of tasks, how many tasks are running, and whether the task
+	// set serves production traffic.
+	TaskSets []*TaskSet `locationName:"taskSets" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Service) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Service) GoString() string {
 	return s.String()
+}
+
+// SetCapacityProviderStrategy sets the CapacityProviderStrategy field's value.
+func (s *Service) SetCapacityProviderStrategy(v []*CapacityProviderStrategyItem) *Service {
+	s.CapacityProviderStrategy = v
+	return s
 }
 
 // SetClusterArn sets the ClusterArn field's value.
@@ -9065,9 +18956,21 @@ func (s *Service) SetCreatedAt(v time.Time) *Service {
 	return s
 }
 
+// SetCreatedBy sets the CreatedBy field's value.
+func (s *Service) SetCreatedBy(v string) *Service {
+	s.CreatedBy = &v
+	return s
+}
+
 // SetDeploymentConfiguration sets the DeploymentConfiguration field's value.
 func (s *Service) SetDeploymentConfiguration(v *DeploymentConfiguration) *Service {
 	s.DeploymentConfiguration = v
+	return s
+}
+
+// SetDeploymentController sets the DeploymentController field's value.
+func (s *Service) SetDeploymentController(v *DeploymentController) *Service {
+	s.DeploymentController = v
 	return s
 }
 
@@ -9080,6 +18983,18 @@ func (s *Service) SetDeployments(v []*Deployment) *Service {
 // SetDesiredCount sets the DesiredCount field's value.
 func (s *Service) SetDesiredCount(v int64) *Service {
 	s.DesiredCount = &v
+	return s
+}
+
+// SetEnableECSManagedTags sets the EnableECSManagedTags field's value.
+func (s *Service) SetEnableECSManagedTags(v bool) *Service {
+	s.EnableECSManagedTags = &v
+	return s
+}
+
+// SetEnableExecuteCommand sets the EnableExecuteCommand field's value.
+func (s *Service) SetEnableExecuteCommand(v bool) *Service {
+	s.EnableExecuteCommand = &v
 	return s
 }
 
@@ -9131,9 +19046,21 @@ func (s *Service) SetPlacementStrategy(v []*PlacementStrategy) *Service {
 	return s
 }
 
+// SetPlatformFamily sets the PlatformFamily field's value.
+func (s *Service) SetPlatformFamily(v string) *Service {
+	s.PlatformFamily = &v
+	return s
+}
+
 // SetPlatformVersion sets the PlatformVersion field's value.
 func (s *Service) SetPlatformVersion(v string) *Service {
 	s.PlatformVersion = &v
+	return s
+}
+
+// SetPropagateTags sets the PropagateTags field's value.
+func (s *Service) SetPropagateTags(v string) *Service {
+	s.PropagateTags = &v
 	return s
 }
 
@@ -9179,9 +19106,21 @@ func (s *Service) SetStatus(v string) *Service {
 	return s
 }
 
+// SetTags sets the Tags field's value.
+func (s *Service) SetTags(v []*Tag) *Service {
+	s.Tags = v
+	return s
+}
+
 // SetTaskDefinition sets the TaskDefinition field's value.
 func (s *Service) SetTaskDefinition(v string) *Service {
 	s.TaskDefinition = &v
+	return s
+}
+
+// SetTaskSets sets the TaskSets field's value.
+func (s *Service) SetTaskSets(v []*TaskSet) *Service {
+	s.TaskSets = v
 	return s
 }
 
@@ -9189,7 +19128,7 @@ func (s *Service) SetTaskDefinition(v string) *Service {
 type ServiceEvent struct {
 	_ struct{} `type:"structure"`
 
-	// The Unix time stamp for when the event was triggered.
+	// The Unix timestamp for when the event was triggered.
 	CreatedAt *time.Time `locationName:"createdAt" type:"timestamp"`
 
 	// The ID string of the event.
@@ -9199,12 +19138,20 @@ type ServiceEvent struct {
 	Message *string `locationName:"message" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ServiceEvent) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ServiceEvent) GoString() string {
 	return s.String()
 }
@@ -9225,6 +19172,136 @@ func (s *ServiceEvent) SetId(v string) *ServiceEvent {
 func (s *ServiceEvent) SetMessage(v string) *ServiceEvent {
 	s.Message = &v
 	return s
+}
+
+// The specified service is not active. You can't update a service that is inactive.
+// If you have previously deleted a service, you can re-create it with CreateService.
+type ServiceNotActiveException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ServiceNotActiveException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ServiceNotActiveException) GoString() string {
+	return s.String()
+}
+
+func newErrorServiceNotActiveException(v protocol.ResponseMetadata) error {
+	return &ServiceNotActiveException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *ServiceNotActiveException) Code() string {
+	return "ServiceNotActiveException"
+}
+
+// Message returns the exception's message.
+func (s *ServiceNotActiveException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *ServiceNotActiveException) OrigErr() error {
+	return nil
+}
+
+func (s *ServiceNotActiveException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *ServiceNotActiveException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *ServiceNotActiveException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
+// The specified service could not be found. You can view your available services
+// with ListServices. Amazon ECS services are cluster-specific and Region-specific.
+type ServiceNotFoundException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ServiceNotFoundException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s ServiceNotFoundException) GoString() string {
+	return s.String()
+}
+
+func newErrorServiceNotFoundException(v protocol.ResponseMetadata) error {
+	return &ServiceNotFoundException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *ServiceNotFoundException) Code() string {
+	return "ServiceNotFoundException"
+}
+
+// Message returns the exception's message.
+func (s *ServiceNotFoundException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *ServiceNotFoundException) OrigErr() error {
+	return nil
+}
+
+func (s *ServiceNotFoundException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *ServiceNotFoundException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *ServiceNotFoundException) RequestID() string {
+	return s.RespMetadata.RequestID
 }
 
 // Details of the service registry.
@@ -9250,22 +19327,29 @@ type ServiceRegistry struct {
 	ContainerPort *int64 `locationName:"containerPort" type:"integer"`
 
 	// The port value used if your service discovery service specified an SRV record.
-	// This field is required if both the awsvpc network mode and SRV records are
+	// This field may be used if both the awsvpc network mode and SRV records are
 	// used.
 	Port *int64 `locationName:"port" type:"integer"`
 
 	// The Amazon Resource Name (ARN) of the service registry. The currently supported
-	// service registry is Amazon Route 53 Auto Naming. For more information, see
-	// Service (https://docs.aws.amazon.com/Route53/latest/APIReference/API_autonaming_Service.html).
+	// service registry is Cloud Map. For more information, see CreateService (https://docs.aws.amazon.com/cloud-map/latest/api/API_CreateService.html).
 	RegistryArn *string `locationName:"registryArn" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ServiceRegistry) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s ServiceRegistry) GoString() string {
 	return s.String()
 }
@@ -9294,6 +19378,113 @@ func (s *ServiceRegistry) SetRegistryArn(v string) *ServiceRegistry {
 	return s
 }
 
+// The details of the execute command session.
+type Session struct {
+	_ struct{} `type:"structure"`
+
+	// The ID of the execute command session.
+	SessionId *string `locationName:"sessionId" type:"string"`
+
+	// A URL back to managed agent on the container that the SSM Session Manager
+	// client uses to send commands and receive output from the container.
+	StreamUrl *string `locationName:"streamUrl" type:"string"`
+
+	// An encrypted token value containing session and caller information. Used
+	// to authenticate the connection to the container.
+	//
+	// TokenValue is a sensitive parameter and its value will be
+	// replaced with "sensitive" in string returned by Session's
+	// String and GoString methods.
+	TokenValue *string `locationName:"tokenValue" type:"string" sensitive:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s Session) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s Session) GoString() string {
+	return s.String()
+}
+
+// SetSessionId sets the SessionId field's value.
+func (s *Session) SetSessionId(v string) *Session {
+	s.SessionId = &v
+	return s
+}
+
+// SetStreamUrl sets the StreamUrl field's value.
+func (s *Session) SetStreamUrl(v string) *Session {
+	s.StreamUrl = &v
+	return s
+}
+
+// SetTokenValue sets the TokenValue field's value.
+func (s *Session) SetTokenValue(v string) *Session {
+	s.TokenValue = &v
+	return s
+}
+
+// The current account setting for a resource.
+type Setting struct {
+	_ struct{} `type:"structure"`
+
+	// The Amazon ECS resource name.
+	Name *string `locationName:"name" type:"string" enum:"SettingName"`
+
+	// The ARN of the principal, which can be an IAM user, IAM role, or the root
+	// user. If this field is omitted, the authenticated user is assumed.
+	PrincipalArn *string `locationName:"principalArn" type:"string"`
+
+	// Whether the account setting is enabled or disabled for the specified resource.
+	Value *string `locationName:"value" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s Setting) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s Setting) GoString() string {
+	return s.String()
+}
+
+// SetName sets the Name field's value.
+func (s *Setting) SetName(v string) *Setting {
+	s.Name = &v
+	return s
+}
+
+// SetPrincipalArn sets the PrincipalArn field's value.
+func (s *Setting) SetPrincipalArn(v string) *Setting {
+	s.PrincipalArn = &v
+	return s
+}
+
+// SetValue sets the Value field's value.
+func (s *Setting) SetValue(v string) *Setting {
+	s.Value = &v
+	return s
+}
+
 type StartTaskInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9308,6 +19499,16 @@ type StartTaskInput struct {
 	//
 	// ContainerInstances is a required field
 	ContainerInstances []*string `locationName:"containerInstances" type:"list" required:"true"`
+
+	// Specifies whether to enable Amazon ECS managed tags for the task. For more
+	// information, see Tagging Your Amazon ECS Resources (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-using-tags.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	EnableECSManagedTags *bool `locationName:"enableECSManagedTags" type:"boolean"`
+
+	// Whether or not the execute command functionality is enabled for the task.
+	// If true, this enables execute command functionality on all containers in
+	// the task.
+	EnableExecuteCommand *bool `locationName:"enableExecuteCommand" type:"boolean"`
 
 	// The name of the task group to associate with the task. The default value
 	// is the family name of the task definition (for example, family:my-family-name).
@@ -9329,7 +19530,14 @@ type StartTaskInput struct {
 	// the JSON formatting characters of the override structure.
 	Overrides *TaskOverride `locationName:"overrides" type:"structure"`
 
-	// An optional tag specified when a task is started. For example if you automatically
+	// Specifies whether to propagate the tags from the task definition or the service
+	// to the task. If no value is specified, the tags are not propagated.
+	PropagateTags *string `locationName:"propagateTags" type:"string" enum:"PropagateTags"`
+
+	// The reference ID to use for the task.
+	ReferenceId *string `locationName:"referenceId" type:"string"`
+
+	// An optional tag specified when a task is started. For example, if you automatically
 	// trigger a task to run a batch process job, you could apply a unique identifier
 	// for that job to your task with the startedBy parameter. You can then identify
 	// which tasks belong to that job by filtering the results of a ListTasks call
@@ -9340,6 +19548,34 @@ type StartTaskInput struct {
 	// contains the deployment ID of the service that starts it.
 	StartedBy *string `locationName:"startedBy" type:"string"`
 
+	// The metadata that you apply to the task to help you categorize and organize
+	// them. Each tag consists of a key and an optional value, both of which you
+	// define.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	Tags []*Tag `locationName:"tags" type:"list"`
+
 	// The family and revision (family:revision) or full ARN of the task definition
 	// to start. If a revision is not specified, the latest ACTIVE revision is used.
 	//
@@ -9347,12 +19583,20 @@ type StartTaskInput struct {
 	TaskDefinition *string `locationName:"taskDefinition" type:"string" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s StartTaskInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s StartTaskInput) GoString() string {
 	return s.String()
 }
@@ -9369,6 +19613,21 @@ func (s *StartTaskInput) Validate() error {
 	if s.NetworkConfiguration != nil {
 		if err := s.NetworkConfiguration.Validate(); err != nil {
 			invalidParams.AddNested("NetworkConfiguration", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.Overrides != nil {
+		if err := s.Overrides.Validate(); err != nil {
+			invalidParams.AddNested("Overrides", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.Tags != nil {
+		for i, v := range s.Tags {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Tags", i), err.(request.ErrInvalidParams))
+			}
 		}
 	}
 
@@ -9390,6 +19649,18 @@ func (s *StartTaskInput) SetContainerInstances(v []*string) *StartTaskInput {
 	return s
 }
 
+// SetEnableECSManagedTags sets the EnableECSManagedTags field's value.
+func (s *StartTaskInput) SetEnableECSManagedTags(v bool) *StartTaskInput {
+	s.EnableECSManagedTags = &v
+	return s
+}
+
+// SetEnableExecuteCommand sets the EnableExecuteCommand field's value.
+func (s *StartTaskInput) SetEnableExecuteCommand(v bool) *StartTaskInput {
+	s.EnableExecuteCommand = &v
+	return s
+}
+
 // SetGroup sets the Group field's value.
 func (s *StartTaskInput) SetGroup(v string) *StartTaskInput {
 	s.Group = &v
@@ -9408,9 +19679,27 @@ func (s *StartTaskInput) SetOverrides(v *TaskOverride) *StartTaskInput {
 	return s
 }
 
+// SetPropagateTags sets the PropagateTags field's value.
+func (s *StartTaskInput) SetPropagateTags(v string) *StartTaskInput {
+	s.PropagateTags = &v
+	return s
+}
+
+// SetReferenceId sets the ReferenceId field's value.
+func (s *StartTaskInput) SetReferenceId(v string) *StartTaskInput {
+	s.ReferenceId = &v
+	return s
+}
+
 // SetStartedBy sets the StartedBy field's value.
 func (s *StartTaskInput) SetStartedBy(v string) *StartTaskInput {
 	s.StartedBy = &v
+	return s
+}
+
+// SetTags sets the Tags field's value.
+func (s *StartTaskInput) SetTags(v []*Tag) *StartTaskInput {
+	s.Tags = v
 	return s
 }
 
@@ -9431,12 +19720,20 @@ type StartTaskOutput struct {
 	Tasks []*Task `locationName:"tasks" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s StartTaskOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s StartTaskOutput) GoString() string {
 	return s.String()
 }
@@ -9467,18 +19764,26 @@ type StopTaskInput struct {
 	// API operations on this task. Up to 255 characters are allowed in this message.
 	Reason *string `locationName:"reason" type:"string"`
 
-	// The task ID or full ARN entry of the task to stop.
+	// The task ID or full Amazon Resource Name (ARN) of the task to stop.
 	//
 	// Task is a required field
 	Task *string `locationName:"task" type:"string" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s StopTaskInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s StopTaskInput) GoString() string {
 	return s.String()
 }
@@ -9521,12 +19826,20 @@ type StopTaskOutput struct {
 	Task *Task `locationName:"task" type:"structure"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s StopTaskOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s StopTaskOutput) GoString() string {
 	return s.String()
 }
@@ -9534,6 +19847,103 @@ func (s StopTaskOutput) GoString() string {
 // SetTask sets the Task field's value.
 func (s *StopTaskOutput) SetTask(v *Task) *StopTaskOutput {
 	s.Task = v
+	return s
+}
+
+type SubmitAttachmentStateChangesInput struct {
+	_ struct{} `type:"structure"`
+
+	// Any attachments associated with the state change request.
+	//
+	// Attachments is a required field
+	Attachments []*AttachmentStateChange `locationName:"attachments" type:"list" required:"true"`
+
+	// The short name or full ARN of the cluster that hosts the container instance
+	// the attachment belongs to.
+	Cluster *string `locationName:"cluster" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s SubmitAttachmentStateChangesInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s SubmitAttachmentStateChangesInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *SubmitAttachmentStateChangesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "SubmitAttachmentStateChangesInput"}
+	if s.Attachments == nil {
+		invalidParams.Add(request.NewErrParamRequired("Attachments"))
+	}
+	if s.Attachments != nil {
+		for i, v := range s.Attachments {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Attachments", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetAttachments sets the Attachments field's value.
+func (s *SubmitAttachmentStateChangesInput) SetAttachments(v []*AttachmentStateChange) *SubmitAttachmentStateChangesInput {
+	s.Attachments = v
+	return s
+}
+
+// SetCluster sets the Cluster field's value.
+func (s *SubmitAttachmentStateChangesInput) SetCluster(v string) *SubmitAttachmentStateChangesInput {
+	s.Cluster = &v
+	return s
+}
+
+type SubmitAttachmentStateChangesOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Acknowledgement of the state change.
+	Acknowledgment *string `locationName:"acknowledgment" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s SubmitAttachmentStateChangesOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s SubmitAttachmentStateChangesOutput) GoString() string {
+	return s.String()
+}
+
+// SetAcknowledgment sets the Acknowledgment field's value.
+func (s *SubmitAttachmentStateChangesOutput) SetAcknowledgment(v string) *SubmitAttachmentStateChangesOutput {
+	s.Acknowledgment = &v
 	return s
 }
 
@@ -9555,6 +19965,9 @@ type SubmitContainerStateChangeInput struct {
 	// The reason for the state change request.
 	Reason *string `locationName:"reason" type:"string"`
 
+	// The ID of the Docker container.
+	RuntimeId *string `locationName:"runtimeId" type:"string"`
+
 	// The status of the state change request.
 	Status *string `locationName:"status" type:"string"`
 
@@ -9563,12 +19976,20 @@ type SubmitContainerStateChangeInput struct {
 	Task *string `locationName:"task" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s SubmitContainerStateChangeInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s SubmitContainerStateChangeInput) GoString() string {
 	return s.String()
 }
@@ -9603,6 +20024,12 @@ func (s *SubmitContainerStateChangeInput) SetReason(v string) *SubmitContainerSt
 	return s
 }
 
+// SetRuntimeId sets the RuntimeId field's value.
+func (s *SubmitContainerStateChangeInput) SetRuntimeId(v string) *SubmitContainerStateChangeInput {
+	s.RuntimeId = &v
+	return s
+}
+
 // SetStatus sets the Status field's value.
 func (s *SubmitContainerStateChangeInput) SetStatus(v string) *SubmitContainerStateChangeInput {
 	s.Status = &v
@@ -9622,12 +20049,20 @@ type SubmitContainerStateChangeOutput struct {
 	Acknowledgment *string `locationName:"acknowledgment" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s SubmitContainerStateChangeOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s SubmitContainerStateChangeOutput) GoString() string {
 	return s.String()
 }
@@ -9651,13 +20086,16 @@ type SubmitTaskStateChangeInput struct {
 	// Any containers associated with the state change request.
 	Containers []*ContainerStateChange `locationName:"containers" type:"list"`
 
-	// The Unix time stamp for when the task execution stopped.
+	// The Unix timestamp for when the task execution stopped.
 	ExecutionStoppedAt *time.Time `locationName:"executionStoppedAt" type:"timestamp"`
 
-	// The Unix time stamp for when the container image pull began.
+	// The details for the managed agent associated with the task.
+	ManagedAgents []*ManagedAgentStateChange `locationName:"managedAgents" type:"list"`
+
+	// The Unix timestamp for when the container image pull began.
 	PullStartedAt *time.Time `locationName:"pullStartedAt" type:"timestamp"`
 
-	// The Unix time stamp for when the container image pull completed.
+	// The Unix timestamp for when the container image pull completed.
 	PullStoppedAt *time.Time `locationName:"pullStoppedAt" type:"timestamp"`
 
 	// The reason for the state change request.
@@ -9670,12 +20108,20 @@ type SubmitTaskStateChangeInput struct {
 	Task *string `locationName:"task" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s SubmitTaskStateChangeInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s SubmitTaskStateChangeInput) GoString() string {
 	return s.String()
 }
@@ -9690,6 +20136,16 @@ func (s *SubmitTaskStateChangeInput) Validate() error {
 			}
 			if err := v.Validate(); err != nil {
 				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Attachments", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+	if s.ManagedAgents != nil {
+		for i, v := range s.ManagedAgents {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "ManagedAgents", i), err.(request.ErrInvalidParams))
 			}
 		}
 	}
@@ -9721,6 +20177,12 @@ func (s *SubmitTaskStateChangeInput) SetContainers(v []*ContainerStateChange) *S
 // SetExecutionStoppedAt sets the ExecutionStoppedAt field's value.
 func (s *SubmitTaskStateChangeInput) SetExecutionStoppedAt(v time.Time) *SubmitTaskStateChangeInput {
 	s.ExecutionStoppedAt = &v
+	return s
+}
+
+// SetManagedAgents sets the ManagedAgents field's value.
+func (s *SubmitTaskStateChangeInput) SetManagedAgents(v []*ManagedAgentStateChange) *SubmitTaskStateChangeInput {
+	s.ManagedAgents = v
 	return s
 }
 
@@ -9761,12 +20223,20 @@ type SubmitTaskStateChangeOutput struct {
 	Acknowledgment *string `locationName:"acknowledgment" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s SubmitTaskStateChangeOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s SubmitTaskStateChangeOutput) GoString() string {
 	return s.String()
 }
@@ -9777,13 +20247,408 @@ func (s *SubmitTaskStateChangeOutput) SetAcknowledgment(v string) *SubmitTaskSta
 	return s
 }
 
+// A list of namespaced kernel parameters to set in the container. This parameter
+// maps to Sysctls in the Create a container (https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate)
+// section of the Docker Remote API (https://docs.docker.com/engine/api/v1.35/)
+// and the --sysctl option to docker run (https://docs.docker.com/engine/reference/run/#security-configuration).
+//
+// It is not recommended that you specify network-related systemControls parameters
+// for multiple containers in a single task that also uses either the awsvpc
+// or host network mode for the following reasons:
+//
+//    * For tasks that use the awsvpc network mode, if you set systemControls
+//    for any container, it applies to all containers in the task. If you set
+//    different systemControls for multiple containers in a single task, the
+//    container that is started last determines which systemControls take effect.
+//
+//    * For tasks that use the host network mode, the systemControls parameter
+//    applies to the container instance's kernel parameter as well as that of
+//    all containers of any tasks running on that container instance.
+type SystemControl struct {
+	_ struct{} `type:"structure"`
+
+	// The namespaced kernel parameter for which to set a value.
+	Namespace *string `locationName:"namespace" type:"string"`
+
+	// The value for the namespaced kernel parameter specified in namespace.
+	Value *string `locationName:"value" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s SystemControl) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s SystemControl) GoString() string {
+	return s.String()
+}
+
+// SetNamespace sets the Namespace field's value.
+func (s *SystemControl) SetNamespace(v string) *SystemControl {
+	s.Namespace = &v
+	return s
+}
+
+// SetValue sets the Value field's value.
+func (s *SystemControl) SetValue(v string) *SystemControl {
+	s.Value = &v
+	return s
+}
+
+// The metadata that you apply to a resource to help you categorize and organize
+// them. Each tag consists of a key and an optional value, both of which you
+// define.
+//
+// The following basic restrictions apply to tags:
+//
+//    * Maximum number of tags per resource - 50
+//
+//    * For each resource, each tag key must be unique, and each tag key can
+//    have only one value.
+//
+//    * Maximum key length - 128 Unicode characters in UTF-8
+//
+//    * Maximum value length - 256 Unicode characters in UTF-8
+//
+//    * If your tagging schema is used across multiple services and resources,
+//    remember that other services may have restrictions on allowed characters.
+//    Generally allowed characters are: letters, numbers, and spaces representable
+//    in UTF-8, and the following characters: + - = . _ : / @.
+//
+//    * Tag keys and values are case-sensitive.
+//
+//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+//    as a prefix for either keys or values as it is reserved for Amazon Web
+//    Services use. You cannot edit or delete tag keys or values with this prefix.
+//    Tags with this prefix do not count against your tags per resource limit.
+type Tag struct {
+	_ struct{} `type:"structure"`
+
+	// One part of a key-value pair that make up a tag. A key is a general label
+	// that acts like a category for more specific tag values.
+	Key *string `locationName:"key" min:"1" type:"string"`
+
+	// The optional part of a key-value pair that make up a tag. A value acts as
+	// a descriptor within a tag category (key).
+	Value *string `locationName:"value" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s Tag) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s Tag) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *Tag) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "Tag"}
+	if s.Key != nil && len(*s.Key) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("Key", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetKey sets the Key field's value.
+func (s *Tag) SetKey(v string) *Tag {
+	s.Key = &v
+	return s
+}
+
+// SetValue sets the Value field's value.
+func (s *Tag) SetValue(v string) *Tag {
+	s.Value = &v
+	return s
+}
+
+type TagResourceInput struct {
+	_ struct{} `type:"structure"`
+
+	// The Amazon Resource Name (ARN) of the resource to which to add tags. Currently,
+	// the supported resources are Amazon ECS capacity providers, tasks, services,
+	// task definitions, clusters, and container instances.
+	//
+	// ResourceArn is a required field
+	ResourceArn *string `locationName:"resourceArn" type:"string" required:"true"`
+
+	// The tags to add to the resource. A tag is an array of key-value pairs.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	//
+	// Tags is a required field
+	Tags []*Tag `locationName:"tags" type:"list" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s TagResourceInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s TagResourceInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *TagResourceInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "TagResourceInput"}
+	if s.ResourceArn == nil {
+		invalidParams.Add(request.NewErrParamRequired("ResourceArn"))
+	}
+	if s.Tags == nil {
+		invalidParams.Add(request.NewErrParamRequired("Tags"))
+	}
+	if s.Tags != nil {
+		for i, v := range s.Tags {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Tags", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetResourceArn sets the ResourceArn field's value.
+func (s *TagResourceInput) SetResourceArn(v string) *TagResourceInput {
+	s.ResourceArn = &v
+	return s
+}
+
+// SetTags sets the Tags field's value.
+func (s *TagResourceInput) SetTags(v []*Tag) *TagResourceInput {
+	s.Tags = v
+	return s
+}
+
+type TagResourceOutput struct {
+	_ struct{} `type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s TagResourceOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s TagResourceOutput) GoString() string {
+	return s.String()
+}
+
+// The target container is not properly configured with the execute command
+// agent or the container is no longer active or running.
+type TargetNotConnectedException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s TargetNotConnectedException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s TargetNotConnectedException) GoString() string {
+	return s.String()
+}
+
+func newErrorTargetNotConnectedException(v protocol.ResponseMetadata) error {
+	return &TargetNotConnectedException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *TargetNotConnectedException) Code() string {
+	return "TargetNotConnectedException"
+}
+
+// Message returns the exception's message.
+func (s *TargetNotConnectedException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *TargetNotConnectedException) OrigErr() error {
+	return nil
+}
+
+func (s *TargetNotConnectedException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *TargetNotConnectedException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *TargetNotConnectedException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
+// The specified target could not be found. You can view your available container
+// instances with ListContainerInstances. Amazon ECS container instances are
+// cluster-specific and Region-specific.
+type TargetNotFoundException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s TargetNotFoundException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s TargetNotFoundException) GoString() string {
+	return s.String()
+}
+
+func newErrorTargetNotFoundException(v protocol.ResponseMetadata) error {
+	return &TargetNotFoundException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *TargetNotFoundException) Code() string {
+	return "TargetNotFoundException"
+}
+
+// Message returns the exception's message.
+func (s *TargetNotFoundException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *TargetNotFoundException) OrigErr() error {
+	return nil
+}
+
+func (s *TargetNotFoundException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *TargetNotFoundException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *TargetNotFoundException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
 // Details on a task in a cluster.
 type Task struct {
 	_ struct{} `type:"structure"`
 
-	// The elastic network adapter associated with the task if the task uses the
+	// The Elastic Network Adapter associated with the task if the task uses the
 	// awsvpc network mode.
 	Attachments []*Attachment `locationName:"attachments" type:"list"`
+
+	// The attributes of the task
+	Attributes []*Attribute `locationName:"attributes" type:"list"`
+
+	// The availability zone of the task.
+	AvailabilityZone *string `locationName:"availabilityZone" type:"string"`
+
+	// The capacity provider associated with the task.
+	CapacityProviderName *string `locationName:"capacityProviderName" type:"string"`
 
 	// The ARN of the cluster that hosts the task.
 	ClusterArn *string `locationName:"clusterArn" type:"string"`
@@ -9791,7 +20656,7 @@ type Task struct {
 	// The connectivity status of a task.
 	Connectivity *string `locationName:"connectivity" type:"string" enum:"Connectivity"`
 
-	// The Unix time stamp for when the task last went into CONNECTED status.
+	// The Unix timestamp for when the task last went into CONNECTED status.
 	ConnectivityAt *time.Time `locationName:"connectivityAt" type:"timestamp"`
 
 	// The ARN of the container instances that host the task.
@@ -9800,17 +20665,18 @@ type Task struct {
 	// The containers associated with the task.
 	Containers []*Container `locationName:"containers" type:"list"`
 
-	// The number of CPU units used by the task. It can be expressed as an integer
-	// using CPU units, for example 1024, or as a string using vCPUs, for example
-	// 1 vCPU or 1 vcpu, in a task definition. String values are converted to an
-	// integer indicating the CPU units when the task definition is registered.
+	// The number of CPU units used by the task as expressed in a task definition.
+	// It can be expressed as an integer using CPU units, for example 1024. It can
+	// also be expressed as a string using vCPUs, for example 1 vCPU or 1 vcpu.
+	// String values are converted to an integer indicating the CPU units when the
+	// task definition is registered.
 	//
-	// If using the EC2 launch type, this field is optional. Supported values are
-	// between 128 CPU units (0.125 vCPUs) and 10240 CPU units (10 vCPUs).
+	// If you are using the EC2 launch type, this field is optional. Supported values
+	// are between 128 CPU units (0.125 vCPUs) and 10240 CPU units (10 vCPUs).
 	//
-	// If using the Fargate launch type, this field is required and you must use
-	// one of the following values, which determines your range of supported values
-	// for the memory parameter:
+	// If you are using the Fargate launch type, this field is required and you
+	// must use one of the following values, which determines your range of supported
+	// values for the memory parameter:
 	//
 	//    * 256 (.25 vCPU) - Available memory values: 512 (0.5 GB), 1024 (1 GB),
 	//    2048 (2 GB)
@@ -9828,14 +20694,23 @@ type Task struct {
 	//    (30 GB) in increments of 1024 (1 GB)
 	Cpu *string `locationName:"cpu" type:"string"`
 
-	// The Unix time stamp for when the task was created (the task entered the PENDING
+	// The Unix timestamp for when the task was created (the task entered the PENDING
 	// state).
 	CreatedAt *time.Time `locationName:"createdAt" type:"timestamp"`
 
-	// The desired status of the task.
+	// The desired status of the task. For more information, see Task Lifecycle
+	// (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-lifecycle.html).
 	DesiredStatus *string `locationName:"desiredStatus" type:"string"`
 
-	// The Unix time stamp for when the task execution stopped.
+	// Whether or not execute command functionality is enabled for this task. If
+	// true, this enables execute command functionality on all containers in the
+	// task.
+	EnableExecuteCommand *bool `locationName:"enableExecuteCommand" type:"boolean"`
+
+	// The ephemeral storage settings for the task.
+	EphemeralStorage *EphemeralStorage `locationName:"ephemeralStorage" type:"structure"`
+
+	// The Unix timestamp for when the task execution stopped.
 	ExecutionStoppedAt *time.Time `locationName:"executionStoppedAt" type:"timestamp"`
 
 	// The name of the task group associated with the task.
@@ -9854,22 +20729,29 @@ type Task struct {
 	// override any Docker health checks that exist in the container image.
 	HealthStatus *string `locationName:"healthStatus" type:"string" enum:"HealthStatus"`
 
-	// The last known status of the task.
+	// The Elastic Inference accelerator associated with the task.
+	InferenceAccelerators []*InferenceAccelerator `locationName:"inferenceAccelerators" type:"list"`
+
+	// The last known status of the task. For more information, see Task Lifecycle
+	// (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-lifecycle.html).
 	LastStatus *string `locationName:"lastStatus" type:"string"`
 
-	// The launch type on which your task is running.
+	// The infrastructure on which your task is running. For more information, see
+	// Amazon ECS launch types (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html)
+	// in the Amazon Elastic Container Service Developer Guide.
 	LaunchType *string `locationName:"launchType" type:"string" enum:"LaunchType"`
 
-	// The amount of memory (in MiB) used by the task. It can be expressed as an
-	// integer using MiB, for example 1024, or as a string using GB, for example
-	// 1GB or 1 GB, in a task definition. String values are converted to an integer
-	// indicating the MiB when the task definition is registered.
+	// The amount of memory (in MiB) used by the task as expressed in a task definition.
+	// It can be expressed as an integer using MiB, for example 1024. It can also
+	// be expressed as a string using GB, for example 1GB or 1 GB. String values
+	// are converted to an integer indicating the MiB when the task definition is
+	// registered.
 	//
-	// If using the EC2 launch type, this field is optional.
+	// If you are using the EC2 launch type, this field is optional.
 	//
-	// If using the Fargate launch type, this field is required and you must use
-	// one of the following values, which determines your range of supported values
-	// for the cpu parameter:
+	// If you are using the Fargate launch type, this field is required and you
+	// must use one of the following values, which determines your range of supported
+	// values for the cpu parameter:
 	//
 	//    * 512 (0.5 GB), 1024 (1 GB), 2048 (2 GB) - Available cpu values: 256 (.25
 	//    vCPU)
@@ -9890,18 +20772,27 @@ type Task struct {
 	// One or more container overrides.
 	Overrides *TaskOverride `locationName:"overrides" type:"structure"`
 
-	// The platform version on which your task is running. For more information,
-	// see AWS Fargate Platform Versions (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html)
+	// The operating system that your tasks are running on. A platform family is
+	// specified only for tasks using the Fargate launch type.
+	//
+	// All tasks that run as part of this service must use the same platformFamily
+	// value as the service, for example, LINUX..
+	PlatformFamily *string `locationName:"platformFamily" type:"string"`
+
+	// The platform version on which your task is running. A platform version is
+	// only specified for tasks using the Fargate launch type. If one is not specified,
+	// the LATEST platform version is used by default. For more information, see
+	// Fargate Platform Versions (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	PlatformVersion *string `locationName:"platformVersion" type:"string"`
 
-	// The Unix time stamp for when the container image pull began.
+	// The Unix timestamp for when the container image pull began.
 	PullStartedAt *time.Time `locationName:"pullStartedAt" type:"timestamp"`
 
-	// The Unix time stamp for when the container image pull completed.
+	// The Unix timestamp for when the container image pull completed.
 	PullStoppedAt *time.Time `locationName:"pullStoppedAt" type:"timestamp"`
 
-	// The Unix time stamp for when the task started (the task transitioned from
+	// The Unix timestamp for when the task started (the task transitioned from
 	// the PENDING state to the RUNNING state).
 	StartedAt *time.Time `locationName:"startedAt" type:"timestamp"`
 
@@ -9910,16 +20801,48 @@ type Task struct {
 	// service that starts it.
 	StartedBy *string `locationName:"startedBy" type:"string"`
 
-	// The Unix time stamp for when the task was stopped (the task transitioned
-	// from the RUNNING state to the STOPPED state).
+	// The stop code indicating why a task was stopped. The stoppedReason may contain
+	// additional details.
+	StopCode *string `locationName:"stopCode" type:"string" enum:"TaskStopCode"`
+
+	// The Unix timestamp for when the task was stopped (the task transitioned from
+	// the RUNNING state to the STOPPED state).
 	StoppedAt *time.Time `locationName:"stoppedAt" type:"timestamp"`
 
-	// The reason the task was stopped.
+	// The reason that the task was stopped.
 	StoppedReason *string `locationName:"stoppedReason" type:"string"`
 
-	// The Unix time stamp for when the task stops (transitions from the RUNNING
+	// The Unix timestamp for when the task stops (transitions from the RUNNING
 	// state to STOPPED).
 	StoppingAt *time.Time `locationName:"stoppingAt" type:"timestamp"`
+
+	// The metadata that you apply to the task to help you categorize and organize
+	// them. Each tag consists of a key and an optional value, both of which you
+	// define.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	Tags []*Tag `locationName:"tags" type:"list"`
 
 	// The Amazon Resource Name (ARN) of the task.
 	TaskArn *string `locationName:"taskArn" type:"string"`
@@ -9930,18 +20853,26 @@ type Task struct {
 	// The version counter for the task. Every time a task experiences a change
 	// that triggers a CloudWatch event, the version counter is incremented. If
 	// you are replicating your Amazon ECS task state with CloudWatch Events, you
-	// can compare the version of a task reported by the Amazon ECS APIs with the
-	// version reported in CloudWatch Events for the task (inside the detail object)
-	// to verify that the version in your event stream is current.
+	// can compare the version of a task reported by the Amazon ECS API actions
+	// with the version reported in CloudWatch Events for the task (inside the detail
+	// object) to verify that the version in your event stream is current.
 	Version *int64 `locationName:"version" type:"long"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Task) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Task) GoString() string {
 	return s.String()
 }
@@ -9949,6 +20880,24 @@ func (s Task) GoString() string {
 // SetAttachments sets the Attachments field's value.
 func (s *Task) SetAttachments(v []*Attachment) *Task {
 	s.Attachments = v
+	return s
+}
+
+// SetAttributes sets the Attributes field's value.
+func (s *Task) SetAttributes(v []*Attribute) *Task {
+	s.Attributes = v
+	return s
+}
+
+// SetAvailabilityZone sets the AvailabilityZone field's value.
+func (s *Task) SetAvailabilityZone(v string) *Task {
+	s.AvailabilityZone = &v
+	return s
+}
+
+// SetCapacityProviderName sets the CapacityProviderName field's value.
+func (s *Task) SetCapacityProviderName(v string) *Task {
+	s.CapacityProviderName = &v
 	return s
 }
 
@@ -10000,6 +20949,18 @@ func (s *Task) SetDesiredStatus(v string) *Task {
 	return s
 }
 
+// SetEnableExecuteCommand sets the EnableExecuteCommand field's value.
+func (s *Task) SetEnableExecuteCommand(v bool) *Task {
+	s.EnableExecuteCommand = &v
+	return s
+}
+
+// SetEphemeralStorage sets the EphemeralStorage field's value.
+func (s *Task) SetEphemeralStorage(v *EphemeralStorage) *Task {
+	s.EphemeralStorage = v
+	return s
+}
+
 // SetExecutionStoppedAt sets the ExecutionStoppedAt field's value.
 func (s *Task) SetExecutionStoppedAt(v time.Time) *Task {
 	s.ExecutionStoppedAt = &v
@@ -10015,6 +20976,12 @@ func (s *Task) SetGroup(v string) *Task {
 // SetHealthStatus sets the HealthStatus field's value.
 func (s *Task) SetHealthStatus(v string) *Task {
 	s.HealthStatus = &v
+	return s
+}
+
+// SetInferenceAccelerators sets the InferenceAccelerators field's value.
+func (s *Task) SetInferenceAccelerators(v []*InferenceAccelerator) *Task {
+	s.InferenceAccelerators = v
 	return s
 }
 
@@ -10039,6 +21006,12 @@ func (s *Task) SetMemory(v string) *Task {
 // SetOverrides sets the Overrides field's value.
 func (s *Task) SetOverrides(v *TaskOverride) *Task {
 	s.Overrides = v
+	return s
+}
+
+// SetPlatformFamily sets the PlatformFamily field's value.
+func (s *Task) SetPlatformFamily(v string) *Task {
+	s.PlatformFamily = &v
 	return s
 }
 
@@ -10072,6 +21045,12 @@ func (s *Task) SetStartedBy(v string) *Task {
 	return s
 }
 
+// SetStopCode sets the StopCode field's value.
+func (s *Task) SetStopCode(v string) *Task {
+	s.StopCode = &v
+	return s
+}
+
 // SetStoppedAt sets the StoppedAt field's value.
 func (s *Task) SetStoppedAt(v time.Time) *Task {
 	s.StoppedAt = &v
@@ -10087,6 +21066,12 @@ func (s *Task) SetStoppedReason(v string) *Task {
 // SetStoppingAt sets the StoppingAt field's value.
 func (s *Task) SetStoppingAt(v time.Time) *Task {
 	s.StoppingAt = &v
+	return s
+}
+
+// SetTags sets the Tags field's value.
+func (s *Task) SetTags(v []*Tag) *Task {
+	s.Tags = v
 	return s
 }
 
@@ -10108,25 +21093,30 @@ func (s *Task) SetVersion(v int64) *Task {
 	return s
 }
 
-// Details of a task definition.
+// The details of a task definition which describes the container and volume
+// definitions of an Amazon Elastic Container Service task. You can specify
+// which Docker images to use, the required resources, and other configurations
+// related to launching the task definition through an Amazon ECS service or
+// task.
 type TaskDefinition struct {
 	_ struct{} `type:"structure"`
 
-	// The launch type to use with your task. For more information, see Amazon ECS
-	// Launch Types (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html)
+	// The task launch types the task definition validated against during task definition
+	// registration. For more information, see Amazon ECS launch types (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	Compatibilities []*string `locationName:"compatibilities" type:"list"`
 
 	// A list of container definitions in JSON format that describe the different
 	// containers that make up your task. For more information about container definition
-	// parameters and defaults, see Amazon ECS Task Definitions (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_defintions.html)
+	// parameters and defaults, see Amazon ECS Task Definitions (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_defintions.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	ContainerDefinitions []*ContainerDefinition `locationName:"containerDefinitions" type:"list"`
 
-	// The number of cpu units used by the task. If using the EC2 launch type, this
-	// field is optional and any value can be used. If using the Fargate launch
-	// type, this field is required and you must use one of the following values,
-	// which determines your range of valid values for the memory parameter:
+	// The number of cpu units used by the task. If you are using the EC2 launch
+	// type, this field is optional and any value can be used. If you are using
+	// the Fargate launch type, this field is required and you must use one of the
+	// following values, which determines your range of valid values for the memory
+	// parameter:
 	//
 	//    * 256 (.25 vCPU) - Available memory values: 512 (0.5 GB), 1024 (1 GB),
 	//    2048 (2 GB)
@@ -10144,17 +21134,74 @@ type TaskDefinition struct {
 	//    (30 GB) in increments of 1024 (1 GB)
 	Cpu *string `locationName:"cpu" type:"string"`
 
-	// The Amazon Resource Name (ARN) of the task execution role that the Amazon
-	// ECS container agent and the Docker daemon can assume.
+	// The Unix timestamp for when the task definition was deregistered.
+	DeregisteredAt *time.Time `locationName:"deregisteredAt" type:"timestamp"`
+
+	// The ephemeral storage settings to use for tasks run with the task definition.
+	EphemeralStorage *EphemeralStorage `locationName:"ephemeralStorage" type:"structure"`
+
+	// The Amazon Resource Name (ARN) of the task execution role that grants the
+	// Amazon ECS container agent permission to make Amazon Web Services API calls
+	// on your behalf. The task execution IAM role is required depending on the
+	// requirements of your task. For more information, see Amazon ECS task execution
+	// IAM role (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html)
+	// in the Amazon Elastic Container Service Developer Guide.
 	ExecutionRoleArn *string `locationName:"executionRoleArn" type:"string"`
 
-	// The family of your task definition, used as the definition name.
+	// The name of a family that this task definition is registered to. Up to 255
+	// letters (uppercase and lowercase), numbers, hyphens, and underscores are
+	// allowed.
+	//
+	// A family groups multiple versions of a task definition. Amazon ECS gives
+	// the first task definition that you registered to a family a revision number
+	// of 1. Amazon ECS gives sequential revision numbers to each task definition
+	// that you add.
 	Family *string `locationName:"family" type:"string"`
 
-	// The amount (in MiB) of memory used by the task. If using the EC2 launch type,
-	// this field is optional and any value can be used. If using the Fargate launch
-	// type, this field is required and you must use one of the following values,
-	// which determines your range of valid values for the cpu parameter:
+	// The Elastic Inference accelerator associated with the task.
+	InferenceAccelerators []*InferenceAccelerator `locationName:"inferenceAccelerators" type:"list"`
+
+	// The IPC resource namespace to use for the containers in the task. The valid
+	// values are host, task, or none. If host is specified, then all containers
+	// within the tasks that specified the host IPC mode on the same container instance
+	// share the same IPC resources with the host Amazon EC2 instance. If task is
+	// specified, all containers within the specified task share the same IPC resources.
+	// If none is specified, then IPC resources within the containers of a task
+	// are private and not shared with other containers in a task or on the container
+	// instance. If no value is specified, then the IPC resource namespace sharing
+	// depends on the Docker daemon setting on the container instance. For more
+	// information, see IPC settings (https://docs.docker.com/engine/reference/run/#ipc-settings---ipc)
+	// in the Docker run reference.
+	//
+	// If the host IPC mode is used, be aware that there is a heightened risk of
+	// undesired IPC namespace expose. For more information, see Docker security
+	// (https://docs.docker.com/engine/security/security/).
+	//
+	// If you are setting namespaced kernel parameters using systemControls for
+	// the containers in the task, the following will apply to your IPC resource
+	// namespace. For more information, see System Controls (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	//
+	//    * For tasks that use the host IPC mode, IPC namespace related systemControls
+	//    are not supported.
+	//
+	//    * For tasks that use the task IPC mode, IPC namespace related systemControls
+	//    will apply to all containers within a task.
+	//
+	// This parameter is not supported for Windows containers or tasks run on Fargate.
+	IpcMode *string `locationName:"ipcMode" type:"string" enum:"IpcMode"`
+
+	// The amount (in MiB) of memory used by the task.
+	//
+	// If your tasks will be run on Amazon EC2 instances, you must specify either
+	// a task-level memory value or a container-level memory value. This field is
+	// optional and any value can be used. If a task-level memory value is specified
+	// then the container-level memory value is optional. For more information regarding
+	// container-level memory and memory reservation, see ContainerDefinition (https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ContainerDefinition.html).
+	//
+	// If your tasks will be run on Fargate, this field is required and you must
+	// use one of the following values, which determines your range of valid values
+	// for the cpu parameter:
 	//
 	//    * 512 (0.5 GB), 1024 (1 GB), 2048 (2 GB) - Available cpu values: 256 (.25
 	//    vCPU)
@@ -10173,59 +21220,107 @@ type TaskDefinition struct {
 	Memory *string `locationName:"memory" type:"string"`
 
 	// The Docker networking mode to use for the containers in the task. The valid
-	// values are none, bridge, awsvpc, and host. The default Docker network mode
-	// is bridge. If using the Fargate launch type, the awsvpc network mode is required.
-	// If using the EC2 launch type, any network mode can be used. If the network
-	// mode is set to none, you can't specify port mappings in your container definitions,
-	// and the task's containers do not have external connectivity. The host and
-	// awsvpc network modes offer the highest networking performance for containers
-	// because they use the EC2 network stack instead of the virtualized network
-	// stack provided by the bridge mode.
+	// values are none, bridge, awsvpc, and host. If no network mode is specified,
+	// the default is bridge.
+	//
+	// For Amazon ECS tasks on Fargate, the awsvpc network mode is required. For
+	// Amazon ECS tasks on Amazon EC2 Linux instances, any network mode can be used.
+	// For Amazon ECS tasks on Amazon EC2 Windows instances, <default> or awsvpc
+	// can be used. If the network mode is set to none, you cannot specify port
+	// mappings in your container definitions, and the tasks containers do not have
+	// external connectivity. The host and awsvpc network modes offer the highest
+	// networking performance for containers because they use the EC2 network stack
+	// instead of the virtualized network stack provided by the bridge mode.
 	//
 	// With the host and awsvpc network modes, exposed container ports are mapped
 	// directly to the corresponding host port (for the host network mode) or the
 	// attached elastic network interface port (for the awsvpc network mode), so
 	// you cannot take advantage of dynamic host port mappings.
 	//
-	// If the network mode is awsvpc, the task is allocated an Elastic Network Interface,
-	// and you must specify a NetworkConfiguration when you create a service or
-	// run a task with the task definition. For more information, see Task Networking
-	// (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html)
+	// When using the host network mode, you should not run containers using the
+	// root user (UID 0). It is considered best practice to use a non-root user.
+	//
+	// If the network mode is awsvpc, the task is allocated an elastic network interface,
+	// and you must specify a NetworkConfiguration value when you create a service
+	// or run a task with the task definition. For more information, see Task Networking
+	// (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	//
-	// Currently, only the Amazon ECS-optimized AMI, other Amazon Linux variants
-	// with the ecs-init package, or AWS Fargate infrastructure support the awsvpc
-	// network mode.
-	//
-	// If the network mode is host, you can't run multiple instantiations of the
+	// If the network mode is host, you cannot run multiple instantiations of the
 	// same task on a single container instance when port mappings are used.
-	//
-	// Docker for Windows uses different network modes than Docker for Linux. When
-	// you register a task definition with Windows containers, you must not specify
-	// a network mode. If you use the console to register a task definition with
-	// Windows containers, you must choose the <default> network mode object.
 	//
 	// For more information, see Network settings (https://docs.docker.com/engine/reference/run/#network-settings)
 	// in the Docker run reference.
 	NetworkMode *string `locationName:"networkMode" type:"string" enum:"NetworkMode"`
 
-	// An array of placement constraint objects to use for tasks. This field is
-	// not valid if using the Fargate launch type for your task.
+	// The process namespace to use for the containers in the task. The valid values
+	// are host or task. If host is specified, then all containers within the tasks
+	// that specified the host PID mode on the same container instance share the
+	// same process namespace with the host Amazon EC2 instance. If task is specified,
+	// all containers within the specified task share the same process namespace.
+	// If no value is specified, the default is a private namespace. For more information,
+	// see PID settings (https://docs.docker.com/engine/reference/run/#pid-settings---pid)
+	// in the Docker run reference.
+	//
+	// If the host PID mode is used, be aware that there is a heightened risk of
+	// undesired process namespace expose. For more information, see Docker security
+	// (https://docs.docker.com/engine/security/security/).
+	//
+	// This parameter is not supported for Windows containers or tasks run on Fargate.
+	PidMode *string `locationName:"pidMode" type:"string" enum:"PidMode"`
+
+	// An array of placement constraint objects to use for tasks.
+	//
+	// This parameter is not supported for tasks run on Fargate.
 	PlacementConstraints []*TaskDefinitionPlacementConstraint `locationName:"placementConstraints" type:"list"`
 
-	// The container instance attributes required by your task. This field is not
-	// valid if using the Fargate launch type for your task.
+	// The configuration details for the App Mesh proxy.
+	//
+	// Your Amazon ECS container instances require at least version 1.26.0 of the
+	// container agent and at least version 1.26.0-1 of the ecs-init package to
+	// enable a proxy configuration. If your container instances are launched from
+	// the Amazon ECS-optimized AMI version 20190301 or later, then they contain
+	// the required versions of the container agent and ecs-init. For more information,
+	// see Amazon ECS-optimized Linux AMI (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	ProxyConfiguration *ProxyConfiguration `locationName:"proxyConfiguration" type:"structure"`
+
+	// The Unix timestamp for when the task definition was registered.
+	RegisteredAt *time.Time `locationName:"registeredAt" type:"timestamp"`
+
+	// The principal that registered the task definition.
+	RegisteredBy *string `locationName:"registeredBy" type:"string"`
+
+	// The container instance attributes required by your task. When an Amazon EC2
+	// instance is registered to your cluster, the Amazon ECS container agent assigns
+	// some standard attributes to the instance. You can apply custom attributes,
+	// specified as key-value pairs using the Amazon ECS console or the PutAttributes
+	// API. These attributes are used when considering task placement for tasks
+	// hosted on Amazon EC2 instances. For more information, see Attributes (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html#attributes)
+	// in the Amazon Elastic Container Service Developer Guide.
+	//
+	// This parameter is not supported for tasks run on Fargate.
 	RequiresAttributes []*Attribute `locationName:"requiresAttributes" type:"list"`
 
-	// The launch type the task is using.
+	// The task launch types the task definition was validated against. To determine
+	// which task launch types the task definition is validated for, see the TaskDefinition$compatibilities
+	// parameter.
 	RequiresCompatibilities []*string `locationName:"requiresCompatibilities" type:"list"`
 
 	// The revision of the task in a particular family. The revision is a version
 	// number of a task definition in a family. When you register a task definition
-	// for the first time, the revision is 1; each time you register a new revision
-	// of a task definition in the same family, the revision value always increases
-	// by one (even if you have deregistered previous revisions in this family).
+	// for the first time, the revision is 1. Each time that you register a new
+	// revision of a task definition in the same family, the revision value always
+	// increases by one, even if you have deregistered previous revisions in this
+	// family.
 	Revision *int64 `locationName:"revision" type:"integer"`
+
+	// The operating system that your task definitions are running on. A platform
+	// family is specified only for tasks using the Fargate launch type.
+	//
+	// When you specify a task in a service, this value must match the runtimePlatform
+	// value of the service.
+	RuntimePlatform *RuntimePlatform `locationName:"runtimePlatform" type:"structure"`
 
 	// The status of the task definition.
 	Status *string `locationName:"status" type:"string" enum:"TaskDefinitionStatus"`
@@ -10233,33 +21328,41 @@ type TaskDefinition struct {
 	// The full Amazon Resource Name (ARN) of the task definition.
 	TaskDefinitionArn *string `locationName:"taskDefinitionArn" type:"string"`
 
-	// The ARN of the IAM role that containers in this task can assume. All containers
-	// in this task are granted the permissions that are specified in this role.
+	// The short name or full Amazon Resource Name (ARN) of the Identity and Access
+	// Management role that grants containers in the task permission to call Amazon
+	// Web Services APIs on your behalf. For more information, see Amazon ECS Task
+	// Role (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html)
+	// in the Amazon Elastic Container Service Developer Guide.
 	//
 	// IAM roles for tasks on Windows require that the -EnableTaskIAMRole option
 	// is set when you launch the Amazon ECS-optimized Windows AMI. Your containers
 	// must also run some configuration code in order to take advantage of the feature.
-	// For more information, see Windows IAM Roles for Tasks (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/windows_task_IAM_roles.html)
+	// For more information, see Windows IAM roles for tasks (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/windows_task_IAM_roles.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	TaskRoleArn *string `locationName:"taskRoleArn" type:"string"`
 
-	// The list of volumes in a task.
-	//
-	// If you are using the Fargate launch type, the host and sourcePath parameters
-	// are not supported.
-	//
-	// For more information about volume definition parameters and defaults, see
-	// Amazon ECS Task Definitions (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html)
+	// The list of data volume definitions for the task. For more information, see
+	// Using data volumes in tasks (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_data_volumes.html)
 	// in the Amazon Elastic Container Service Developer Guide.
+	//
+	// The host and sourcePath parameters are not supported for tasks run on Fargate.
 	Volumes []*Volume `locationName:"volumes" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s TaskDefinition) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s TaskDefinition) GoString() string {
 	return s.String()
 }
@@ -10282,6 +21385,18 @@ func (s *TaskDefinition) SetCpu(v string) *TaskDefinition {
 	return s
 }
 
+// SetDeregisteredAt sets the DeregisteredAt field's value.
+func (s *TaskDefinition) SetDeregisteredAt(v time.Time) *TaskDefinition {
+	s.DeregisteredAt = &v
+	return s
+}
+
+// SetEphemeralStorage sets the EphemeralStorage field's value.
+func (s *TaskDefinition) SetEphemeralStorage(v *EphemeralStorage) *TaskDefinition {
+	s.EphemeralStorage = v
+	return s
+}
+
 // SetExecutionRoleArn sets the ExecutionRoleArn field's value.
 func (s *TaskDefinition) SetExecutionRoleArn(v string) *TaskDefinition {
 	s.ExecutionRoleArn = &v
@@ -10291,6 +21406,18 @@ func (s *TaskDefinition) SetExecutionRoleArn(v string) *TaskDefinition {
 // SetFamily sets the Family field's value.
 func (s *TaskDefinition) SetFamily(v string) *TaskDefinition {
 	s.Family = &v
+	return s
+}
+
+// SetInferenceAccelerators sets the InferenceAccelerators field's value.
+func (s *TaskDefinition) SetInferenceAccelerators(v []*InferenceAccelerator) *TaskDefinition {
+	s.InferenceAccelerators = v
+	return s
+}
+
+// SetIpcMode sets the IpcMode field's value.
+func (s *TaskDefinition) SetIpcMode(v string) *TaskDefinition {
+	s.IpcMode = &v
 	return s
 }
 
@@ -10306,9 +21433,33 @@ func (s *TaskDefinition) SetNetworkMode(v string) *TaskDefinition {
 	return s
 }
 
+// SetPidMode sets the PidMode field's value.
+func (s *TaskDefinition) SetPidMode(v string) *TaskDefinition {
+	s.PidMode = &v
+	return s
+}
+
 // SetPlacementConstraints sets the PlacementConstraints field's value.
 func (s *TaskDefinition) SetPlacementConstraints(v []*TaskDefinitionPlacementConstraint) *TaskDefinition {
 	s.PlacementConstraints = v
+	return s
+}
+
+// SetProxyConfiguration sets the ProxyConfiguration field's value.
+func (s *TaskDefinition) SetProxyConfiguration(v *ProxyConfiguration) *TaskDefinition {
+	s.ProxyConfiguration = v
+	return s
+}
+
+// SetRegisteredAt sets the RegisteredAt field's value.
+func (s *TaskDefinition) SetRegisteredAt(v time.Time) *TaskDefinition {
+	s.RegisteredAt = &v
+	return s
+}
+
+// SetRegisteredBy sets the RegisteredBy field's value.
+func (s *TaskDefinition) SetRegisteredBy(v string) *TaskDefinition {
+	s.RegisteredBy = &v
 	return s
 }
 
@@ -10327,6 +21478,12 @@ func (s *TaskDefinition) SetRequiresCompatibilities(v []*string) *TaskDefinition
 // SetRevision sets the Revision field's value.
 func (s *TaskDefinition) SetRevision(v int64) *TaskDefinition {
 	s.Revision = &v
+	return s
+}
+
+// SetRuntimePlatform sets the RuntimePlatform field's value.
+func (s *TaskDefinition) SetRuntimePlatform(v *RuntimePlatform) *TaskDefinition {
+	s.RuntimePlatform = v
 	return s
 }
 
@@ -10355,32 +21512,37 @@ func (s *TaskDefinition) SetVolumes(v []*Volume) *TaskDefinition {
 }
 
 // An object representing a constraint on task placement in the task definition.
-//
-// If you are using the Fargate launch type, task placement constraints are
-// not supported.
-//
-// For more information, see Task Placement Constraints (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html)
+// For more information, see Task placement constraints (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html)
 // in the Amazon Elastic Container Service Developer Guide.
+//
+// Task placement constraints are not supported for tasks run on Fargate.
 type TaskDefinitionPlacementConstraint struct {
 	_ struct{} `type:"structure"`
 
 	// A cluster query language expression to apply to the constraint. For more
-	// information, see Cluster Query Language (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/cluster-query-language.html)
+	// information, see Cluster query language (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cluster-query-language.html)
 	// in the Amazon Elastic Container Service Developer Guide.
 	Expression *string `locationName:"expression" type:"string"`
 
-	// The type of constraint. The DistinctInstance constraint ensures that each
-	// task in a particular group is running on a different container instance.
-	// The MemberOf constraint restricts selection to be from a group of valid candidates.
+	// The type of constraint. The MemberOf constraint restricts selection to be
+	// from a group of valid candidates.
 	Type *string `locationName:"type" type:"string" enum:"TaskDefinitionPlacementConstraintType"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s TaskDefinitionPlacementConstraint) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s TaskDefinitionPlacementConstraint) GoString() string {
 	return s.String()
 }
@@ -10404,29 +21566,96 @@ type TaskOverride struct {
 	// One or more container overrides sent to a task.
 	ContainerOverrides []*ContainerOverride `locationName:"containerOverrides" type:"list"`
 
-	// The Amazon Resource Name (ARN) of the task execution role that the Amazon
-	// ECS container agent and the Docker daemon can assume.
+	// The cpu override for the task.
+	Cpu *string `locationName:"cpu" type:"string"`
+
+	// The ephemeral storage setting override for the task.
+	//
+	// This parameter is only supported for tasks hosted on Fargate using the following
+	// platform versions:
+	//
+	//    * Linux platform version 1.4.0 or later.
+	//
+	//    * Windows platform version 1.0.0 or later.
+	EphemeralStorage *EphemeralStorage `locationName:"ephemeralStorage" type:"structure"`
+
+	// The Amazon Resource Name (ARN) of the task execution IAM role override for
+	// the task. For more information, see Amazon ECS task execution IAM role (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html)
+	// in the Amazon Elastic Container Service Developer Guide.
 	ExecutionRoleArn *string `locationName:"executionRoleArn" type:"string"`
+
+	// The Elastic Inference accelerator override for the task.
+	InferenceAcceleratorOverrides []*InferenceAcceleratorOverride `locationName:"inferenceAcceleratorOverrides" type:"list"`
+
+	// The memory override for the task.
+	Memory *string `locationName:"memory" type:"string"`
 
 	// The Amazon Resource Name (ARN) of the IAM role that containers in this task
 	// can assume. All containers in this task are granted the permissions that
-	// are specified in this role.
+	// are specified in this role. For more information, see IAM Role for Tasks
+	// (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html)
+	// in the Amazon Elastic Container Service Developer Guide.
 	TaskRoleArn *string `locationName:"taskRoleArn" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s TaskOverride) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s TaskOverride) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *TaskOverride) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "TaskOverride"}
+	if s.ContainerOverrides != nil {
+		for i, v := range s.ContainerOverrides {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "ContainerOverrides", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+	if s.EphemeralStorage != nil {
+		if err := s.EphemeralStorage.Validate(); err != nil {
+			invalidParams.AddNested("EphemeralStorage", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // SetContainerOverrides sets the ContainerOverrides field's value.
 func (s *TaskOverride) SetContainerOverrides(v []*ContainerOverride) *TaskOverride {
 	s.ContainerOverrides = v
+	return s
+}
+
+// SetCpu sets the Cpu field's value.
+func (s *TaskOverride) SetCpu(v string) *TaskOverride {
+	s.Cpu = &v
+	return s
+}
+
+// SetEphemeralStorage sets the EphemeralStorage field's value.
+func (s *TaskOverride) SetEphemeralStorage(v *EphemeralStorage) *TaskOverride {
+	s.EphemeralStorage = v
 	return s
 }
 
@@ -10436,10 +21665,409 @@ func (s *TaskOverride) SetExecutionRoleArn(v string) *TaskOverride {
 	return s
 }
 
+// SetInferenceAcceleratorOverrides sets the InferenceAcceleratorOverrides field's value.
+func (s *TaskOverride) SetInferenceAcceleratorOverrides(v []*InferenceAcceleratorOverride) *TaskOverride {
+	s.InferenceAcceleratorOverrides = v
+	return s
+}
+
+// SetMemory sets the Memory field's value.
+func (s *TaskOverride) SetMemory(v string) *TaskOverride {
+	s.Memory = &v
+	return s
+}
+
 // SetTaskRoleArn sets the TaskRoleArn field's value.
 func (s *TaskOverride) SetTaskRoleArn(v string) *TaskOverride {
 	s.TaskRoleArn = &v
 	return s
+}
+
+// Information about a set of Amazon ECS tasks in either an CodeDeploy or an
+// EXTERNAL deployment. An Amazon ECS task set includes details such as the
+// desired number of tasks, how many tasks are running, and whether the task
+// set serves production traffic.
+type TaskSet struct {
+	_ struct{} `type:"structure"`
+
+	// The capacity provider strategy associated with the task set.
+	CapacityProviderStrategy []*CapacityProviderStrategyItem `locationName:"capacityProviderStrategy" type:"list"`
+
+	// The Amazon Resource Name (ARN) of the cluster that the service that hosts
+	// the task set exists in.
+	ClusterArn *string `locationName:"clusterArn" type:"string"`
+
+	// The computed desired count for the task set. This is calculated by multiplying
+	// the service's desiredCount by the task set's scale percentage. The result
+	// is always rounded up. For example, if the computed desired count is 1.2,
+	// it rounds up to 2 tasks.
+	ComputedDesiredCount *int64 `locationName:"computedDesiredCount" type:"integer"`
+
+	// The Unix timestamp for when the task set was created.
+	CreatedAt *time.Time `locationName:"createdAt" type:"timestamp"`
+
+	// The external ID associated with the task set.
+	//
+	// If a task set is created by an CodeDeploy deployment, the externalId parameter
+	// contains the CodeDeploy deployment ID.
+	//
+	// If a task set is created for an external deployment and is associated with
+	// a service discovery registry, the externalId parameter contains the ECS_TASK_SET_EXTERNAL_ID
+	// Cloud Map attribute.
+	ExternalId *string `locationName:"externalId" type:"string"`
+
+	// The ID of the task set.
+	Id *string `locationName:"id" type:"string"`
+
+	// The launch type the tasks in the task set are using. For more information,
+	// see Amazon ECS launch types (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	LaunchType *string `locationName:"launchType" type:"string" enum:"LaunchType"`
+
+	// Details on a load balancer that is used with a task set.
+	LoadBalancers []*LoadBalancer `locationName:"loadBalancers" type:"list"`
+
+	// The network configuration for the task set.
+	NetworkConfiguration *NetworkConfiguration `locationName:"networkConfiguration" type:"structure"`
+
+	// The number of tasks in the task set that are in the PENDING status during
+	// a deployment. A task in the PENDING state is preparing to enter the RUNNING
+	// state. A task set enters the PENDING status when it launches for the first
+	// time or when it is restarted after being in the STOPPED state.
+	PendingCount *int64 `locationName:"pendingCount" type:"integer"`
+
+	// The operating system that your tasks in the set are running on. A platform
+	// family is specified only for tasks using the Fargate launch type.
+	//
+	// All tasks in the set must have the same value.
+	PlatformFamily *string `locationName:"platformFamily" type:"string"`
+
+	// The Fargate platform version on which the tasks in the task set are running.
+	// A platform version is only specified for tasks run on Fargate. For more information,
+	// see Fargate platform versions (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html)
+	// in the Amazon Elastic Container Service Developer Guide.
+	PlatformVersion *string `locationName:"platformVersion" type:"string"`
+
+	// The number of tasks in the task set that are in the RUNNING status during
+	// a deployment. A task in the RUNNING state is running and ready for use.
+	RunningCount *int64 `locationName:"runningCount" type:"integer"`
+
+	// A floating-point percentage of the desired number of tasks to place and keep
+	// running in the task set.
+	Scale *Scale `locationName:"scale" type:"structure"`
+
+	// The Amazon Resource Name (ARN) of the service the task set exists in.
+	ServiceArn *string `locationName:"serviceArn" type:"string"`
+
+	// The details of the service discovery registries to assign to this task set.
+	// For more information, see Service discovery (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-discovery.html).
+	ServiceRegistries []*ServiceRegistry `locationName:"serviceRegistries" type:"list"`
+
+	// The stability status, which indicates whether the task set has reached a
+	// steady state. If the following conditions are met, the task set will be in
+	// STEADY_STATE:
+	//
+	//    * The task runningCount is equal to the computedDesiredCount.
+	//
+	//    * The pendingCount is 0.
+	//
+	//    * There are no tasks running on container instances in the DRAINING status.
+	//
+	//    * All tasks are reporting a healthy status from the load balancers, service
+	//    discovery, and container health checks.
+	//
+	// If any of those conditions are not met, the stability status returns STABILIZING.
+	StabilityStatus *string `locationName:"stabilityStatus" type:"string" enum:"StabilityStatus"`
+
+	// The Unix timestamp for when the task set stability status was retrieved.
+	StabilityStatusAt *time.Time `locationName:"stabilityStatusAt" type:"timestamp"`
+
+	// The tag specified when a task set is started. If the task set is created
+	// by an CodeDeploy deployment, the startedBy parameter is CODE_DEPLOY. For
+	// a task set created for an external deployment, the startedBy field isn't
+	// used.
+	StartedBy *string `locationName:"startedBy" type:"string"`
+
+	// The status of the task set. The following describes each state:
+	//
+	// PRIMARY
+	//
+	// The task set is serving production traffic.
+	//
+	// ACTIVE
+	//
+	// The task set is not serving production traffic.
+	//
+	// DRAINING
+	//
+	// The tasks in the task set are being stopped and their corresponding targets
+	// are being deregistered from their target group.
+	Status *string `locationName:"status" type:"string"`
+
+	// The metadata that you apply to the task set to help you categorize and organize
+	// them. Each tag consists of a key and an optional value, both of which you
+	// define.
+	//
+	// The following basic restrictions apply to tags:
+	//
+	//    * Maximum number of tags per resource - 50
+	//
+	//    * For each resource, each tag key must be unique, and each tag key can
+	//    have only one value.
+	//
+	//    * Maximum key length - 128 Unicode characters in UTF-8
+	//
+	//    * Maximum value length - 256 Unicode characters in UTF-8
+	//
+	//    * If your tagging schema is used across multiple services and resources,
+	//    remember that other services may have restrictions on allowed characters.
+	//    Generally allowed characters are: letters, numbers, and spaces representable
+	//    in UTF-8, and the following characters: + - = . _ : / @.
+	//
+	//    * Tag keys and values are case-sensitive.
+	//
+	//    * Do not use aws:, AWS:, or any upper or lowercase combination of such
+	//    as a prefix for either keys or values as it is reserved for Amazon Web
+	//    Services use. You cannot edit or delete tag keys or values with this prefix.
+	//    Tags with this prefix do not count against your tags per resource limit.
+	Tags []*Tag `locationName:"tags" type:"list"`
+
+	// The task definition the task set is using.
+	TaskDefinition *string `locationName:"taskDefinition" type:"string"`
+
+	// The Amazon Resource Name (ARN) of the task set.
+	TaskSetArn *string `locationName:"taskSetArn" type:"string"`
+
+	// The Unix timestamp for when the task set was last updated.
+	UpdatedAt *time.Time `locationName:"updatedAt" type:"timestamp"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s TaskSet) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s TaskSet) GoString() string {
+	return s.String()
+}
+
+// SetCapacityProviderStrategy sets the CapacityProviderStrategy field's value.
+func (s *TaskSet) SetCapacityProviderStrategy(v []*CapacityProviderStrategyItem) *TaskSet {
+	s.CapacityProviderStrategy = v
+	return s
+}
+
+// SetClusterArn sets the ClusterArn field's value.
+func (s *TaskSet) SetClusterArn(v string) *TaskSet {
+	s.ClusterArn = &v
+	return s
+}
+
+// SetComputedDesiredCount sets the ComputedDesiredCount field's value.
+func (s *TaskSet) SetComputedDesiredCount(v int64) *TaskSet {
+	s.ComputedDesiredCount = &v
+	return s
+}
+
+// SetCreatedAt sets the CreatedAt field's value.
+func (s *TaskSet) SetCreatedAt(v time.Time) *TaskSet {
+	s.CreatedAt = &v
+	return s
+}
+
+// SetExternalId sets the ExternalId field's value.
+func (s *TaskSet) SetExternalId(v string) *TaskSet {
+	s.ExternalId = &v
+	return s
+}
+
+// SetId sets the Id field's value.
+func (s *TaskSet) SetId(v string) *TaskSet {
+	s.Id = &v
+	return s
+}
+
+// SetLaunchType sets the LaunchType field's value.
+func (s *TaskSet) SetLaunchType(v string) *TaskSet {
+	s.LaunchType = &v
+	return s
+}
+
+// SetLoadBalancers sets the LoadBalancers field's value.
+func (s *TaskSet) SetLoadBalancers(v []*LoadBalancer) *TaskSet {
+	s.LoadBalancers = v
+	return s
+}
+
+// SetNetworkConfiguration sets the NetworkConfiguration field's value.
+func (s *TaskSet) SetNetworkConfiguration(v *NetworkConfiguration) *TaskSet {
+	s.NetworkConfiguration = v
+	return s
+}
+
+// SetPendingCount sets the PendingCount field's value.
+func (s *TaskSet) SetPendingCount(v int64) *TaskSet {
+	s.PendingCount = &v
+	return s
+}
+
+// SetPlatformFamily sets the PlatformFamily field's value.
+func (s *TaskSet) SetPlatformFamily(v string) *TaskSet {
+	s.PlatformFamily = &v
+	return s
+}
+
+// SetPlatformVersion sets the PlatformVersion field's value.
+func (s *TaskSet) SetPlatformVersion(v string) *TaskSet {
+	s.PlatformVersion = &v
+	return s
+}
+
+// SetRunningCount sets the RunningCount field's value.
+func (s *TaskSet) SetRunningCount(v int64) *TaskSet {
+	s.RunningCount = &v
+	return s
+}
+
+// SetScale sets the Scale field's value.
+func (s *TaskSet) SetScale(v *Scale) *TaskSet {
+	s.Scale = v
+	return s
+}
+
+// SetServiceArn sets the ServiceArn field's value.
+func (s *TaskSet) SetServiceArn(v string) *TaskSet {
+	s.ServiceArn = &v
+	return s
+}
+
+// SetServiceRegistries sets the ServiceRegistries field's value.
+func (s *TaskSet) SetServiceRegistries(v []*ServiceRegistry) *TaskSet {
+	s.ServiceRegistries = v
+	return s
+}
+
+// SetStabilityStatus sets the StabilityStatus field's value.
+func (s *TaskSet) SetStabilityStatus(v string) *TaskSet {
+	s.StabilityStatus = &v
+	return s
+}
+
+// SetStabilityStatusAt sets the StabilityStatusAt field's value.
+func (s *TaskSet) SetStabilityStatusAt(v time.Time) *TaskSet {
+	s.StabilityStatusAt = &v
+	return s
+}
+
+// SetStartedBy sets the StartedBy field's value.
+func (s *TaskSet) SetStartedBy(v string) *TaskSet {
+	s.StartedBy = &v
+	return s
+}
+
+// SetStatus sets the Status field's value.
+func (s *TaskSet) SetStatus(v string) *TaskSet {
+	s.Status = &v
+	return s
+}
+
+// SetTags sets the Tags field's value.
+func (s *TaskSet) SetTags(v []*Tag) *TaskSet {
+	s.Tags = v
+	return s
+}
+
+// SetTaskDefinition sets the TaskDefinition field's value.
+func (s *TaskSet) SetTaskDefinition(v string) *TaskSet {
+	s.TaskDefinition = &v
+	return s
+}
+
+// SetTaskSetArn sets the TaskSetArn field's value.
+func (s *TaskSet) SetTaskSetArn(v string) *TaskSet {
+	s.TaskSetArn = &v
+	return s
+}
+
+// SetUpdatedAt sets the UpdatedAt field's value.
+func (s *TaskSet) SetUpdatedAt(v time.Time) *TaskSet {
+	s.UpdatedAt = &v
+	return s
+}
+
+// The specified task set could not be found. You can view your available task
+// sets with DescribeTaskSets. Task sets are specific to each cluster, service
+// and Region.
+type TaskSetNotFoundException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s TaskSetNotFoundException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s TaskSetNotFoundException) GoString() string {
+	return s.String()
+}
+
+func newErrorTaskSetNotFoundException(v protocol.ResponseMetadata) error {
+	return &TaskSetNotFoundException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *TaskSetNotFoundException) Code() string {
+	return "TaskSetNotFoundException"
+}
+
+// Message returns the exception's message.
+func (s *TaskSetNotFoundException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *TaskSetNotFoundException) OrigErr() error {
+	return nil
+}
+
+func (s *TaskSetNotFoundException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *TaskSetNotFoundException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *TaskSetNotFoundException) RequestID() string {
+	return s.RespMetadata.RequestID
 }
 
 // The container path, mount options, and size of the tmpfs mount.
@@ -10458,20 +22086,29 @@ type Tmpfs struct {
 	// "nomand" | "atime" | "noatime" | "diratime" | "nodiratime" | "bind" | "rbind"
 	// | "unbindable" | "runbindable" | "private" | "rprivate" | "shared" | "rshared"
 	// | "slave" | "rslave" | "relatime" | "norelatime" | "strictatime" | "nostrictatime"
+	// | "mode" | "uid" | "gid" | "nr_inodes" | "nr_blocks" | "mpol"
 	MountOptions []*string `locationName:"mountOptions" type:"list"`
 
-	// The size (in MiB) of the tmpfs volume.
+	// The maximum size (in MiB) of the tmpfs volume.
 	//
 	// Size is a required field
 	Size *int64 `locationName:"size" type:"integer" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Tmpfs) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Tmpfs) GoString() string {
 	return s.String()
 }
@@ -10511,6 +22148,12 @@ func (s *Tmpfs) SetSize(v int64) *Tmpfs {
 }
 
 // The ulimit settings to pass to the container.
+//
+// Amazon ECS tasks hosted on Fargate use the default resource limit values
+// set by the operating system with the exception of the nofile resource limit
+// parameter which Fargate overrides. The nofile resource limit sets a restriction
+// on the number of open files that a container can use. The default nofile
+// soft limit is 1024 and hard limit is 4096.
 type Ulimit struct {
 	_ struct{} `type:"structure"`
 
@@ -10530,12 +22173,20 @@ type Ulimit struct {
 	SoftLimit *int64 `locationName:"softLimit" type:"integer" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Ulimit) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Ulimit) GoString() string {
 	return s.String()
 }
@@ -10577,6 +22228,440 @@ func (s *Ulimit) SetSoftLimit(v int64) *Ulimit {
 	return s
 }
 
+// The specified task is not supported in this Region.
+type UnsupportedFeatureException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UnsupportedFeatureException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UnsupportedFeatureException) GoString() string {
+	return s.String()
+}
+
+func newErrorUnsupportedFeatureException(v protocol.ResponseMetadata) error {
+	return &UnsupportedFeatureException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *UnsupportedFeatureException) Code() string {
+	return "UnsupportedFeatureException"
+}
+
+// Message returns the exception's message.
+func (s *UnsupportedFeatureException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *UnsupportedFeatureException) OrigErr() error {
+	return nil
+}
+
+func (s *UnsupportedFeatureException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *UnsupportedFeatureException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *UnsupportedFeatureException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
+type UntagResourceInput struct {
+	_ struct{} `type:"structure"`
+
+	// The Amazon Resource Name (ARN) of the resource from which to delete tags.
+	// Currently, the supported resources are Amazon ECS capacity providers, tasks,
+	// services, task definitions, clusters, and container instances.
+	//
+	// ResourceArn is a required field
+	ResourceArn *string `locationName:"resourceArn" type:"string" required:"true"`
+
+	// The keys of the tags to be removed.
+	//
+	// TagKeys is a required field
+	TagKeys []*string `locationName:"tagKeys" type:"list" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UntagResourceInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UntagResourceInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *UntagResourceInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "UntagResourceInput"}
+	if s.ResourceArn == nil {
+		invalidParams.Add(request.NewErrParamRequired("ResourceArn"))
+	}
+	if s.TagKeys == nil {
+		invalidParams.Add(request.NewErrParamRequired("TagKeys"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetResourceArn sets the ResourceArn field's value.
+func (s *UntagResourceInput) SetResourceArn(v string) *UntagResourceInput {
+	s.ResourceArn = &v
+	return s
+}
+
+// SetTagKeys sets the TagKeys field's value.
+func (s *UntagResourceInput) SetTagKeys(v []*string) *UntagResourceInput {
+	s.TagKeys = v
+	return s
+}
+
+type UntagResourceOutput struct {
+	_ struct{} `type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UntagResourceOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UntagResourceOutput) GoString() string {
+	return s.String()
+}
+
+type UpdateCapacityProviderInput struct {
+	_ struct{} `type:"structure"`
+
+	// An object representing the parameters to update for the Auto Scaling group
+	// capacity provider.
+	//
+	// AutoScalingGroupProvider is a required field
+	AutoScalingGroupProvider *AutoScalingGroupProviderUpdate `locationName:"autoScalingGroupProvider" type:"structure" required:"true"`
+
+	// The name of the capacity provider to update.
+	//
+	// Name is a required field
+	Name *string `locationName:"name" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateCapacityProviderInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateCapacityProviderInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *UpdateCapacityProviderInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "UpdateCapacityProviderInput"}
+	if s.AutoScalingGroupProvider == nil {
+		invalidParams.Add(request.NewErrParamRequired("AutoScalingGroupProvider"))
+	}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+	if s.AutoScalingGroupProvider != nil {
+		if err := s.AutoScalingGroupProvider.Validate(); err != nil {
+			invalidParams.AddNested("AutoScalingGroupProvider", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetAutoScalingGroupProvider sets the AutoScalingGroupProvider field's value.
+func (s *UpdateCapacityProviderInput) SetAutoScalingGroupProvider(v *AutoScalingGroupProviderUpdate) *UpdateCapacityProviderInput {
+	s.AutoScalingGroupProvider = v
+	return s
+}
+
+// SetName sets the Name field's value.
+func (s *UpdateCapacityProviderInput) SetName(v string) *UpdateCapacityProviderInput {
+	s.Name = &v
+	return s
+}
+
+type UpdateCapacityProviderOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Details about the capacity provider.
+	CapacityProvider *CapacityProvider `locationName:"capacityProvider" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateCapacityProviderOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateCapacityProviderOutput) GoString() string {
+	return s.String()
+}
+
+// SetCapacityProvider sets the CapacityProvider field's value.
+func (s *UpdateCapacityProviderOutput) SetCapacityProvider(v *CapacityProvider) *UpdateCapacityProviderOutput {
+	s.CapacityProvider = v
+	return s
+}
+
+type UpdateClusterInput struct {
+	_ struct{} `type:"structure"`
+
+	// The name of the cluster to modify the settings for.
+	//
+	// Cluster is a required field
+	Cluster *string `locationName:"cluster" type:"string" required:"true"`
+
+	// The execute command configuration for the cluster.
+	Configuration *ClusterConfiguration `locationName:"configuration" type:"structure"`
+
+	// The cluster settings for your cluster.
+	Settings []*ClusterSetting `locationName:"settings" type:"list"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateClusterInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateClusterInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *UpdateClusterInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "UpdateClusterInput"}
+	if s.Cluster == nil {
+		invalidParams.Add(request.NewErrParamRequired("Cluster"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetCluster sets the Cluster field's value.
+func (s *UpdateClusterInput) SetCluster(v string) *UpdateClusterInput {
+	s.Cluster = &v
+	return s
+}
+
+// SetConfiguration sets the Configuration field's value.
+func (s *UpdateClusterInput) SetConfiguration(v *ClusterConfiguration) *UpdateClusterInput {
+	s.Configuration = v
+	return s
+}
+
+// SetSettings sets the Settings field's value.
+func (s *UpdateClusterInput) SetSettings(v []*ClusterSetting) *UpdateClusterInput {
+	s.Settings = v
+	return s
+}
+
+type UpdateClusterOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Details about the cluster.
+	Cluster *Cluster `locationName:"cluster" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateClusterOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateClusterOutput) GoString() string {
+	return s.String()
+}
+
+// SetCluster sets the Cluster field's value.
+func (s *UpdateClusterOutput) SetCluster(v *Cluster) *UpdateClusterOutput {
+	s.Cluster = v
+	return s
+}
+
+type UpdateClusterSettingsInput struct {
+	_ struct{} `type:"structure"`
+
+	// The name of the cluster to modify the settings for.
+	//
+	// Cluster is a required field
+	Cluster *string `locationName:"cluster" type:"string" required:"true"`
+
+	// The setting to use by default for a cluster. This parameter is used to enable
+	// CloudWatch Container Insights for a cluster. If this value is specified,
+	// it will override the containerInsights value set with PutAccountSetting or
+	// PutAccountSettingDefault.
+	//
+	// Settings is a required field
+	Settings []*ClusterSetting `locationName:"settings" type:"list" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateClusterSettingsInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateClusterSettingsInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *UpdateClusterSettingsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "UpdateClusterSettingsInput"}
+	if s.Cluster == nil {
+		invalidParams.Add(request.NewErrParamRequired("Cluster"))
+	}
+	if s.Settings == nil {
+		invalidParams.Add(request.NewErrParamRequired("Settings"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetCluster sets the Cluster field's value.
+func (s *UpdateClusterSettingsInput) SetCluster(v string) *UpdateClusterSettingsInput {
+	s.Cluster = &v
+	return s
+}
+
+// SetSettings sets the Settings field's value.
+func (s *UpdateClusterSettingsInput) SetSettings(v []*ClusterSetting) *UpdateClusterSettingsInput {
+	s.Settings = v
+	return s
+}
+
+type UpdateClusterSettingsOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Details about the cluster
+	Cluster *Cluster `locationName:"cluster" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateClusterSettingsOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateClusterSettingsOutput) GoString() string {
+	return s.String()
+}
+
+// SetCluster sets the Cluster field's value.
+func (s *UpdateClusterSettingsOutput) SetCluster(v *Cluster) *UpdateClusterSettingsOutput {
+	s.Cluster = v
+	return s
+}
+
 type UpdateContainerAgentInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10592,12 +22677,20 @@ type UpdateContainerAgentInput struct {
 	ContainerInstance *string `locationName:"containerInstance" type:"string" required:"true"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s UpdateContainerAgentInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s UpdateContainerAgentInput) GoString() string {
 	return s.String()
 }
@@ -10634,12 +22727,20 @@ type UpdateContainerAgentOutput struct {
 	ContainerInstance *ContainerInstance `locationName:"containerInstance" type:"structure"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s UpdateContainerAgentOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s UpdateContainerAgentOutput) GoString() string {
 	return s.String()
 }
@@ -10664,17 +22765,30 @@ type UpdateContainerInstancesStateInput struct {
 	ContainerInstances []*string `locationName:"containerInstances" type:"list" required:"true"`
 
 	// The container instance state with which to update the container instance.
+	// The only valid values for this action are ACTIVE and DRAINING. A container
+	// instance can only be updated to DRAINING status once it has reached an ACTIVE
+	// state. If a container instance is in REGISTERING, DEREGISTERING, or REGISTRATION_FAILED
+	// state you can describe the container instance but will be unable to update
+	// the container instance state.
 	//
 	// Status is a required field
 	Status *string `locationName:"status" type:"string" required:"true" enum:"ContainerInstanceStatus"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s UpdateContainerInstancesStateInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s UpdateContainerInstancesStateInput) GoString() string {
 	return s.String()
 }
@@ -10723,12 +22837,20 @@ type UpdateContainerInstancesStateOutput struct {
 	Failures []*Failure `locationName:"failures" type:"list"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s UpdateContainerInstancesStateOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s UpdateContainerInstancesStateOutput) GoString() string {
 	return s.String()
 }
@@ -10745,8 +22867,103 @@ func (s *UpdateContainerInstancesStateOutput) SetFailures(v []*Failure) *UpdateC
 	return s
 }
 
+// There is already a current Amazon ECS container agent update in progress
+// on the specified container instance. If the container agent becomes disconnected
+// while it is in a transitional stage, such as PENDING or STAGING, the update
+// process can get stuck in that state. However, when the agent reconnects,
+// it resumes where it stopped previously.
+type UpdateInProgressException struct {
+	_            struct{}                  `type:"structure"`
+	RespMetadata protocol.ResponseMetadata `json:"-" xml:"-"`
+
+	Message_ *string `locationName:"message" type:"string"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateInProgressException) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateInProgressException) GoString() string {
+	return s.String()
+}
+
+func newErrorUpdateInProgressException(v protocol.ResponseMetadata) error {
+	return &UpdateInProgressException{
+		RespMetadata: v,
+	}
+}
+
+// Code returns the exception type name.
+func (s *UpdateInProgressException) Code() string {
+	return "UpdateInProgressException"
+}
+
+// Message returns the exception's message.
+func (s *UpdateInProgressException) Message() string {
+	if s.Message_ != nil {
+		return *s.Message_
+	}
+	return ""
+}
+
+// OrigErr always returns nil, satisfies awserr.Error interface.
+func (s *UpdateInProgressException) OrigErr() error {
+	return nil
+}
+
+func (s *UpdateInProgressException) Error() string {
+	return fmt.Sprintf("%s: %s", s.Code(), s.Message())
+}
+
+// Status code returns the HTTP status code for the request's response error.
+func (s *UpdateInProgressException) StatusCode() int {
+	return s.RespMetadata.StatusCode
+}
+
+// RequestID returns the service's response RequestID for request.
+func (s *UpdateInProgressException) RequestID() string {
+	return s.RespMetadata.RequestID
+}
+
 type UpdateServiceInput struct {
 	_ struct{} `type:"structure"`
+
+	// The capacity provider strategy to update the service to use.
+	//
+	// If the service is using the default capacity provider strategy for the cluster,
+	// the service can be updated to use one or more capacity providers as opposed
+	// to the default capacity provider strategy. However, when a service is using
+	// a capacity provider strategy that is not the default capacity provider strategy,
+	// the service cannot be updated to use the cluster's default capacity provider
+	// strategy.
+	//
+	// A capacity provider strategy consists of one or more capacity providers along
+	// with the base and weight to assign to them. A capacity provider must be associated
+	// with the cluster to be used in a capacity provider strategy. The PutClusterCapacityProviders
+	// API is used to associate a capacity provider with a cluster. Only capacity
+	// providers with an ACTIVE or UPDATING status can be used.
+	//
+	// If specifying a capacity provider that uses an Auto Scaling group, the capacity
+	// provider must already be created. New capacity providers can be created with
+	// the CreateCapacityProvider API operation.
+	//
+	// To use a Fargate capacity provider, specify either the FARGATE or FARGATE_SPOT
+	// capacity providers. The Fargate capacity providers are available to all accounts
+	// and only need to be associated with a cluster to be used.
+	//
+	// The PutClusterCapacityProviders API operation is used to update the list
+	// of available capacity providers for a cluster after the cluster is created.
+	CapacityProviderStrategy []*CapacityProviderStrategyItem `locationName:"capacityProviderStrategy" type:"list"`
 
 	// The short name or full Amazon Resource Name (ARN) of the cluster that your
 	// service is running on. If you do not specify a cluster, the default cluster
@@ -10761,6 +22978,12 @@ type UpdateServiceInput struct {
 	// service.
 	DesiredCount *int64 `locationName:"desiredCount" type:"integer"`
 
+	// If true, this enables execute command functionality on all task containers.
+	//
+	// If you do not want to override the value that was set when the service was
+	// created, you can set this to null when performing this action.
+	EnableExecuteCommand *bool `locationName:"enableExecuteCommand" type:"boolean"`
+
 	// Whether to force a new deployment of the service. Deployments are not forced
 	// by default. You can use this option to trigger a new deployment with no service
 	// definition changes. For example, you can update a service's tasks to use
@@ -10773,25 +22996,39 @@ type UpdateServiceInput struct {
 	// has first started. This is only valid if your service is configured to use
 	// a load balancer. If your service's tasks take a while to start and respond
 	// to Elastic Load Balancing health checks, you can specify a health check grace
-	// period of up to 1,800 seconds during which the ECS service scheduler ignores
-	// the Elastic Load Balancing health check status. This grace period can prevent
-	// the ECS service scheduler from marking tasks as unhealthy and stopping them
-	// before they have time to come up.
+	// period of up to 2,147,483,647 seconds. During that time, the Amazon ECS service
+	// scheduler ignores the Elastic Load Balancing health check status. This grace
+	// period can prevent the ECS service scheduler from marking tasks as unhealthy
+	// and stopping them before they have time to come up.
 	HealthCheckGracePeriodSeconds *int64 `locationName:"healthCheckGracePeriodSeconds" type:"integer"`
 
-	// The network configuration for the service. This parameter is required for
-	// task definitions that use the awsvpc network mode to receive their own elastic
-	// network interface, and it is not supported for other network modes. For more
-	// information, see Task Networking (http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html)
-	// in the Amazon Elastic Container Service Developer Guide.
-	//
-	// Updating a service to add a subnet to a list of existing subnets does not
-	// trigger a service deployment. For example, if your network configuration
-	// change is to keep the existing subnets and simply add another subnet to the
-	// network configuration, this does not trigger a new service deployment.
+	// An object representing the network configuration for the service.
 	NetworkConfiguration *NetworkConfiguration `locationName:"networkConfiguration" type:"structure"`
 
-	// The platform version that your service should run.
+	// An array of task placement constraint objects to update the service to use.
+	// If no value is specified, the existing placement constraints for the service
+	// will remain unchanged. If this value is specified, it will override any existing
+	// placement constraints defined for the service. To remove all existing placement
+	// constraints, specify an empty array.
+	//
+	// You can specify a maximum of 10 constraints per task (this limit includes
+	// constraints in the task definition and those specified at runtime).
+	PlacementConstraints []*PlacementConstraint `locationName:"placementConstraints" type:"list"`
+
+	// The task placement strategy objects to update the service to use. If no value
+	// is specified, the existing placement strategy for the service will remain
+	// unchanged. If this value is specified, it will override the existing placement
+	// strategy defined for the service. To remove an existing placement strategy,
+	// specify an empty object.
+	//
+	// You can specify a maximum of five strategy rules per service.
+	PlacementStrategy []*PlacementStrategy `locationName:"placementStrategy" type:"list"`
+
+	// The platform version on which your tasks in the service are running. A platform
+	// version is only specified for tasks using the Fargate launch type. If a platform
+	// version is not specified, the LATEST platform version is used by default.
+	// For more information, see Fargate Platform Versions (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html)
+	// in the Amazon Elastic Container Service Developer Guide.
 	PlatformVersion *string `locationName:"platformVersion" type:"string"`
 
 	// The name of the service to update.
@@ -10807,12 +23044,20 @@ type UpdateServiceInput struct {
 	TaskDefinition *string `locationName:"taskDefinition" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s UpdateServiceInput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s UpdateServiceInput) GoString() string {
 	return s.String()
 }
@@ -10822,6 +23067,21 @@ func (s *UpdateServiceInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "UpdateServiceInput"}
 	if s.Service == nil {
 		invalidParams.Add(request.NewErrParamRequired("Service"))
+	}
+	if s.CapacityProviderStrategy != nil {
+		for i, v := range s.CapacityProviderStrategy {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "CapacityProviderStrategy", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+	if s.DeploymentConfiguration != nil {
+		if err := s.DeploymentConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("DeploymentConfiguration", err.(request.ErrInvalidParams))
+		}
 	}
 	if s.NetworkConfiguration != nil {
 		if err := s.NetworkConfiguration.Validate(); err != nil {
@@ -10833,6 +23093,12 @@ func (s *UpdateServiceInput) Validate() error {
 		return invalidParams
 	}
 	return nil
+}
+
+// SetCapacityProviderStrategy sets the CapacityProviderStrategy field's value.
+func (s *UpdateServiceInput) SetCapacityProviderStrategy(v []*CapacityProviderStrategyItem) *UpdateServiceInput {
+	s.CapacityProviderStrategy = v
+	return s
 }
 
 // SetCluster sets the Cluster field's value.
@@ -10853,6 +23119,12 @@ func (s *UpdateServiceInput) SetDesiredCount(v int64) *UpdateServiceInput {
 	return s
 }
 
+// SetEnableExecuteCommand sets the EnableExecuteCommand field's value.
+func (s *UpdateServiceInput) SetEnableExecuteCommand(v bool) *UpdateServiceInput {
+	s.EnableExecuteCommand = &v
+	return s
+}
+
 // SetForceNewDeployment sets the ForceNewDeployment field's value.
 func (s *UpdateServiceInput) SetForceNewDeployment(v bool) *UpdateServiceInput {
 	s.ForceNewDeployment = &v
@@ -10868,6 +23140,18 @@ func (s *UpdateServiceInput) SetHealthCheckGracePeriodSeconds(v int64) *UpdateSe
 // SetNetworkConfiguration sets the NetworkConfiguration field's value.
 func (s *UpdateServiceInput) SetNetworkConfiguration(v *NetworkConfiguration) *UpdateServiceInput {
 	s.NetworkConfiguration = v
+	return s
+}
+
+// SetPlacementConstraints sets the PlacementConstraints field's value.
+func (s *UpdateServiceInput) SetPlacementConstraints(v []*PlacementConstraint) *UpdateServiceInput {
+	s.PlacementConstraints = v
+	return s
+}
+
+// SetPlacementStrategy sets the PlacementStrategy field's value.
+func (s *UpdateServiceInput) SetPlacementStrategy(v []*PlacementStrategy) *UpdateServiceInput {
+	s.PlacementStrategy = v
 	return s
 }
 
@@ -10896,12 +23180,20 @@ type UpdateServiceOutput struct {
 	Service *Service `locationName:"service" type:"structure"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s UpdateServiceOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s UpdateServiceOutput) GoString() string {
 	return s.String()
 }
@@ -10912,13 +23204,243 @@ func (s *UpdateServiceOutput) SetService(v *Service) *UpdateServiceOutput {
 	return s
 }
 
+type UpdateServicePrimaryTaskSetInput struct {
+	_ struct{} `type:"structure"`
+
+	// The short name or full Amazon Resource Name (ARN) of the cluster that hosts
+	// the service that the task set exists in.
+	//
+	// Cluster is a required field
+	Cluster *string `locationName:"cluster" type:"string" required:"true"`
+
+	// The short name or full Amazon Resource Name (ARN) of the task set to set
+	// as the primary task set in the deployment.
+	//
+	// PrimaryTaskSet is a required field
+	PrimaryTaskSet *string `locationName:"primaryTaskSet" type:"string" required:"true"`
+
+	// The short name or full Amazon Resource Name (ARN) of the service that the
+	// task set exists in.
+	//
+	// Service is a required field
+	Service *string `locationName:"service" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateServicePrimaryTaskSetInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateServicePrimaryTaskSetInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *UpdateServicePrimaryTaskSetInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "UpdateServicePrimaryTaskSetInput"}
+	if s.Cluster == nil {
+		invalidParams.Add(request.NewErrParamRequired("Cluster"))
+	}
+	if s.PrimaryTaskSet == nil {
+		invalidParams.Add(request.NewErrParamRequired("PrimaryTaskSet"))
+	}
+	if s.Service == nil {
+		invalidParams.Add(request.NewErrParamRequired("Service"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetCluster sets the Cluster field's value.
+func (s *UpdateServicePrimaryTaskSetInput) SetCluster(v string) *UpdateServicePrimaryTaskSetInput {
+	s.Cluster = &v
+	return s
+}
+
+// SetPrimaryTaskSet sets the PrimaryTaskSet field's value.
+func (s *UpdateServicePrimaryTaskSetInput) SetPrimaryTaskSet(v string) *UpdateServicePrimaryTaskSetInput {
+	s.PrimaryTaskSet = &v
+	return s
+}
+
+// SetService sets the Service field's value.
+func (s *UpdateServicePrimaryTaskSetInput) SetService(v string) *UpdateServicePrimaryTaskSetInput {
+	s.Service = &v
+	return s
+}
+
+type UpdateServicePrimaryTaskSetOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Details about the task set.
+	TaskSet *TaskSet `locationName:"taskSet" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateServicePrimaryTaskSetOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateServicePrimaryTaskSetOutput) GoString() string {
+	return s.String()
+}
+
+// SetTaskSet sets the TaskSet field's value.
+func (s *UpdateServicePrimaryTaskSetOutput) SetTaskSet(v *TaskSet) *UpdateServicePrimaryTaskSetOutput {
+	s.TaskSet = v
+	return s
+}
+
+type UpdateTaskSetInput struct {
+	_ struct{} `type:"structure"`
+
+	// The short name or full Amazon Resource Name (ARN) of the cluster that hosts
+	// the service that the task set exists in.
+	//
+	// Cluster is a required field
+	Cluster *string `locationName:"cluster" type:"string" required:"true"`
+
+	// A floating-point percentage of the desired number of tasks to place and keep
+	// running in the task set.
+	//
+	// Scale is a required field
+	Scale *Scale `locationName:"scale" type:"structure" required:"true"`
+
+	// The short name or full Amazon Resource Name (ARN) of the service that the
+	// task set exists in.
+	//
+	// Service is a required field
+	Service *string `locationName:"service" type:"string" required:"true"`
+
+	// The short name or full Amazon Resource Name (ARN) of the task set to update.
+	//
+	// TaskSet is a required field
+	TaskSet *string `locationName:"taskSet" type:"string" required:"true"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateTaskSetInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateTaskSetInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *UpdateTaskSetInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "UpdateTaskSetInput"}
+	if s.Cluster == nil {
+		invalidParams.Add(request.NewErrParamRequired("Cluster"))
+	}
+	if s.Scale == nil {
+		invalidParams.Add(request.NewErrParamRequired("Scale"))
+	}
+	if s.Service == nil {
+		invalidParams.Add(request.NewErrParamRequired("Service"))
+	}
+	if s.TaskSet == nil {
+		invalidParams.Add(request.NewErrParamRequired("TaskSet"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetCluster sets the Cluster field's value.
+func (s *UpdateTaskSetInput) SetCluster(v string) *UpdateTaskSetInput {
+	s.Cluster = &v
+	return s
+}
+
+// SetScale sets the Scale field's value.
+func (s *UpdateTaskSetInput) SetScale(v *Scale) *UpdateTaskSetInput {
+	s.Scale = v
+	return s
+}
+
+// SetService sets the Service field's value.
+func (s *UpdateTaskSetInput) SetService(v string) *UpdateTaskSetInput {
+	s.Service = &v
+	return s
+}
+
+// SetTaskSet sets the TaskSet field's value.
+func (s *UpdateTaskSetInput) SetTaskSet(v string) *UpdateTaskSetInput {
+	s.TaskSet = &v
+	return s
+}
+
+type UpdateTaskSetOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Details about the task set.
+	TaskSet *TaskSet `locationName:"taskSet" type:"structure"`
+}
+
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateTaskSetOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
+func (s UpdateTaskSetOutput) GoString() string {
+	return s.String()
+}
+
+// SetTaskSet sets the TaskSet field's value.
+func (s *UpdateTaskSetOutput) SetTaskSet(v *TaskSet) *UpdateTaskSetOutput {
+	s.TaskSet = v
+	return s
+}
+
 // The Docker and Amazon ECS container agent version information about a container
 // instance.
 type VersionInfo struct {
 	_ struct{} `type:"structure"`
 
 	// The Git commit hash for the Amazon ECS container agent build on the amazon-ecs-agent
-	//  (https://github.com/aws/amazon-ecs-agent/commits/master) GitHub repository.
+	// (https://github.com/aws/amazon-ecs-agent/commits/master) GitHub repository.
 	AgentHash *string `locationName:"agentHash" type:"string"`
 
 	// The version number of the Amazon ECS container agent.
@@ -10928,12 +23450,20 @@ type VersionInfo struct {
 	DockerVersion *string `locationName:"dockerVersion" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s VersionInfo) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s VersionInfo) GoString() string {
 	return s.String()
 }
@@ -10956,15 +23486,38 @@ func (s *VersionInfo) SetDockerVersion(v string) *VersionInfo {
 	return s
 }
 
-// A data volume used in a task definition.
+// A data volume used in a task definition. For tasks that use the Amazon Elastic
+// File System (Amazon EFS), specify an efsVolumeConfiguration. For Windows
+// tasks that use Amazon FSx for Windows File Server file system, specify a
+// fsxWindowsFileServerVolumeConfiguration. For tasks that use a Docker volume,
+// specify a DockerVolumeConfiguration. For tasks that use a bind mount host
+// volume, specify a host and optional sourcePath. For more information, see
+// Using Data Volumes in Tasks (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_data_volumes.html).
 type Volume struct {
 	_ struct{} `type:"structure"`
 
-	// The contents of the host parameter determine whether your data volume persists
-	// on the host container instance and where it is stored. If the host parameter
-	// is empty, then the Docker daemon assigns a host path for your data volume,
-	// but the data is not guaranteed to persist after the containers associated
-	// with it stop running.
+	// This parameter is specified when you are using Docker volumes.
+	//
+	// Windows containers only support the use of the local driver. To use bind
+	// mounts, specify the host parameter instead.
+	//
+	// Docker volumes are not supported by tasks run on Fargate.
+	DockerVolumeConfiguration *DockerVolumeConfiguration `locationName:"dockerVolumeConfiguration" type:"structure"`
+
+	// This parameter is specified when you are using an Amazon Elastic File System
+	// file system for task storage.
+	EfsVolumeConfiguration *EFSVolumeConfiguration `locationName:"efsVolumeConfiguration" type:"structure"`
+
+	// This parameter is specified when you are using Amazon FSx for Windows File
+	// Server file system for task storage.
+	FsxWindowsFileServerVolumeConfiguration *FSxWindowsFileServerVolumeConfiguration `locationName:"fsxWindowsFileServerVolumeConfiguration" type:"structure"`
+
+	// This parameter is specified when you are using bind mount host volumes. The
+	// contents of the host parameter determine whether your bind mount host volume
+	// persists on the host container instance and where it is stored. If the host
+	// parameter is empty, then the Docker daemon assigns a host path for your data
+	// volume. However, the data is not guaranteed to persist after the containers
+	// associated with it stop running.
 	//
 	// Windows containers can mount whole directories on the same drive as $env:ProgramData.
 	// Windows containers cannot mount directories on a different drive, and mount
@@ -10973,19 +23526,65 @@ type Volume struct {
 	Host *HostVolumeProperties `locationName:"host" type:"structure"`
 
 	// The name of the volume. Up to 255 letters (uppercase and lowercase), numbers,
-	// hyphens, and underscores are allowed. This name is referenced in the sourceVolume
+	// underscores, and hyphens are allowed. This name is referenced in the sourceVolume
 	// parameter of container definition mountPoints.
 	Name *string `locationName:"name" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Volume) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s Volume) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *Volume) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "Volume"}
+	if s.EfsVolumeConfiguration != nil {
+		if err := s.EfsVolumeConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("EfsVolumeConfiguration", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.FsxWindowsFileServerVolumeConfiguration != nil {
+		if err := s.FsxWindowsFileServerVolumeConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("FsxWindowsFileServerVolumeConfiguration", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetDockerVolumeConfiguration sets the DockerVolumeConfiguration field's value.
+func (s *Volume) SetDockerVolumeConfiguration(v *DockerVolumeConfiguration) *Volume {
+	s.DockerVolumeConfiguration = v
+	return s
+}
+
+// SetEfsVolumeConfiguration sets the EfsVolumeConfiguration field's value.
+func (s *Volume) SetEfsVolumeConfiguration(v *EFSVolumeConfiguration) *Volume {
+	s.EfsVolumeConfiguration = v
+	return s
+}
+
+// SetFsxWindowsFileServerVolumeConfiguration sets the FsxWindowsFileServerVolumeConfiguration field's value.
+func (s *Volume) SetFsxWindowsFileServerVolumeConfiguration(v *FSxWindowsFileServerVolumeConfiguration) *Volume {
+	s.FsxWindowsFileServerVolumeConfiguration = v
+	return s
 }
 
 // SetHost sets the Host field's value.
@@ -11009,17 +23608,25 @@ type VolumeFrom struct {
 	// value is false.
 	ReadOnly *bool `locationName:"readOnly" type:"boolean"`
 
-	// The name of another container within the same task definition to mount volumes
-	// from.
+	// The name of another container within the same task definition from which
+	// to mount volumes.
 	SourceContainer *string `locationName:"sourceContainer" type:"string"`
 }
 
-// String returns the string representation
+// String returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s VolumeFrom) String() string {
 	return awsutil.Prettify(s)
 }
 
-// GoString returns the string representation
+// GoString returns the string representation.
+//
+// API parameter values that are decorated as "sensitive" in the API will not
+// be included in the string output. The member name will be present, but the
+// value will be replaced with "sensitive".
 func (s VolumeFrom) GoString() string {
 	return s.String()
 }
@@ -11056,6 +23663,18 @@ const (
 	AgentUpdateStatusFailed = "FAILED"
 )
 
+// AgentUpdateStatus_Values returns all elements of the AgentUpdateStatus enum
+func AgentUpdateStatus_Values() []string {
+	return []string{
+		AgentUpdateStatusPending,
+		AgentUpdateStatusStaging,
+		AgentUpdateStatusStaged,
+		AgentUpdateStatusUpdating,
+		AgentUpdateStatusUpdated,
+		AgentUpdateStatusFailed,
+	}
+}
+
 const (
 	// AssignPublicIpEnabled is a AssignPublicIp enum value
 	AssignPublicIpEnabled = "ENABLED"
@@ -11064,10 +23683,129 @@ const (
 	AssignPublicIpDisabled = "DISABLED"
 )
 
+// AssignPublicIp_Values returns all elements of the AssignPublicIp enum
+func AssignPublicIp_Values() []string {
+	return []string{
+		AssignPublicIpEnabled,
+		AssignPublicIpDisabled,
+	}
+}
+
 const (
+	// CPUArchitectureX8664 is a CPUArchitecture enum value
+	CPUArchitectureX8664 = "X86_64"
+
+	// CPUArchitectureArm64 is a CPUArchitecture enum value
+	CPUArchitectureArm64 = "ARM64"
+)
+
+// CPUArchitecture_Values returns all elements of the CPUArchitecture enum
+func CPUArchitecture_Values() []string {
+	return []string{
+		CPUArchitectureX8664,
+		CPUArchitectureArm64,
+	}
+}
+
+const (
+	// CapacityProviderFieldTags is a CapacityProviderField enum value
+	CapacityProviderFieldTags = "TAGS"
+)
+
+// CapacityProviderField_Values returns all elements of the CapacityProviderField enum
+func CapacityProviderField_Values() []string {
+	return []string{
+		CapacityProviderFieldTags,
+	}
+}
+
+const (
+	// CapacityProviderStatusActive is a CapacityProviderStatus enum value
+	CapacityProviderStatusActive = "ACTIVE"
+
+	// CapacityProviderStatusInactive is a CapacityProviderStatus enum value
+	CapacityProviderStatusInactive = "INACTIVE"
+)
+
+// CapacityProviderStatus_Values returns all elements of the CapacityProviderStatus enum
+func CapacityProviderStatus_Values() []string {
+	return []string{
+		CapacityProviderStatusActive,
+		CapacityProviderStatusInactive,
+	}
+}
+
+const (
+	// CapacityProviderUpdateStatusDeleteInProgress is a CapacityProviderUpdateStatus enum value
+	CapacityProviderUpdateStatusDeleteInProgress = "DELETE_IN_PROGRESS"
+
+	// CapacityProviderUpdateStatusDeleteComplete is a CapacityProviderUpdateStatus enum value
+	CapacityProviderUpdateStatusDeleteComplete = "DELETE_COMPLETE"
+
+	// CapacityProviderUpdateStatusDeleteFailed is a CapacityProviderUpdateStatus enum value
+	CapacityProviderUpdateStatusDeleteFailed = "DELETE_FAILED"
+
+	// CapacityProviderUpdateStatusUpdateInProgress is a CapacityProviderUpdateStatus enum value
+	CapacityProviderUpdateStatusUpdateInProgress = "UPDATE_IN_PROGRESS"
+
+	// CapacityProviderUpdateStatusUpdateComplete is a CapacityProviderUpdateStatus enum value
+	CapacityProviderUpdateStatusUpdateComplete = "UPDATE_COMPLETE"
+
+	// CapacityProviderUpdateStatusUpdateFailed is a CapacityProviderUpdateStatus enum value
+	CapacityProviderUpdateStatusUpdateFailed = "UPDATE_FAILED"
+)
+
+// CapacityProviderUpdateStatus_Values returns all elements of the CapacityProviderUpdateStatus enum
+func CapacityProviderUpdateStatus_Values() []string {
+	return []string{
+		CapacityProviderUpdateStatusDeleteInProgress,
+		CapacityProviderUpdateStatusDeleteComplete,
+		CapacityProviderUpdateStatusDeleteFailed,
+		CapacityProviderUpdateStatusUpdateInProgress,
+		CapacityProviderUpdateStatusUpdateComplete,
+		CapacityProviderUpdateStatusUpdateFailed,
+	}
+}
+
+const (
+	// ClusterFieldAttachments is a ClusterField enum value
+	ClusterFieldAttachments = "ATTACHMENTS"
+
+	// ClusterFieldConfigurations is a ClusterField enum value
+	ClusterFieldConfigurations = "CONFIGURATIONS"
+
+	// ClusterFieldSettings is a ClusterField enum value
+	ClusterFieldSettings = "SETTINGS"
+
 	// ClusterFieldStatistics is a ClusterField enum value
 	ClusterFieldStatistics = "STATISTICS"
+
+	// ClusterFieldTags is a ClusterField enum value
+	ClusterFieldTags = "TAGS"
 )
+
+// ClusterField_Values returns all elements of the ClusterField enum
+func ClusterField_Values() []string {
+	return []string{
+		ClusterFieldAttachments,
+		ClusterFieldConfigurations,
+		ClusterFieldSettings,
+		ClusterFieldStatistics,
+		ClusterFieldTags,
+	}
+}
+
+const (
+	// ClusterSettingNameContainerInsights is a ClusterSettingName enum value
+	ClusterSettingNameContainerInsights = "containerInsights"
+)
+
+// ClusterSettingName_Values returns all elements of the ClusterSettingName enum
+func ClusterSettingName_Values() []string {
+	return []string{
+		ClusterSettingNameContainerInsights,
+	}
+}
 
 const (
 	// CompatibilityEc2 is a Compatibility enum value
@@ -11075,7 +23813,19 @@ const (
 
 	// CompatibilityFargate is a Compatibility enum value
 	CompatibilityFargate = "FARGATE"
+
+	// CompatibilityExternal is a Compatibility enum value
+	CompatibilityExternal = "EXTERNAL"
 )
+
+// Compatibility_Values returns all elements of the Compatibility enum
+func Compatibility_Values() []string {
+	return []string{
+		CompatibilityEc2,
+		CompatibilityFargate,
+		CompatibilityExternal,
+	}
+}
 
 const (
 	// ConnectivityConnected is a Connectivity enum value
@@ -11085,13 +23835,117 @@ const (
 	ConnectivityDisconnected = "DISCONNECTED"
 )
 
+// Connectivity_Values returns all elements of the Connectivity enum
+func Connectivity_Values() []string {
+	return []string{
+		ConnectivityConnected,
+		ConnectivityDisconnected,
+	}
+}
+
+const (
+	// ContainerConditionStart is a ContainerCondition enum value
+	ContainerConditionStart = "START"
+
+	// ContainerConditionComplete is a ContainerCondition enum value
+	ContainerConditionComplete = "COMPLETE"
+
+	// ContainerConditionSuccess is a ContainerCondition enum value
+	ContainerConditionSuccess = "SUCCESS"
+
+	// ContainerConditionHealthy is a ContainerCondition enum value
+	ContainerConditionHealthy = "HEALTHY"
+)
+
+// ContainerCondition_Values returns all elements of the ContainerCondition enum
+func ContainerCondition_Values() []string {
+	return []string{
+		ContainerConditionStart,
+		ContainerConditionComplete,
+		ContainerConditionSuccess,
+		ContainerConditionHealthy,
+	}
+}
+
+const (
+	// ContainerInstanceFieldTags is a ContainerInstanceField enum value
+	ContainerInstanceFieldTags = "TAGS"
+)
+
+// ContainerInstanceField_Values returns all elements of the ContainerInstanceField enum
+func ContainerInstanceField_Values() []string {
+	return []string{
+		ContainerInstanceFieldTags,
+	}
+}
+
 const (
 	// ContainerInstanceStatusActive is a ContainerInstanceStatus enum value
 	ContainerInstanceStatusActive = "ACTIVE"
 
 	// ContainerInstanceStatusDraining is a ContainerInstanceStatus enum value
 	ContainerInstanceStatusDraining = "DRAINING"
+
+	// ContainerInstanceStatusRegistering is a ContainerInstanceStatus enum value
+	ContainerInstanceStatusRegistering = "REGISTERING"
+
+	// ContainerInstanceStatusDeregistering is a ContainerInstanceStatus enum value
+	ContainerInstanceStatusDeregistering = "DEREGISTERING"
+
+	// ContainerInstanceStatusRegistrationFailed is a ContainerInstanceStatus enum value
+	ContainerInstanceStatusRegistrationFailed = "REGISTRATION_FAILED"
 )
+
+// ContainerInstanceStatus_Values returns all elements of the ContainerInstanceStatus enum
+func ContainerInstanceStatus_Values() []string {
+	return []string{
+		ContainerInstanceStatusActive,
+		ContainerInstanceStatusDraining,
+		ContainerInstanceStatusRegistering,
+		ContainerInstanceStatusDeregistering,
+		ContainerInstanceStatusRegistrationFailed,
+	}
+}
+
+const (
+	// DeploymentControllerTypeEcs is a DeploymentControllerType enum value
+	DeploymentControllerTypeEcs = "ECS"
+
+	// DeploymentControllerTypeCodeDeploy is a DeploymentControllerType enum value
+	DeploymentControllerTypeCodeDeploy = "CODE_DEPLOY"
+
+	// DeploymentControllerTypeExternal is a DeploymentControllerType enum value
+	DeploymentControllerTypeExternal = "EXTERNAL"
+)
+
+// DeploymentControllerType_Values returns all elements of the DeploymentControllerType enum
+func DeploymentControllerType_Values() []string {
+	return []string{
+		DeploymentControllerTypeEcs,
+		DeploymentControllerTypeCodeDeploy,
+		DeploymentControllerTypeExternal,
+	}
+}
+
+const (
+	// DeploymentRolloutStateCompleted is a DeploymentRolloutState enum value
+	DeploymentRolloutStateCompleted = "COMPLETED"
+
+	// DeploymentRolloutStateFailed is a DeploymentRolloutState enum value
+	DeploymentRolloutStateFailed = "FAILED"
+
+	// DeploymentRolloutStateInProgress is a DeploymentRolloutState enum value
+	DeploymentRolloutStateInProgress = "IN_PROGRESS"
+)
+
+// DeploymentRolloutState_Values returns all elements of the DeploymentRolloutState enum
+func DeploymentRolloutState_Values() []string {
+	return []string{
+		DeploymentRolloutStateCompleted,
+		DeploymentRolloutStateFailed,
+		DeploymentRolloutStateInProgress,
+	}
+}
 
 const (
 	// DesiredStatusRunning is a DesiredStatus enum value
@@ -11104,6 +23958,15 @@ const (
 	DesiredStatusStopped = "STOPPED"
 )
 
+// DesiredStatus_Values returns all elements of the DesiredStatus enum
+func DesiredStatus_Values() []string {
+	return []string{
+		DesiredStatusRunning,
+		DesiredStatusPending,
+		DesiredStatusStopped,
+	}
+}
+
 const (
 	// DeviceCgroupPermissionRead is a DeviceCgroupPermission enum value
 	DeviceCgroupPermissionRead = "read"
@@ -11114,6 +23977,95 @@ const (
 	// DeviceCgroupPermissionMknod is a DeviceCgroupPermission enum value
 	DeviceCgroupPermissionMknod = "mknod"
 )
+
+// DeviceCgroupPermission_Values returns all elements of the DeviceCgroupPermission enum
+func DeviceCgroupPermission_Values() []string {
+	return []string{
+		DeviceCgroupPermissionRead,
+		DeviceCgroupPermissionWrite,
+		DeviceCgroupPermissionMknod,
+	}
+}
+
+const (
+	// EFSAuthorizationConfigIAMEnabled is a EFSAuthorizationConfigIAM enum value
+	EFSAuthorizationConfigIAMEnabled = "ENABLED"
+
+	// EFSAuthorizationConfigIAMDisabled is a EFSAuthorizationConfigIAM enum value
+	EFSAuthorizationConfigIAMDisabled = "DISABLED"
+)
+
+// EFSAuthorizationConfigIAM_Values returns all elements of the EFSAuthorizationConfigIAM enum
+func EFSAuthorizationConfigIAM_Values() []string {
+	return []string{
+		EFSAuthorizationConfigIAMEnabled,
+		EFSAuthorizationConfigIAMDisabled,
+	}
+}
+
+const (
+	// EFSTransitEncryptionEnabled is a EFSTransitEncryption enum value
+	EFSTransitEncryptionEnabled = "ENABLED"
+
+	// EFSTransitEncryptionDisabled is a EFSTransitEncryption enum value
+	EFSTransitEncryptionDisabled = "DISABLED"
+)
+
+// EFSTransitEncryption_Values returns all elements of the EFSTransitEncryption enum
+func EFSTransitEncryption_Values() []string {
+	return []string{
+		EFSTransitEncryptionEnabled,
+		EFSTransitEncryptionDisabled,
+	}
+}
+
+const (
+	// EnvironmentFileTypeS3 is a EnvironmentFileType enum value
+	EnvironmentFileTypeS3 = "s3"
+)
+
+// EnvironmentFileType_Values returns all elements of the EnvironmentFileType enum
+func EnvironmentFileType_Values() []string {
+	return []string{
+		EnvironmentFileTypeS3,
+	}
+}
+
+const (
+	// ExecuteCommandLoggingNone is a ExecuteCommandLogging enum value
+	ExecuteCommandLoggingNone = "NONE"
+
+	// ExecuteCommandLoggingDefault is a ExecuteCommandLogging enum value
+	ExecuteCommandLoggingDefault = "DEFAULT"
+
+	// ExecuteCommandLoggingOverride is a ExecuteCommandLogging enum value
+	ExecuteCommandLoggingOverride = "OVERRIDE"
+)
+
+// ExecuteCommandLogging_Values returns all elements of the ExecuteCommandLogging enum
+func ExecuteCommandLogging_Values() []string {
+	return []string{
+		ExecuteCommandLoggingNone,
+		ExecuteCommandLoggingDefault,
+		ExecuteCommandLoggingOverride,
+	}
+}
+
+const (
+	// FirelensConfigurationTypeFluentd is a FirelensConfigurationType enum value
+	FirelensConfigurationTypeFluentd = "fluentd"
+
+	// FirelensConfigurationTypeFluentbit is a FirelensConfigurationType enum value
+	FirelensConfigurationTypeFluentbit = "fluentbit"
+)
+
+// FirelensConfigurationType_Values returns all elements of the FirelensConfigurationType enum
+func FirelensConfigurationType_Values() []string {
+	return []string{
+		FirelensConfigurationTypeFluentd,
+		FirelensConfigurationTypeFluentbit,
+	}
+}
 
 const (
 	// HealthStatusHealthy is a HealthStatus enum value
@@ -11126,13 +24078,54 @@ const (
 	HealthStatusUnknown = "UNKNOWN"
 )
 
+// HealthStatus_Values returns all elements of the HealthStatus enum
+func HealthStatus_Values() []string {
+	return []string{
+		HealthStatusHealthy,
+		HealthStatusUnhealthy,
+		HealthStatusUnknown,
+	}
+}
+
+const (
+	// IpcModeHost is a IpcMode enum value
+	IpcModeHost = "host"
+
+	// IpcModeTask is a IpcMode enum value
+	IpcModeTask = "task"
+
+	// IpcModeNone is a IpcMode enum value
+	IpcModeNone = "none"
+)
+
+// IpcMode_Values returns all elements of the IpcMode enum
+func IpcMode_Values() []string {
+	return []string{
+		IpcModeHost,
+		IpcModeTask,
+		IpcModeNone,
+	}
+}
+
 const (
 	// LaunchTypeEc2 is a LaunchType enum value
 	LaunchTypeEc2 = "EC2"
 
 	// LaunchTypeFargate is a LaunchType enum value
 	LaunchTypeFargate = "FARGATE"
+
+	// LaunchTypeExternal is a LaunchType enum value
+	LaunchTypeExternal = "EXTERNAL"
 )
+
+// LaunchType_Values returns all elements of the LaunchType enum
+func LaunchType_Values() []string {
+	return []string{
+		LaunchTypeEc2,
+		LaunchTypeFargate,
+		LaunchTypeExternal,
+	}
+}
 
 const (
 	// LogDriverJsonFile is a LogDriver enum value
@@ -11155,7 +24148,68 @@ const (
 
 	// LogDriverSplunk is a LogDriver enum value
 	LogDriverSplunk = "splunk"
+
+	// LogDriverAwsfirelens is a LogDriver enum value
+	LogDriverAwsfirelens = "awsfirelens"
 )
+
+// LogDriver_Values returns all elements of the LogDriver enum
+func LogDriver_Values() []string {
+	return []string{
+		LogDriverJsonFile,
+		LogDriverSyslog,
+		LogDriverJournald,
+		LogDriverGelf,
+		LogDriverFluentd,
+		LogDriverAwslogs,
+		LogDriverSplunk,
+		LogDriverAwsfirelens,
+	}
+}
+
+const (
+	// ManagedAgentNameExecuteCommandAgent is a ManagedAgentName enum value
+	ManagedAgentNameExecuteCommandAgent = "ExecuteCommandAgent"
+)
+
+// ManagedAgentName_Values returns all elements of the ManagedAgentName enum
+func ManagedAgentName_Values() []string {
+	return []string{
+		ManagedAgentNameExecuteCommandAgent,
+	}
+}
+
+const (
+	// ManagedScalingStatusEnabled is a ManagedScalingStatus enum value
+	ManagedScalingStatusEnabled = "ENABLED"
+
+	// ManagedScalingStatusDisabled is a ManagedScalingStatus enum value
+	ManagedScalingStatusDisabled = "DISABLED"
+)
+
+// ManagedScalingStatus_Values returns all elements of the ManagedScalingStatus enum
+func ManagedScalingStatus_Values() []string {
+	return []string{
+		ManagedScalingStatusEnabled,
+		ManagedScalingStatusDisabled,
+	}
+}
+
+const (
+	// ManagedTerminationProtectionEnabled is a ManagedTerminationProtection enum value
+	ManagedTerminationProtectionEnabled = "ENABLED"
+
+	// ManagedTerminationProtectionDisabled is a ManagedTerminationProtection enum value
+	ManagedTerminationProtectionDisabled = "DISABLED"
+)
+
+// ManagedTerminationProtection_Values returns all elements of the ManagedTerminationProtection enum
+func ManagedTerminationProtection_Values() []string {
+	return []string{
+		ManagedTerminationProtectionEnabled,
+		ManagedTerminationProtectionDisabled,
+	}
+}
 
 const (
 	// NetworkModeBridge is a NetworkMode enum value
@@ -11171,6 +24225,72 @@ const (
 	NetworkModeNone = "none"
 )
 
+// NetworkMode_Values returns all elements of the NetworkMode enum
+func NetworkMode_Values() []string {
+	return []string{
+		NetworkModeBridge,
+		NetworkModeHost,
+		NetworkModeAwsvpc,
+		NetworkModeNone,
+	}
+}
+
+const (
+	// OSFamilyWindowsServer2019Full is a OSFamily enum value
+	OSFamilyWindowsServer2019Full = "WINDOWS_SERVER_2019_FULL"
+
+	// OSFamilyWindowsServer2019Core is a OSFamily enum value
+	OSFamilyWindowsServer2019Core = "WINDOWS_SERVER_2019_CORE"
+
+	// OSFamilyWindowsServer2016Full is a OSFamily enum value
+	OSFamilyWindowsServer2016Full = "WINDOWS_SERVER_2016_FULL"
+
+	// OSFamilyWindowsServer2004Core is a OSFamily enum value
+	OSFamilyWindowsServer2004Core = "WINDOWS_SERVER_2004_CORE"
+
+	// OSFamilyWindowsServer2022Core is a OSFamily enum value
+	OSFamilyWindowsServer2022Core = "WINDOWS_SERVER_2022_CORE"
+
+	// OSFamilyWindowsServer2022Full is a OSFamily enum value
+	OSFamilyWindowsServer2022Full = "WINDOWS_SERVER_2022_FULL"
+
+	// OSFamilyWindowsServer20h2Core is a OSFamily enum value
+	OSFamilyWindowsServer20h2Core = "WINDOWS_SERVER_20H2_CORE"
+
+	// OSFamilyLinux is a OSFamily enum value
+	OSFamilyLinux = "LINUX"
+)
+
+// OSFamily_Values returns all elements of the OSFamily enum
+func OSFamily_Values() []string {
+	return []string{
+		OSFamilyWindowsServer2019Full,
+		OSFamilyWindowsServer2019Core,
+		OSFamilyWindowsServer2016Full,
+		OSFamilyWindowsServer2004Core,
+		OSFamilyWindowsServer2022Core,
+		OSFamilyWindowsServer2022Full,
+		OSFamilyWindowsServer20h2Core,
+		OSFamilyLinux,
+	}
+}
+
+const (
+	// PidModeHost is a PidMode enum value
+	PidModeHost = "host"
+
+	// PidModeTask is a PidMode enum value
+	PidModeTask = "task"
+)
+
+// PidMode_Values returns all elements of the PidMode enum
+func PidMode_Values() []string {
+	return []string{
+		PidModeHost,
+		PidModeTask,
+	}
+}
+
 const (
 	// PlacementConstraintTypeDistinctInstance is a PlacementConstraintType enum value
 	PlacementConstraintTypeDistinctInstance = "distinctInstance"
@@ -11178,6 +24298,14 @@ const (
 	// PlacementConstraintTypeMemberOf is a PlacementConstraintType enum value
 	PlacementConstraintTypeMemberOf = "memberOf"
 )
+
+// PlacementConstraintType_Values returns all elements of the PlacementConstraintType enum
+func PlacementConstraintType_Values() []string {
+	return []string{
+		PlacementConstraintTypeDistinctInstance,
+		PlacementConstraintTypeMemberOf,
+	}
+}
 
 const (
 	// PlacementStrategyTypeRandom is a PlacementStrategyType enum value
@@ -11190,6 +24318,83 @@ const (
 	PlacementStrategyTypeBinpack = "binpack"
 )
 
+// PlacementStrategyType_Values returns all elements of the PlacementStrategyType enum
+func PlacementStrategyType_Values() []string {
+	return []string{
+		PlacementStrategyTypeRandom,
+		PlacementStrategyTypeSpread,
+		PlacementStrategyTypeBinpack,
+	}
+}
+
+const (
+	// PlatformDeviceTypeGpu is a PlatformDeviceType enum value
+	PlatformDeviceTypeGpu = "GPU"
+)
+
+// PlatformDeviceType_Values returns all elements of the PlatformDeviceType enum
+func PlatformDeviceType_Values() []string {
+	return []string{
+		PlatformDeviceTypeGpu,
+	}
+}
+
+const (
+	// PropagateTagsTaskDefinition is a PropagateTags enum value
+	PropagateTagsTaskDefinition = "TASK_DEFINITION"
+
+	// PropagateTagsService is a PropagateTags enum value
+	PropagateTagsService = "SERVICE"
+)
+
+// PropagateTags_Values returns all elements of the PropagateTags enum
+func PropagateTags_Values() []string {
+	return []string{
+		PropagateTagsTaskDefinition,
+		PropagateTagsService,
+	}
+}
+
+const (
+	// ProxyConfigurationTypeAppmesh is a ProxyConfigurationType enum value
+	ProxyConfigurationTypeAppmesh = "APPMESH"
+)
+
+// ProxyConfigurationType_Values returns all elements of the ProxyConfigurationType enum
+func ProxyConfigurationType_Values() []string {
+	return []string{
+		ProxyConfigurationTypeAppmesh,
+	}
+}
+
+const (
+	// ResourceTypeGpu is a ResourceType enum value
+	ResourceTypeGpu = "GPU"
+
+	// ResourceTypeInferenceAccelerator is a ResourceType enum value
+	ResourceTypeInferenceAccelerator = "InferenceAccelerator"
+)
+
+// ResourceType_Values returns all elements of the ResourceType enum
+func ResourceType_Values() []string {
+	return []string{
+		ResourceTypeGpu,
+		ResourceTypeInferenceAccelerator,
+	}
+}
+
+const (
+	// ScaleUnitPercent is a ScaleUnit enum value
+	ScaleUnitPercent = "PERCENT"
+)
+
+// ScaleUnit_Values returns all elements of the ScaleUnit enum
+func ScaleUnit_Values() []string {
+	return []string{
+		ScaleUnitPercent,
+	}
+}
+
 const (
 	// SchedulingStrategyReplica is a SchedulingStrategy enum value
 	SchedulingStrategyReplica = "REPLICA"
@@ -11197,6 +24402,70 @@ const (
 	// SchedulingStrategyDaemon is a SchedulingStrategy enum value
 	SchedulingStrategyDaemon = "DAEMON"
 )
+
+// SchedulingStrategy_Values returns all elements of the SchedulingStrategy enum
+func SchedulingStrategy_Values() []string {
+	return []string{
+		SchedulingStrategyReplica,
+		SchedulingStrategyDaemon,
+	}
+}
+
+const (
+	// ScopeTask is a Scope enum value
+	ScopeTask = "task"
+
+	// ScopeShared is a Scope enum value
+	ScopeShared = "shared"
+)
+
+// Scope_Values returns all elements of the Scope enum
+func Scope_Values() []string {
+	return []string{
+		ScopeTask,
+		ScopeShared,
+	}
+}
+
+const (
+	// ServiceFieldTags is a ServiceField enum value
+	ServiceFieldTags = "TAGS"
+)
+
+// ServiceField_Values returns all elements of the ServiceField enum
+func ServiceField_Values() []string {
+	return []string{
+		ServiceFieldTags,
+	}
+}
+
+const (
+	// SettingNameServiceLongArnFormat is a SettingName enum value
+	SettingNameServiceLongArnFormat = "serviceLongArnFormat"
+
+	// SettingNameTaskLongArnFormat is a SettingName enum value
+	SettingNameTaskLongArnFormat = "taskLongArnFormat"
+
+	// SettingNameContainerInstanceLongArnFormat is a SettingName enum value
+	SettingNameContainerInstanceLongArnFormat = "containerInstanceLongArnFormat"
+
+	// SettingNameAwsvpcTrunking is a SettingName enum value
+	SettingNameAwsvpcTrunking = "awsvpcTrunking"
+
+	// SettingNameContainerInsights is a SettingName enum value
+	SettingNameContainerInsights = "containerInsights"
+)
+
+// SettingName_Values returns all elements of the SettingName enum
+func SettingName_Values() []string {
+	return []string{
+		SettingNameServiceLongArnFormat,
+		SettingNameTaskLongArnFormat,
+		SettingNameContainerInstanceLongArnFormat,
+		SettingNameAwsvpcTrunking,
+		SettingNameContainerInsights,
+	}
+}
 
 const (
 	// SortOrderAsc is a SortOrder enum value
@@ -11206,10 +24475,41 @@ const (
 	SortOrderDesc = "DESC"
 )
 
+// SortOrder_Values returns all elements of the SortOrder enum
+func SortOrder_Values() []string {
+	return []string{
+		SortOrderAsc,
+		SortOrderDesc,
+	}
+}
+
+const (
+	// StabilityStatusSteadyState is a StabilityStatus enum value
+	StabilityStatusSteadyState = "STEADY_STATE"
+
+	// StabilityStatusStabilizing is a StabilityStatus enum value
+	StabilityStatusStabilizing = "STABILIZING"
+)
+
+// StabilityStatus_Values returns all elements of the StabilityStatus enum
+func StabilityStatus_Values() []string {
+	return []string{
+		StabilityStatusSteadyState,
+		StabilityStatusStabilizing,
+	}
+}
+
 const (
 	// TargetTypeContainerInstance is a TargetType enum value
 	TargetTypeContainerInstance = "container-instance"
 )
+
+// TargetType_Values returns all elements of the TargetType enum
+func TargetType_Values() []string {
+	return []string{
+		TargetTypeContainerInstance,
+	}
+}
 
 const (
 	// TaskDefinitionFamilyStatusActive is a TaskDefinitionFamilyStatus enum value
@@ -11222,10 +24522,38 @@ const (
 	TaskDefinitionFamilyStatusAll = "ALL"
 )
 
+// TaskDefinitionFamilyStatus_Values returns all elements of the TaskDefinitionFamilyStatus enum
+func TaskDefinitionFamilyStatus_Values() []string {
+	return []string{
+		TaskDefinitionFamilyStatusActive,
+		TaskDefinitionFamilyStatusInactive,
+		TaskDefinitionFamilyStatusAll,
+	}
+}
+
+const (
+	// TaskDefinitionFieldTags is a TaskDefinitionField enum value
+	TaskDefinitionFieldTags = "TAGS"
+)
+
+// TaskDefinitionField_Values returns all elements of the TaskDefinitionField enum
+func TaskDefinitionField_Values() []string {
+	return []string{
+		TaskDefinitionFieldTags,
+	}
+}
+
 const (
 	// TaskDefinitionPlacementConstraintTypeMemberOf is a TaskDefinitionPlacementConstraintType enum value
 	TaskDefinitionPlacementConstraintTypeMemberOf = "memberOf"
 )
+
+// TaskDefinitionPlacementConstraintType_Values returns all elements of the TaskDefinitionPlacementConstraintType enum
+func TaskDefinitionPlacementConstraintType_Values() []string {
+	return []string{
+		TaskDefinitionPlacementConstraintTypeMemberOf,
+	}
+}
 
 const (
 	// TaskDefinitionStatusActive is a TaskDefinitionStatus enum value
@@ -11235,6 +24563,58 @@ const (
 	TaskDefinitionStatusInactive = "INACTIVE"
 )
 
+// TaskDefinitionStatus_Values returns all elements of the TaskDefinitionStatus enum
+func TaskDefinitionStatus_Values() []string {
+	return []string{
+		TaskDefinitionStatusActive,
+		TaskDefinitionStatusInactive,
+	}
+}
+
+const (
+	// TaskFieldTags is a TaskField enum value
+	TaskFieldTags = "TAGS"
+)
+
+// TaskField_Values returns all elements of the TaskField enum
+func TaskField_Values() []string {
+	return []string{
+		TaskFieldTags,
+	}
+}
+
+const (
+	// TaskSetFieldTags is a TaskSetField enum value
+	TaskSetFieldTags = "TAGS"
+)
+
+// TaskSetField_Values returns all elements of the TaskSetField enum
+func TaskSetField_Values() []string {
+	return []string{
+		TaskSetFieldTags,
+	}
+}
+
+const (
+	// TaskStopCodeTaskFailedToStart is a TaskStopCode enum value
+	TaskStopCodeTaskFailedToStart = "TaskFailedToStart"
+
+	// TaskStopCodeEssentialContainerExited is a TaskStopCode enum value
+	TaskStopCodeEssentialContainerExited = "EssentialContainerExited"
+
+	// TaskStopCodeUserInitiated is a TaskStopCode enum value
+	TaskStopCodeUserInitiated = "UserInitiated"
+)
+
+// TaskStopCode_Values returns all elements of the TaskStopCode enum
+func TaskStopCode_Values() []string {
+	return []string{
+		TaskStopCodeTaskFailedToStart,
+		TaskStopCodeEssentialContainerExited,
+		TaskStopCodeUserInitiated,
+	}
+}
+
 const (
 	// TransportProtocolTcp is a TransportProtocol enum value
 	TransportProtocolTcp = "tcp"
@@ -11242,6 +24622,14 @@ const (
 	// TransportProtocolUdp is a TransportProtocol enum value
 	TransportProtocolUdp = "udp"
 )
+
+// TransportProtocol_Values returns all elements of the TransportProtocol enum
+func TransportProtocol_Values() []string {
+	return []string{
+		TransportProtocolTcp,
+		TransportProtocolUdp,
+	}
+}
 
 const (
 	// UlimitNameCore is a UlimitName enum value
@@ -11289,3 +24677,24 @@ const (
 	// UlimitNameStack is a UlimitName enum value
 	UlimitNameStack = "stack"
 )
+
+// UlimitName_Values returns all elements of the UlimitName enum
+func UlimitName_Values() []string {
+	return []string{
+		UlimitNameCore,
+		UlimitNameCpu,
+		UlimitNameData,
+		UlimitNameFsize,
+		UlimitNameLocks,
+		UlimitNameMemlock,
+		UlimitNameMsgqueue,
+		UlimitNameNice,
+		UlimitNameNofile,
+		UlimitNameNproc,
+		UlimitNameRss,
+		UlimitNameRtprio,
+		UlimitNameRttime,
+		UlimitNameSigpending,
+		UlimitNameStack,
+	}
+}
