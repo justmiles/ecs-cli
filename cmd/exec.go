@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/AlecAivazis/survey/v2"
 	ecs "github.com/justmiles/ecs-cli/lib"
-	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
 
@@ -52,11 +52,12 @@ func promptCluster() {
 			os.Exit(1)
 		}
 
-		clusterPrompt := promptui.Select{
-			Label: "Select a cluster",
-			Items: clusters,
+		clusterPrompt := &survey.Select{
+			Message: "Select a service:",
+			Options: clusters,
 		}
-		_, execInput.Cluster, err = clusterPrompt.Run()
+
+		err = survey.AskOne(clusterPrompt, &execInput.Cluster)
 		if err != nil {
 			fmt.Printf("Prompt failed %v\n", err)
 			os.Exit(1)
@@ -66,18 +67,19 @@ func promptCluster() {
 
 func promptService() {
 	if execInput.Service == "" && execInput.Task == "" {
+
 		services, err := ecs.GetServices(execInput.Cluster)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 
-		servicePrompt := promptui.Select{
-			Label: "Select a service",
-			Items: services,
+		prompt := &survey.Select{
+			Message: "Select a cluster:",
+			Options: services,
 		}
-		_, execInput.Service, err = servicePrompt.Run()
 
+		err = survey.AskOne(prompt, &execInput.Service)
 		if err != nil {
 			fmt.Printf("Prompt failed %v\n", err)
 			os.Exit(1)
@@ -96,12 +98,12 @@ func promptTask() {
 		if len(tasks) == 1 {
 			execInput.Task = tasks[0]
 		} else {
-			taskPrompt := promptui.Select{
-				Label: "Select a task",
-				Items: tasks,
+			taskPrompt := &survey.Select{
+				Message: "Select a task",
+				Options: tasks,
 			}
-			_, execInput.Task, err = taskPrompt.Run()
 
+			err = survey.AskOne(taskPrompt, &execInput.Task)
 			if err != nil {
 				fmt.Printf("Prompt failed %v\n", err)
 				os.Exit(1)
@@ -121,12 +123,12 @@ func promptContainer() {
 		if len(containers) == 1 {
 			execInput.Container = containers[0]
 		} else {
-			taskPrompt := promptui.Select{
-				Label: "Select a container",
-				Items: containers,
+			prompt := &survey.Select{
+				Message: "Select a container",
+				Options: containers,
 			}
-			_, execInput.Container, err = taskPrompt.Run()
 
+			err = survey.AskOne(prompt, &execInput.Container)
 			if err != nil {
 				fmt.Printf("Prompt failed %v\n", err)
 				os.Exit(1)
@@ -137,12 +139,11 @@ func promptContainer() {
 
 func promptCommand() {
 	if execInput.Command == "" {
-		prompt := promptui.Prompt{
-			Label:   "Command",
-			Default: "/bin/bash",
+		prompt := &survey.Input{
+			Message: "Command",
+			Default: "bash",
 		}
-		var err error
-		execInput.Command, err = prompt.Run()
+		err := survey.AskOne(prompt, &execInput.Command)
 
 		if err != nil {
 			fmt.Printf("Prompt failed %v\n", err)
