@@ -41,10 +41,9 @@ steps:
       from_secret: docker_password
     repo: justmiles/ecs-cli
     auto_tag_suffix: slim
+    dockerfile: slim.Dockerfile
     squash: true
     auto_tag: true
-    cache_from:
-      - "justmiles/ecs-cli:latest-slim"
 
 
 ## TODO add goreleaser pipeline for binary releases
