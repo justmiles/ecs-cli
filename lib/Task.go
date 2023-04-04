@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -35,6 +36,7 @@ type Task struct {
 	Public             bool
 	Fargate            bool
 	Deregister         bool
+	DeletePrevRevision bool
 	Wait               bool
 	Count              int64
 	Memory             int64
@@ -152,6 +154,17 @@ func (t *Task) Run() error {
 	}
 
 	logInfo("Running task definition: " + *arn)
+
+	// Deregister and delete previous task definition
+	if t.DeletePrevRevision {
+		prevARN, err := decrementTdefRevision(*arn)
+		logInfo("Deleting previous task definition: " + prevARN)
+		if err != nil {
+			fmt.Printf("Error deleting previous task definition: %s", err.Error())
+			os.Exit(1)
+		}
+		t.delete(ecsClient, prevARN)
+	}
 
 	// Build the task parametes
 	runTaskInput := &ecs.RunTaskInput{
@@ -489,6 +502,45 @@ func (t *Task) deregister(svc *ecs.ECS) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func (t *Task) delete(svc *ecs.ECS, arn string) {
+	// task must be deregistered before deletion
+	tdi := &ecs.DeregisterTaskDefinitionInput{
+		TaskDefinition: aws.String(arn),
+	}
+
+	_, err := svc.DeregisterTaskDefinition(tdi)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// delete
+	dtdi := &ecs.DeleteTaskDefinitionsInput{
+		TaskDefinitions: []*string{&arn},
+	}
+
+	_, err = svc.DeleteTaskDefinitions(dtdi)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func decrementTdefRevision(arn string) (string, error) {
+	parts := strings.Split(arn, ":")
+
+	revisionPart := parts[len(parts)-1]
+	revision, err := strconv.Atoi(revisionPart)
+	if err != nil {
+		return "", fmt.Errorf("error converting version to integer: %v", err)
+	}
+
+	if revision <= 0 {
+		return "", fmt.Errorf("version cannot be decremented below 0")
+	}
+
+	revision--
+	parts[len(parts)-1] = strconv.Itoa(revision)
+	return strings.Join(parts, ":"), nil
 }
 
 func (t *Task) upsertTaskDefinition(svc *ecs.ECS, taskDefInput *ecs.RegisterTaskDefinitionInput) (*string, error) {

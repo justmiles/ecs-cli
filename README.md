@@ -58,6 +58,7 @@ All containers have exited
     -c, --count int                     Spawn n tasks (default 1)
         --cpu-reservation int           CPU reservation
     -d, --detach                        Run the task in the background
+        --delete                        Delete the previous task definition revision
         --efs-volume stringArray        Map EFS volume to ECS Container Instance (ex. fs-23kj2f:/efs/dir:/container/mnt/dir)
     -e, --env stringArray               Set environment variables
         --execution-role string         Execution role ARN (required for Fargate)
