@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -36,7 +35,7 @@ type Task struct {
 	Public             bool
 	Fargate            bool
 	Deregister         bool
-	DeletePrevRevision bool
+	DeleteRevision     bool
 	Wait               bool
 	Count              int64
 	Memory             int64
@@ -155,17 +154,6 @@ func (t *Task) Run() error {
 
 	logInfo("Running task definition: " + *arn)
 
-	// Deregister and delete previous task definition
-	if t.DeletePrevRevision {
-		prevARN, err := decrementTdefRevision(*arn)
-		logInfo("Deleting previous task definition: " + prevARN)
-		if err != nil {
-			fmt.Printf("Error deleting previous task definition: %s", err.Error())
-			os.Exit(1)
-		}
-		t.delete(ecsClient, prevARN)
-	}
-
 	// Build the task parametes
 	runTaskInput := &ecs.RunTaskInput{
 		Cluster:              aws.String(t.Cluster),
@@ -216,6 +204,13 @@ func (t *Task) Run() error {
 	runTaskResponse, err := ecsClient.RunTask(runTaskInput)
 	if err != nil {
 		return err
+	}
+	
+	// Deregister and delete task definition
+	if t.DeleteRevision {
+		t.delete(ecsClient, *arn)
+	} else {
+		logInfo("Preserving task definition.")
 	}
 
 	for _, failure := range runTaskResponse.Failures {
@@ -458,9 +453,6 @@ func (t *Task) Check() {
 		}
 		if stoppedCount == len(res.Tasks) && len(res.Tasks) != 0 {
 			logInfo("All containers have exited")
-			if t.Deregister {
-				t.deregister(ecsClient)
-			}
 			time.Sleep(time.Second * 5) // give the logs another chance to come in
 			os.Exit(int(exitCode))
 		}
@@ -494,53 +486,42 @@ func (t *Task) createLogGroup() {
 	}
 }
 
-func (t *Task) deregister(svc *ecs.ECS) {
-	_, err := svc.DeregisterTaskDefinition(&ecs.DeregisterTaskDefinitionInput{
-		TaskDefinition: t.TaskDefinition.TaskDefinitionArn,
-	})
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-}
-
 func (t *Task) delete(svc *ecs.ECS, arn string) {
-	// task must be deregistered before deletion
+	const maxRetries = 10
+	backoffWithRetries := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), maxRetries)
+	// deregister
 	tdi := &ecs.DeregisterTaskDefinitionInput{
-		TaskDefinition: aws.String(arn),
+		TaskDefinition: t.TaskDefinition.TaskDefinitionArn,
 	}
 
-	_, err := svc.DeregisterTaskDefinition(tdi)
-	if err != nil {
-		fmt.Println(err)
+	deregister := func() error {
+		_, err := svc.DeregisterTaskDefinition(tdi)
+		return err
 	}
+
+	// Retry the operation using exponential backoff
+	err := backoff.Retry(deregister, backoffWithRetries)
+	if err != nil {
+		fmt.Println("Failed to deregister task definition:", err)
+		return
+	}
+
 	// delete
 	dtdi := &ecs.DeleteTaskDefinitionsInput{
-		TaskDefinitions: []*string{&arn},
+		TaskDefinitions: []*string{t.TaskDefinition.TaskDefinitionArn},
 	}
 
-	_, err = svc.DeleteTaskDefinitions(dtdi)
+	delete := func() error {
+		_, err := svc.DeleteTaskDefinitions(dtdi)
+		return err
+	}
+
+	// Retry the operation using exponential backoff
+	err = backoff.Retry(delete, backoffWithRetries)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Failed to delete task definition:", err)
+		return
 	}
-}
-
-func decrementTdefRevision(arn string) (string, error) {
-	parts := strings.Split(arn, ":")
-
-	revisionPart := parts[len(parts)-1]
-	revision, err := strconv.Atoi(revisionPart)
-	if err != nil {
-		return "", fmt.Errorf("error converting version to integer: %v", err)
-	}
-
-	if revision <= 0 {
-		return "", fmt.Errorf("version cannot be decremented below 0")
-	}
-
-	revision--
-	parts[len(parts)-1] = strconv.Itoa(revision)
-	return strings.Join(parts, ":"), nil
 }
 
 func (t *Task) upsertTaskDefinition(svc *ecs.ECS, taskDefInput *ecs.RegisterTaskDefinitionInput) (*string, error) {
