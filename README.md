@@ -58,7 +58,6 @@ All containers have exited
     -c, --count int                     Spawn n tasks (default 1)
         --cpu-reservation int           CPU reservation
     -d, --detach                        Run the task in the background
-        --delete                        Delete the previous task definition revision
         --efs-volume stringArray        Map EFS volume to ECS Container Instance (ex. fs-23kj2f:/efs/dir:/container/mnt/dir)
     -e, --env stringArray               Set environment variables
         --execution-role string         Execution role ARN (required for Fargate)
@@ -68,7 +67,7 @@ All containers have exited
     -m, --memory int                    Memory limit
         --memory-reservation int        Memory reservation (default 2048)
     -n, --name string                   Assign a name to the task (default "ephemeral-task-from-ecs-cli")
-        --no-deregister                 do not deregister the task definition
+        --no-cleanup                    Do not deregister and delete the task definition revision
         --public                        assign public ip
     -p, --publish stringArray           Publish a container's port(s) to the host
         --role string                   Task role ARN
