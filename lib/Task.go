@@ -35,6 +35,7 @@ type Task struct {
 	Public             bool
 	Fargate            bool
 	Deregister         bool
+	DeleteRevision     bool
 	Wait               bool
 	Count              int64
 	Memory             int64
@@ -208,6 +209,13 @@ func (t *Task) Run() error {
 	runTaskResponse, err := ecsClient.RunTask(runTaskInput)
 	if err != nil {
 		return err
+	}
+	
+	// Deregister and delete task definition
+	if t.DeleteRevision {
+		t.delete(ecsClient, *arn)
+	} else {
+		logInfo("Preserving task definition.")
 	}
 
 	for _, failure := range runTaskResponse.Failures {
@@ -450,9 +458,6 @@ func (t *Task) Check() {
 		}
 		if stoppedCount == len(res.Tasks) && len(res.Tasks) != 0 {
 			logInfo("All containers have exited")
-			if t.Deregister {
-				t.deregister(ecsClient)
-			}
 			time.Sleep(time.Second * 5) // give the logs another chance to come in
 			os.Exit(int(exitCode))
 		}
@@ -486,13 +491,41 @@ func (t *Task) createLogGroup() {
 	}
 }
 
-func (t *Task) deregister(svc *ecs.ECS) {
-	_, err := svc.DeregisterTaskDefinition(&ecs.DeregisterTaskDefinitionInput{
+func (t *Task) delete(svc *ecs.ECS, arn string) {
+	const maxRetries = 10
+	backoffWithRetries := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), maxRetries)
+	// deregister
+	tdi := &ecs.DeregisterTaskDefinitionInput{
 		TaskDefinition: t.TaskDefinition.TaskDefinitionArn,
-	})
+	}
+
+	deregister := func() error {
+		_, err := svc.DeregisterTaskDefinition(tdi)
+		return err
+	}
+
+	// Retry the operation using exponential backoff
+	err := backoff.Retry(deregister, backoffWithRetries)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		fmt.Println("Failed to deregister task definition:", err)
+		return
+	}
+
+	// delete
+	dtdi := &ecs.DeleteTaskDefinitionsInput{
+		TaskDefinitions: []*string{t.TaskDefinition.TaskDefinitionArn},
+	}
+
+	delete := func() error {
+		_, err := svc.DeleteTaskDefinitions(dtdi)
+		return err
+	}
+
+	// Retry the operation using exponential backoff
+	err = backoff.Retry(delete, backoffWithRetries)
+	if err != nil {
+		fmt.Println("Failed to delete task definition:", err)
+		return
 	}
 }
 
