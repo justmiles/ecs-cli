@@ -15,7 +15,7 @@ var (
 	task         ecs.Task
 	wg           sync.WaitGroup
 	validMemCPU  map[int][]int
-	noDeregister bool
+	noDeleteRevision bool
 )
 
 func init() {
@@ -29,6 +29,7 @@ func init() {
 	runCmd.PersistentFlags().StringVar(&task.TaskRoleArn, "role", "", "Task role ARN")
 	runCmd.PersistentFlags().StringVar(&task.CLIRoleArn, "cli-role", "", "An IAM role ARN to assume before creating/executing a task")
 	runCmd.PersistentFlags().BoolVarP(&task.Detach, "detach", "d", false, "Run the task in the background")
+	runCmd.PersistentFlags().BoolVar(&noDeleteRevision, "no-cleanup", false, "do not deregister and delete the task definition revision")
 	runCmd.PersistentFlags().Int64VarP(&task.Count, "count", "c", 1, "Spawn n tasks")
 	runCmd.PersistentFlags().Int64VarP(&task.Memory, "memory", "m", 0, "Memory limit")
 	runCmd.PersistentFlags().Int64Var(&task.CPUReservation, "cpu-reservation", 256, "CPU reservation")
@@ -43,7 +44,6 @@ func init() {
 	// TODO: support assigning public ip address
 	runCmd.PersistentFlags().BoolVar(&task.Public, "public", false, "assign public ip")
 	runCmd.PersistentFlags().BoolVar(&task.Fargate, "fargate", false, "Launch in Fargate")
-	runCmd.PersistentFlags().BoolVar(&noDeregister, "no-deregister", false, "do not deregister the task definition")
 	runCmd.PersistentFlags().BoolVar(&task.Debug, "debug", false, "Verbose logging")
 	runCmd.Flags().SetInterspersed(false)
 
@@ -64,7 +64,7 @@ var runCmd = &cobra.Command{
 	Short: "Run a command in a new task",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		task.Deregister = !noDeregister
+		task.DeleteRevision = !noDeleteRevision
 		if len(args) < 1 {
 			log.Fatal("Please pass an image to run")
 		}

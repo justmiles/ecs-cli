@@ -67,7 +67,7 @@ All containers have exited
     -m, --memory int                    Memory limit
         --memory-reservation int        Memory reservation (default 2048)
     -n, --name string                   Assign a name to the task (default "ephemeral-task-from-ecs-cli")
-        --no-deregister                 do not deregister the task definition
+        --no-cleanup                    Do not deregister and delete the task definition revision
         --public                        assign public ip
     -p, --publish stringArray           Publish a container's port(s) to the host
         --role string                   Task role ARN
