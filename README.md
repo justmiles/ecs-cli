@@ -54,9 +54,11 @@ All containers have exited
     ecs run [flags]
 
     Flags:
+        --cli-role string               An IAM role ARN to assume before creating/executing a task
         --cluster string                ECS cluster
     -c, --count int                     Spawn n tasks (default 1)
-        --cpu-reservation int           CPU reservation
+        --cpu-reservation int           CPU reservation (default 256)
+        --debug                         Verbose logging
     -d, --detach                        Run the task in the background
         --efs-volume stringArray        Map EFS volume to ECS Container Instance (ex. fs-23kj2f:/efs/dir:/container/mnt/dir)
     -e, --env stringArray               Set environment variables
@@ -71,8 +73,9 @@ All containers have exited
         --public                        assign public ip
     -p, --publish stringArray           Publish a container's port(s) to the host
         --role string                   Task role ARN
-        --security-groups stringArray   [TODO] Attach security groups to task
-        --subnet stringArray            Subnet(s) where task should run
+        --security-groups stringArray   attach security groups to task
+        --subnet-filter stringArray     'Key=Value' filters for your subnet, eg tag:Name=private
+    -t, --tag stringArray               Tag task definition on creation (eg key=value). Multiple uses for multiple tags
     -v, --volume stringArray            Map volume to ECS Container Instance
 
 

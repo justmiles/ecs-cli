@@ -47,6 +47,7 @@ type Task struct {
 	Volumes            []string
 	EfsVolumes         []string
 	Command            []string
+	Tag                []string
 	TaskDefinition     ecs.TaskDefinition
 	Tasks              []*ecs.Task
 	Debug              bool
@@ -124,6 +125,10 @@ func (t *Task) Run() error {
 
 	if t.MemoryReservation > 0 {
 		taskDefInput.ContainerDefinitions[0].MemoryReservation = aws.Int64(t.MemoryReservation)
+	}
+
+	if len(t.Tag) > 0 {
+		taskDefInput.Tags = buildTags(t.Tag)
 	}
 
 	if t.Fargate {

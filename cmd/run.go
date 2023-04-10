@@ -40,6 +40,7 @@ func init() {
 	runCmd.PersistentFlags().StringArrayVar(&task.SubnetFilters, "subnet-filter", nil, "'Key=Value' filters for your subnet, eg tag:Name=private")
 	runCmd.PersistentFlags().StringArrayVarP(&task.Volumes, "volume", "v", nil, "Map volume to ECS Container Instance")
 	runCmd.PersistentFlags().StringArrayVarP(&task.EfsVolumes, "efs-volume", "", nil, "Map EFS volume to ECS Container Instance (ex. fs-23kj2f:/efs/dir:/container/mnt/dir)")
+	runCmd.PersistentFlags().StringArrayVarP(&task.Tag, "tag", "t", nil, "Tag task definition on creation (eg key=value). Multiple uses for multiple tags")
 	// TODO: support assigning public ip address
 	runCmd.PersistentFlags().BoolVar(&task.Public, "public", false, "assign public ip")
 	runCmd.PersistentFlags().BoolVar(&task.Fargate, "fargate", false, "Launch in Fargate")
@@ -90,6 +91,14 @@ var runCmd = &cobra.Command{
 			av := strings.Split(volume, ":")
 			if len(av) != 3 {
 				log.Fatal("Incorrect usage (--efs-volume)")
+			}
+		}
+
+		// tag validation
+		for _, tag := range task.Tag {
+			av := strings.Split(tag, "=")
+			if len(av) != 2 {
+				log.Fatal("Incorrect usage (--tag)")
 			}
 		}
 
