@@ -175,6 +175,22 @@ func buildMountPoint(volumes []string, efsVolumes []string) (v []*ecs.Volume, k 
 	return
 }
 
+func buildTags(tag []string) (tags []*ecs.Tag) {
+	if len(tag) < 1 {
+		return []*ecs.Tag{}
+	}
+	for _, t := range tag {
+		tagArray := strings.Split(t, "=")
+
+		// Add a new tag to the list
+		tags = append(tags, &ecs.Tag{
+			Key:   aws.String(tagArray[0]),
+			Value: aws.String(tagArray[1]),
+		})
+	}
+	return
+}
+
 // Log types
 func logCloudWatchEvent(log *cloudwatchlogs.OutputLogEvent) {
 	yellow := color.New(color.FgYellow).SprintFunc()
