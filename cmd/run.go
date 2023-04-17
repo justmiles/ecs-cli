@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	task         ecs.Task
-	wg           sync.WaitGroup
-	validMemCPU  map[int][]int
+	task             ecs.Task
+	wg               sync.WaitGroup
+	validMemCPU      map[int][]int
 	noDeleteRevision bool
 )
 
@@ -65,7 +65,7 @@ var runCmd = &cobra.Command{
 	Short: "Run a command in a new task",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		task.DeleteRevision = !noDeleteRevision
+		task.DeleteRevision = noDeleteRevision
 		if len(args) < 1 {
 			log.Fatal("Please pass an image to run")
 		}
