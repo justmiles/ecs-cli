@@ -12,10 +12,9 @@ import (
 )
 
 var (
-	task             ecs.Task
-	wg               sync.WaitGroup
-	validMemCPU      map[int][]int
-	noDeleteRevision bool
+	task        ecs.Task
+	wg          sync.WaitGroup
+	validMemCPU map[int][]int
 )
 
 func init() {
@@ -29,7 +28,7 @@ func init() {
 	runCmd.PersistentFlags().StringVar(&task.TaskRoleArn, "role", "", "Task role ARN")
 	runCmd.PersistentFlags().StringVar(&task.CLIRoleArn, "cli-role", "", "An IAM role ARN to assume before creating/executing a task")
 	runCmd.PersistentFlags().BoolVarP(&task.Detach, "detach", "d", false, "Run the task in the background")
-	runCmd.PersistentFlags().BoolVar(&noDeleteRevision, "no-cleanup", false, "do not deregister and delete the task definition revision")
+	runCmd.PersistentFlags().BoolVar(&task.NoCleanup, "no-cleanup", false, "do not deregister and delete the task definition revision")
 	runCmd.PersistentFlags().Int64VarP(&task.Count, "count", "c", 1, "Spawn n tasks")
 	runCmd.PersistentFlags().Int64VarP(&task.Memory, "memory", "m", 0, "Memory limit")
 	runCmd.PersistentFlags().Int64Var(&task.CPUReservation, "cpu-reservation", 256, "CPU reservation")
@@ -65,7 +64,6 @@ var runCmd = &cobra.Command{
 	Short: "Run a command in a new task",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		task.DeleteRevision = noDeleteRevision
 		if len(args) < 1 {
 			log.Fatal("Please pass an image to run")
 		}

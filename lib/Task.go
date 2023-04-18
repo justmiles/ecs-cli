@@ -35,7 +35,7 @@ type Task struct {
 	Public             bool
 	Fargate            bool
 	Deregister         bool
-	DeleteRevision     bool
+	NoCleanup          bool
 	Wait               bool
 	Count              int64
 	Memory             int64
@@ -210,12 +210,12 @@ func (t *Task) Run() error {
 	if err != nil {
 		return err
 	}
-	
+
 	// Deregister and delete task definition
-	if t.DeleteRevision {
-		t.delete(ecsClient, *arn)
-	} else {
+	if t.NoCleanup {
 		logInfo("Preserving task definition.")
+	} else {
+		t.delete(ecsClient, *arn)
 	}
 
 	for _, failure := range runTaskResponse.Failures {
