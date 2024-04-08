@@ -53,7 +53,7 @@ func promptCluster() {
 		}
 
 		clusterPrompt := &survey.Select{
-			Message: "Select a service:",
+			Message: "Select a cluster:",
 			Options: clusters,
 		}
 
@@ -75,7 +75,7 @@ func promptService() {
 		}
 
 		prompt := &survey.Select{
-			Message: "Select a cluster:",
+			Message: "Select a service:",
 			Options: services,
 		}
 
