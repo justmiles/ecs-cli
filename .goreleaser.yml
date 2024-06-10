@@ -3,27 +3,31 @@
 project_name: ecs
 
 builds:
-- env:
-  - CGO_ENABLED=0
-  goos:
-    - darwin
-    - windows
-    - linux
-  binary: ecs
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - windows
+      - linux
+    binary: ecs
 
 archives:
-- replacements:
-    darwin: Darwin
-    linux: Linux
-    windows: Windows
-    386: i386
-    amd64: x86_64
-  format_overrides:
-    - goos: windows
-      format: zip
+  - format: tar.gz
+    # this name template makes the OS and Arch compatible with the results of `uname`.
+    name_template: >-
+      ecs_{{.Version}}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        format: zip
 
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 
 snapshot:
   name_template: "{{ .Tag }}"
@@ -32,20 +36,8 @@ changelog:
   sort: asc
   filters:
     exclude:
-    - '^docs:'
-    - '^test:'
+      - "^docs:"
+      - "^test:"
 
 release:
   disable: false
-
-brews:
-  -
-    tap:
-      owner: chrispruitt
-      name: homebrew-tap
-    folder: Formula
-    commit_author:
-      name: goreleaserbot
-      email: goreleaser@carlosbecker.com
-    homepage: "https://github.com/justmiles/ecs-cli"
-    license: "Mozilla Public License Version 2.0"
