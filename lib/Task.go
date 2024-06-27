@@ -392,7 +392,7 @@ func (t *Task) Stream() {
 func (t *Task) Check() {
 	var cluster *string
 	var stoppedCount int
-	var exitCode int64 = 1
+	var exitCode int64
 	var reportedPorts = false
 	var ip *string
 	var re = regexp.MustCompile("[^/]*$")
@@ -443,17 +443,20 @@ func (t *Task) Check() {
 			}
 
 			if *ecsTask.LastStatus == "STOPPED" {
+				logInfo(fmt.Sprintf("Task %v has stopped:\n\t%v", *ecsTask.TaskArn, *ecsTask.StoppedReason))
 				for _, container := range ecsTask.Containers {
-					if container.ExitCode != nil {
+					if container.ExitCode != nil && *container.ExitCode >= exitCode {
 						exitCode = *container.ExitCode
+					} else {
+						exitCode = 1
 					}
 
-					logInfo(fmt.Sprintf("Task %v has stopped (exit code %v):\n\t%v", *ecsTask.TaskArn, exitCode, *ecsTask.StoppedReason))
+					logInfo(fmt.Sprintf("Container %v has stopped (exit code %v)", *container.ContainerArn, exitCode))
 					if container.Reason != nil {
 						logInfo(fmt.Sprintf("\t%v", *container.Reason))
 					}
-					stoppedCount++
 				}
+				stoppedCount++
 			}
 		}
 		if stoppedCount == len(res.Tasks) && len(res.Tasks) != 0 {
